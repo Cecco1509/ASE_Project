@@ -8,3 +8,55 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 
 def create_app():
     return app
+
+@app.route('/api/player/profile/<int:user_id>', methods=['GET'])
+def getPlayerInformation(user_id):
+    try:
+        response = requests.get({DATABASE_API_URL}/{user_id})
+        
+        if response.status_code == 200:
+            return jsonify(response.json()), 200
+        else:
+            return jsonify({"error": "Player not found"}), response.status_code
+    except requests.RequestException as e:
+        return jsonify({"error": "Failed to connect to database API", "details": str(e)}), 500
+
+@app.route('/api/player/update/<int:user_id>', methods=['PUT'])
+def updatePlayerInformation(user_id):
+    new_profile_pic = request.json['profile_pic']
+    if 'profile_pic' not in request.json:
+        return jsonify({"error": "No profile picture provided"}), 400
+
+    response = requests.get(f"{DATABASE_API_URL}/{user_id}")
+
+    if response.status_code == 404:
+        return jsonify({"error": "Player not found"}), 404
+    elif response.status_code==500:
+        return jsonify({"error":"While updating user"}), 500
+
+
+    update_data = {
+        'profile_pic': new_profile_pic
+    }
+    update_response = requests.put(f"{DATABASE_API_URL}/{user_id}", json=update_data)
+
+    if update_response.status_code == 200:
+        updated_player = update_response.json()
+        return jsonify(updated_player), 200
+    else:
+        return jsonify({"error": "Failed to update profile picture"}), 500
+
+@app.route('api/player/delete/<int:user_id>', methods=['DELETE'])
+def delete_player(user_id):
+    response = requests.get(f"{DATABASE_API_URL}/{user_id}")
+    
+    delete_response = requests.delete(f"{DATABASE_API_URL}/{user_id}")
+    
+    if delete_response.status_code == 200:
+        return jsonify({"message": "Player successfully deleted"}), 200
+    elif delete_response.status_code == 500:
+        return jsonify({"error": "Failed to delete player"}), 500
+    elif delete_response.status_code == 404:
+        return jsonify({"error": "Player not found"}), 404
+    
+
