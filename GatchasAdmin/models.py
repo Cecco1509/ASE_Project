@@ -19,3 +19,16 @@ class GachaItem:
             "description": self.description,
             "created_at": self.created_at
         }
+    
+    # TODO handle errors, return None if data is invalid, and handle it in other code
+    @classmethod
+    def from_dict(cls, data):
+        """Create a GachaItem instance from a dictionary."""
+        return cls(
+            gacha_id=data.get("gacha_id"),
+            name=data.get("name"),
+            image=data.get("image"),
+            rarity_percentage=data.get("rarity_percentage"),
+            description=data.get("description"),
+            created_at=data.get("created_at")
+        )
