@@ -21,6 +21,22 @@ def get_all_gacha():
     except Exception as err:
         # TODO better handle errors
         return make_response(jsonify({"error": f"GatchaAdmin: An unexpected error occurred: {err}"}), 400)
+    
+@app.route('/api/admin/gacha', methods=['POST'])
+def add_gacha():
+    """Add a new gacha item."""
+    data = request.get_json()
+    print(f"GatchaAdmin: Adding gacha item {data}")
+    if data:
+        try:
+            # Make a POST request to the DB manager service
+            response = requests.post(DB_MANAGER_GACHA_URL + f'/gacha', json=data)
+            response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
+            return make_response(jsonify({"message": f"GatchaAdmin: Gacha item added successfully"}), 200)
+        except Exception as err:
+            # TODO better handle errors
+            return make_response(jsonify({"error": f"GatchaAdmin: An unexpected error occurred: {err}"}), 400)
+    return make_response(jsonify({"error": "Missing JSON data"}), 400)
 
 def create_app():
     return app

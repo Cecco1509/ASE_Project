@@ -20,12 +20,13 @@ def get_all_gacha_items():
     return make_response(jsonify([item.to_dict() for item in gacha_collection.values()]), 200)
 
 @app.route('/gacha', methods=['POST'])
-def add_gacha_item(item):
+def add_gacha_item():
     """Simulate adding a new gacha item."""
     json_data = request.get_json()
     if json_data:
-        gacha_collection[item.gacha_id] = item
-        return make_response(jsonify(item.to_dict()), 200)
+        gacha_item = GachaItem.from_dict(json_data)
+        gacha_collection[gacha_item.gacha_id] = gacha_item
+        return make_response(jsonify(gacha_item.to_dict()), 200)
     return make_response(jsonify({"message": "Error missing JSON data"}), 400)
 
 @app.route('/gacha/<int:gacha_id>', methods=['DELETE'])
