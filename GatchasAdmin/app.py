@@ -32,7 +32,7 @@ def add_gacha():
             # Make a POST request to the DB manager service
             response = requests.post(DB_MANAGER_GACHA_URL + f'/gacha', json=data)
             response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
-            return make_response(jsonify({"message": f"GatchaAdmin: Gacha item added successfully"}), 200)
+            return make_response(jsonify(response.json()), 200)
         except Exception as err:
             # TODO better handle errors
             return make_response(jsonify({"error": f"GatchaAdmin: An unexpected error occurred: {err}"}), 400)
@@ -60,7 +60,7 @@ def update_gacha(gacha_id):
             # Make a PUT request to the DB manager service
             response = requests.patch(DB_MANAGER_GACHA_URL + f'/gacha/{gacha_id}', json=data)
             response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
-            return make_response(jsonify({"message": f"GatchaAdmin: Gacha item {gacha_id} updated successfully"}), 200)
+            return make_response(jsonify(response.json()), 200)
         except Exception as err:
             # TODO better handle errors
             return make_response(jsonify({"error": f"GatchaAdmin: An unexpected error occurred: {err}"}), 400)

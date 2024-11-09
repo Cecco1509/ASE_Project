@@ -26,7 +26,7 @@ def admin_gacha_add():
         try:
             response = requests.post(GACHAS_ADMIN_URL + '/api/admin/gacha', json=data)
             response.raise_for_status()
-            return make_response(jsonify({"message": f"APIGateway: Gacha item added successfully"}), 200)
+            return make_response(jsonify(response.json()), 200)
         except Exception as err:
             return make_response(jsonify({"error": f"APIGateway: An unexpected error occurred: {err}"}), 400)
     return make_response(jsonify({"error": "APIGateway: Missing JSON data"}), 400)
@@ -48,7 +48,7 @@ def admin_gacha_update(gacha_id):
         try:
             response = requests.patch(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gacha_id}', json=data)
             response.raise_for_status()
-            return make_response(jsonify({"message": f"APIGateway: Gacha item {gacha_id} updated successfully"}), 200)
+            return make_response(jsonify(response.json()), 200)
         except Exception as err:
             return make_response(jsonify({"error": f"APIGateway: An unexpected error occurred: {err}"}), 400)
     return make_response(jsonify({"error": "APIGateway: Missing JSON data"}), 400)

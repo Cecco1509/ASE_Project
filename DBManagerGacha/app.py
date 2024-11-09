@@ -26,7 +26,7 @@ def add_gacha_item():
     if json_data:
         gacha_item = GachaItem.from_dict(json_data)
         gacha_collection[gacha_item.gacha_id] = gacha_item
-        return make_response(jsonify({"message": f"DBManager_Gacha: Gacha item {gacha_item.gacha_id} added successfully"}), 200)
+        return make_response(jsonify(json_data), 200)
     return make_response(jsonify({"message": "DBManager_Gacha: Error missing JSON data"}), 400)
 
 @app.route('/gacha/<int:gacha_id>', methods=['DELETE'])
@@ -48,7 +48,7 @@ def update_gacha_item(gacha_id):
         item.image = new_data.get("image", item.image)
         item.rarity_percentage = new_data.get("rarity_percentage", item.rarity_percentage)
         item.description = new_data.get("description", item.description)
-        return make_response(jsonify({"message": f"DBManager_Gacha: Gacha item {gacha_id} updated successfully"}), 200)
+        return make_response(jsonify(item.to_dict()), 200)
     return make_response(jsonify({"message": "DBManager_Gacha: Error missing JSON data"}), 400)
 
 def create_app():
