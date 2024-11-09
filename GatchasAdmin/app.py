@@ -50,5 +50,21 @@ def delete_gacha(gacha_id):
         # TODO better handle errors
         return make_response(jsonify({"error": f"GatchaAdmin: An unexpected error occurred: {err}"}), 400)
 
+@app.route('/api/admin/gacha/<int:gacha_id>', methods=['PATCH'])
+def update_gacha(gacha_id):
+    """Update a gacha item."""
+    data = request.get_json()
+    print(f"GatchaAdmin: Updating gacha item {gacha_id} with data {data}")
+    if data:
+        try:
+            # Make a PUT request to the DB manager service
+            response = requests.patch(DB_MANAGER_GACHA_URL + f'/gacha/{gacha_id}', json=data)
+            response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
+            return make_response(jsonify({"message": f"GatchaAdmin: Gacha item {gacha_id} updated successfully"}), 200)
+        except Exception as err:
+            # TODO better handle errors
+            return make_response(jsonify({"error": f"GatchaAdmin: An unexpected error occurred: {err}"}), 400)
+    return make_response(jsonify({"error": "Missing JSON data"}), 400)
+
 def create_app():
     return app
