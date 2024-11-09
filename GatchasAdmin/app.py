@@ -38,5 +38,17 @@ def add_gacha():
             return make_response(jsonify({"error": f"GatchaAdmin: An unexpected error occurred: {err}"}), 400)
     return make_response(jsonify({"error": "Missing JSON data"}), 400)
 
+@app.route('/api/admin/gacha/<int:gacha_id>', methods=['DELETE'])
+def delete_gacha(gacha_id):
+    """Delete a gacha item."""
+    try:
+        # Make a DELETE request to the DB manager service
+        response = requests.delete(DB_MANAGER_GACHA_URL + f'/gacha/{gacha_id}')
+        response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
+        return make_response(jsonify({"message": f"GatchaAdmin: Gacha item {gacha_id} deleted successfully"}), 200)
+    except Exception as err:
+        # TODO better handle errors
+        return make_response(jsonify({"error": f"GatchaAdmin: An unexpected error occurred: {err}"}), 400)
+
 def create_app():
     return app

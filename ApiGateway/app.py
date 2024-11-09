@@ -31,5 +31,14 @@ def admin_gacha_add():
             return make_response(jsonify({"error": f"APIGateway: An unexpected error occurred: {err}"}), 400)
     return make_response(jsonify({"error": "APIGateway: Missing JSON data"}), 400)
 
+@app.route('/api/admin/gacha/<int:gacha_id>', methods=['DELETE'])
+def admin_gacha_delete(gacha_id):
+    try:
+        response = requests.delete(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gacha_id}')
+        response.raise_for_status()
+        return make_response(jsonify({"message": f"APIGateway: Gacha item {gacha_id} deleted successfully"}), 200)
+    except Exception as err:
+        return make_response(jsonify({"error": f"APIGateway: An unexpected error occurred: {err}"}), 400)
+
 def create_app():
     return app
