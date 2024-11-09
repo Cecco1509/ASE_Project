@@ -7,103 +7,19 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway
     depends_on:
-      - auctionsadmin
-      - auctionsuser
-      - authadmin
-      - authuser
-      - dbmanager
+      - dbmanager_gacha
       - gachasadmin
-      - gachasuser
-      - paymentsadmin
-      - paymentsuser
-      - roll
-      - transactionsadmin
-      - transactionsuser
-      - usersadmin
-      - usersuser
     ports:
-      - "8080:8080"
+      - "5000:5000"
 
-  auctionsadmin:
+  dbmanager_gacha:
     build:
-      context: ./AuctionsAdmin
+      context: ./DBManagerGacha
       dockerfile: Dockerfile
-    container_name: auctionsadmin
-
-  auctionsuser:
-    build:
-      context: ./AuctionsUser
-      dockerfile: Dockerfile
-    container_name: auctionsuser
-
-  authadmin:
-    build:
-      context: ./AuthAdmin
-      dockerfile: Dockerfile
-    container_name: authadmin
-
-  authuser:
-    build:
-      context: ./AuthUser
-      dockerfile: Dockerfile
-    container_name: authuser
-
-  dbmanager:
-    build:
-      context: ./DBManager
-      dockerfile: Dockerfile
-    container_name: dbmanager
+    container_name: dbmanager_gacha
 
   gachasadmin:
     build:
       context: ./GatchasAdmin
       dockerfile: Dockerfile
     container_name: gachasadmin
-
-  gachasuser:
-    build:
-      context: ./GatchasUser
-      dockerfile: Dockerfile
-    container_name: gachasuser
-
-  paymentsadmin:
-    build:
-      context: ./PaymentsAdmin
-      dockerfile: Dockerfile
-    container_name: paymentsadmin
-
-  paymentsuser:
-    build:
-      context: ./PaymentsUser
-      dockerfile: Dockerfile
-    container_name: paymentsuser
-
-  roll:
-    build:
-      context: ./Roll
-      dockerfile: Dockerfile
-    container_name: roll
-
-  transactionsadmin:
-    build:
-      context: ./TransactionsAdmin
-      dockerfile: Dockerfile
-    container_name: transactionsadmin
-
-  transactionsuser:
-    build:
-      context: ./TransactionsUser
-      dockerfile: Dockerfile
-    container_name: transactionsuser
-
-  usersadmin:
-    build:
-      context: ./UsersAdmin
-      dockerfile: Dockerfile
-    container_name: usersadmin
-
-  usersuser:
-    build:
-      context: ./UsersUser
-      dockerfile: Dockerfile
-    container_name: usersuser
