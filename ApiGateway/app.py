@@ -9,13 +9,13 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 def create_app():
     return app
 
-    DATABASE_MANAGER_URL = 'http://dbmanager:5000'
+    CURRENCY_ADMIN_URL = 'http://paymentsadmin:5000'
 
 @app.route('/api/admin/currency/<int:user_id>', methods=['GET'])
 def get_transaction_history(user_id):
     try:
         # Prepare the request URL for fetching transaction history
-        transaction_history_url = f"{DATABASE_MANAGER_URL}/history/{user_id}"
+        transaction_history_url = CURRENCY_ADMIN_URL + f'/api/admin/currency/history/{user_id}'
 
         # Make a GET request to the database manager service to fetch the transaction history
         response = requests.get(transaction_history_url)
