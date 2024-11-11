@@ -10,13 +10,25 @@ class Account(db.Model):
     __tablename__ = 'account'
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] 
-    password: Mapped[str] 
+    password: Mapped[str]
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'password': self.password
+        }
 
 class Admin(db.Model):
     __tablename__ = 'admin'
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] 
     password: Mapped[str]
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'password': self.password
+        }
 
 class User(db.Model):
     __bind_key__ = 'userDatabase'
@@ -27,6 +39,15 @@ class User(db.Model):
     profilePicture: Mapped[str]
     registrationDate: Mapped[datetime]
     status: Mapped[UserStatus]
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'authId': self.authId,
+            'ingameCurrency': self.ingameCurrency,
+            'profilePicture': self.profilePicture,
+            'registrationDate': self.registrationDate,
+            'status': self.status.name
+        }
 
 class Gacha(db.Model):
     __bind_key__ = 'gachaDatabase'
@@ -36,6 +57,15 @@ class Gacha(db.Model):
     image: Mapped[str]
     rarityPercent: Mapped[float]
     description: Mapped[str]
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'image': self.image,
+            'rarityPercent': self.rarityPercent
+        }
+        
 
 class GachaCollection(db.Model):
     __bind_key__ = 'gachaDatabase'
@@ -45,6 +75,14 @@ class GachaCollection(db.Model):
     userId: Mapped[int]
     timestamp: Mapped[datetime]
     source: Mapped[GachaSource]
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'gachaId': self.gachaId,
+            'userId': self.userId,
+            'timestamp': self.timestamp,
+            'source': self.source.name
+        }
 
 class Auction(db.Model):
     __bind_key__ = 'auctionDatabase'
@@ -56,6 +94,16 @@ class Auction(db.Model):
     minimumBid: Mapped[float]
     timestamp: Mapped[datetime]
     status: Mapped[AuctionStatus]
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'gachaCollectionId': self.gachaCollectionId,
+            'auctionStart': self.auctionStart,
+            'auctionEnd': self.auctionEnd,
+            'minimumBid': self.minimumBid,
+            'timestamp': self.timestamp,
+            'status': self.status.name
+        }
 
 class AuctionBid(db.Model):
     __bind_key__ = 'auctionDatabase'
@@ -65,6 +113,14 @@ class AuctionBid(db.Model):
     bidAmount: Mapped[float]
     auctionId: Mapped[int] = mapped_column(ForeignKey("auction.id"))
     timestamp: Mapped[datetime]
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'userId': self.userId,
+            'bidAmount': self.bidAmount,
+            'auctionId': self.auctionId,
+            'timestamp': self.timestamp
+        }
 
 class CurrencyTransaction(db.Model):
     __bind_key__ = 'paymentDatabase'
@@ -74,6 +130,14 @@ class CurrencyTransaction(db.Model):
     realMount: Mapped[float]
     ingameMount: Mapped[float]
     timestamp: Mapped[datetime]
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'userId': self.userId,
+            'realMount': self.realMount,
+            'ingameMount': self.ingameMount,
+            'timestamp': self.timestamp
+        }
 
 class AuctionTransaction(db.Model):
     __bind_key__ = 'transactionDatabase'
@@ -83,3 +147,11 @@ class AuctionTransaction(db.Model):
     buyerId: Mapped[int]
     auctionBidId: Mapped[int]
     timestamp: Mapped[datetime]
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'sellerId': self.sellerId,
+            'buyerId': self.buyerId,
+            'auctionBidId': self.auctionBidId,
+            'timestamp': self.timestamp
+        }

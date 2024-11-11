@@ -3,4 +3,3 @@ requests
 python-json-config
 flask-sqlalchemy
 pyodbc
-dataclasses
