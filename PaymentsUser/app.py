@@ -11,7 +11,7 @@ def create_app():
 
 
 # Configuration for the database manager service
-DATABASE_MANAGER_URL = 'http://database-manager-service-url/api/transactions'  # Replace with actual URL
+DATABASE_MANAGER_URL = 'http://dbmanager:5000'  # Replace with actual URL
 
 @app.route('/api/player/currency/transaction-history/<int:user_id>', methods=['GET'])
 def get_transaction_history(user_id):
