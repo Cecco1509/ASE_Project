@@ -9,10 +9,12 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 def create_app():
     return app
 
+DB_MANAGER_USERS_URL = 'http://dbmanager_users:5000'
+
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
 def getPlayerInformation(user_id):
     try:
-        response = requests.get({DATABASE_API_URL}/{user_id})
+        response = requests.get(f"{DATABASE_API_URL}/{user_id}")
         
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
@@ -46,12 +48,9 @@ def updatePlayerInformation(user_id):
     else:
         return make_response(jsonify({"error": "Failed to update profile picture"}), 500)
 
-@app.route('api/player/delete/<int:user_id>', methods=['DELETE'])
+@app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
 def delete_player(user_id):
-    response = requests.get(f"{DATABASE_API_URL}/{user_id}")
-    
-    delete_response = requests.delete(f"{DATABASE_API_URL}/{user_id}")
-    
+    delete_response = requests.delete(f"{DATABASE_API_URL}/{user_id}")  
     if delete_response.status_code == 200:
         return make_response(jsonify({"message": "Player successfully deleted"}), 200)
     elif delete_response.status_code == 500:
