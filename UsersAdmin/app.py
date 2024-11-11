@@ -11,6 +11,8 @@ class StatusEnum(Enum):
     INACTIVE = "unknown"
     BANNED = "banned"
 
+DATABASE_API_URL="http://dbmanager:5000"
+
 @app.route('/api/admin/users', methods=['GET'])
 def get_players():
     try:
