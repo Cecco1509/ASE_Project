@@ -28,12 +28,12 @@ def get_players():
                 }
                 players.append(player)
 
-            return jsonify(players), 200
+            return make_response(jsonify(players), 200)
         else:
-            return jsonify({"error": "Failed to fetch player data from the database API."}), 500
+            return make_response(jsonify({"error": "Failed to fetch player data from the database API."}), 500)
 
     except requests.RequestException as e:
-        return jsonify({"error": f"An error occurred while fetching data: {str(e)}"}), 500
+        return make_response(jsonify({"error": f"An error occurred while fetching data: {str(e)}"}), 500)
 
 @app.route('/api/admin/users/<int:user_id>', methods=['GET'])
 def get_player(user_id):
@@ -51,19 +51,19 @@ def get_player(user_id):
                 "status": StatusEnum(player_data["status"]).value 
             }
 
-            return jsonify(player), 200
+            return make_response(jsonify(player), 200)
         else:
-            return jsonify({"error": f"Player with ID {user_id} not found."}), 404
+            return make_response(jsonify({"error": f"Player with ID {user_id} not found."}), 404)
 
     except requests.RequestException as e:
-        return jsonify({"error": f"An error occurred while fetching data: {str(e)}"}), 500
+        return make_response(jsonify({"error": f"An error occurred while fetching data: {str(e)}"}), 500)
     
 @app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
 def update_player(user_id):
     try:
         player_data = request.get_json()
         if not player_data:
-            return jsonify({"error": "No data provided"}), 400
+            return make_response(jsonify({"error": "No data provided"}), 400)
         
         updated_data = {
             "id": user_id,  
@@ -75,12 +75,12 @@ def update_player(user_id):
 
         response = requests.put(f"{DATABASE_API_URL}/{user_id}", json=updated_data)
         if response.status_code == 200:
-            return jsonify({"message": "Player updated successfully"}), 200
+            return make_response(jsonify({"message": "Player updated successfully"}), 200)
         else:
-            return jsonify({"error": "Failed to update player data"}), response.status_code
+            return make_response(jsonify({"error": "Failed to update player data"}), response.status_code)
 
     except requests.RequestException as e:
-        return jsonify({"error": f"An error occurred while updating data: {str(e)}"}), 500
+        return make_response(jsonify({"error": f"An error occurred while updating data: {str(e)}"}), 500)
 
 @app.route('/api/admin/users/ban/<int:user_id>', methods=['POST'])
 def ban_player(user_id):
@@ -92,14 +92,13 @@ def ban_player(user_id):
         response = requests.put(f"{DATABASE_API_URL}/{user_id}", json=updated_data)
 
         if response.status_code == 200:
-            return jsonify({"message": f"Player {user_id} has been banned successfully."}), 200
+            return make_response(jsonify({"message": f"Player {user_id} has been banned successfully."}), 200)
         elif response.status_code == 404:
-            return jsonify({"error": f"Player with ID {user_id} not found."}), 404
+            return make_response(jsonify({"error": f"Player with ID {user_id} not found."}), 404)
         else:
-            return jsonify({"error": "Failed to ban player. Please try again later."}), response.status_code
-
+            return make_response(jsonify({"error": "Failed to ban player. Please try again later."}), response.status_code)
     except requests.RequestException as e:
-        return jsonify({"error": f"An error occurred while banning the player: {str(e)}"}), 500
+        return make_response(jsonify({"error": f"An error occurred while banning the player: {str(e)}"}), 500)
 
 def create_app():
     return app
