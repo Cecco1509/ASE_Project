@@ -3,11 +3,15 @@ import requests, time
 from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
+from handle_errors import handle_errors
 
 app = Flask(__name__)
 
 GACHAS_ADMIN_URL = 'http://gachasadmin:5000'
+GACHAS_PLAYER_URL = 'http://gachasuser:5000'
 
+"""ADMIN API"""
+"""GahcaAdmin API"""
 @app.route('/api/admin/gacha', methods=['GET'])
 def admin_gacha():
     try:
@@ -52,6 +56,17 @@ def admin_gacha_update(gacha_id):
         except Exception as err:
             return make_response(jsonify({"error": f"APIGateway: An unexpected error occurred: {err}"}), 400)
     return make_response(jsonify({"error": "APIGateway: Missing JSON data"}), 400)
+
+"""PLAYER API"""
+"""GatchaUser API"""
+@app.route('/api/player/gacha/player-collection/<int:user_id>', methods=['GET'])
+@handle_errors
+def get_player_collection(user_id):
+    print(f"APIGateway: Fetching player collection for user {user_id}")
+    response = requests.get(GACHAS_PLAYER_URL + f'/api/player/gacha/player-collection/{user_id}')
+    response.raise_for_status()
+    gacha_items = response.json()
+    return make_response(jsonify(gacha_items), 200)
 
 def create_app():
     return app

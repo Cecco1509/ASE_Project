@@ -1,6 +1,8 @@
 import requests
 from flask import Flask, make_response, jsonify, request
-from models import GachaItem
+from models import GachaItem, GachaCollection
+from enums import GachaSource
+from handle_errors import handle_errors
 
 app = Flask(__name__)
 
@@ -14,11 +16,19 @@ gacha_collection = {
     "6": GachaItem("6", "Ring of the Ancients", "ring.jpg", 0.25, "A ring that grants the wearer immortality.")
 }
 
+player_gacha_collection = {
+    1: GachaCollection("1", "1", "1", GachaSource.ROLL.value),
+    2: GachaCollection("2", "2", "1", GachaSource.AUCTION.value),
+    3: GachaCollection("3", "3", "2", GachaSource.AUCTION.value),
+    4: GachaCollection("4", "4", "2", GachaSource.AUCTION.value),
+}
+
 @app.route('/gacha', methods=['GET'])
 def get_all_gacha_items():
     """Simulate fetching all gacha items."""
     return make_response(jsonify([item.to_dict() for item in gacha_collection.values()]), 200)
 
+"""ADMIN API"""
 @app.route('/gacha', methods=['POST'])
 def add_gacha_item():
     """Simulate adding a new gacha item."""
@@ -50,6 +60,16 @@ def update_gacha_item(gacha_id):
         item.description = new_data.get("description", item.description)
         return make_response(jsonify(item.to_dict()), 200)
     return make_response(jsonify({"message": "DBManager_Gacha: Error missing JSON data"}), 400)
+
+"""PLAYER API"""
+@app.route('/gacha/player-collection/<int:user_id>', methods=['GET'])
+def get_player_collection(user_id):
+    """Simulate fetching all gacha items for a specific user."""
+    print(f"DBManager_Gacha: Fetching player collection for user {user_id}")
+    user_collection = [item.to_dict() for item in player_gacha_collection.values() if item.userId == str(user_id)]
+    #user_collection = [item.to_dict() for item in player_gacha_collection.values()]
+    return make_response(jsonify(user_collection), 200)
+    #return make_response(jsonify([item.to_dict() for item in gacha_collection.values()]), 200)
 
 def create_app():
     return app

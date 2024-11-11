@@ -9,6 +9,7 @@ services:
     depends_on:
       - dbmanager_gacha
       - gachasadmin
+      - gachasuser
     ports:
       - "5000:5000"
 
@@ -23,3 +24,9 @@ services:
       context: ./GatchasAdmin
       dockerfile: Dockerfile
     container_name: gachasadmin
+
+  gachasuser:
+    build:
+      context: ./GatchasUser
+      dockerfile: Dockerfile
+    container_name: gachasuser
