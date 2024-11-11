@@ -9,7 +9,7 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 def create_app():
     return app
 
-DB_MANAGER_USERS_URL = 'http://dbmanager_users:5000'
+DB_MANAGER_USERS_URL = 'http://dbmanager:5000'
 
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
 def getPlayerInformation(user_id):
