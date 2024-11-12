@@ -14,7 +14,10 @@ config = builder.parse_config('./config.json')
 @app.route('/api/player/register', methods=['POST'])
 def register_user():
     json_data = request.get_json()
-    if json_data:
+    if json_data |json_data['username'] | json_data['password']:
+        user = request.get(f"{config.db_manager_url}/account/username/{json_data['username']}")
+        if user:
+            return make_response(jsonify({"message":"Username taken."}), 400)
         authData = {"username":json_data['username'],"password":json_data['password']}
         response = requests.post(f"{config.db_manager_url}/account", json=authData)
         if response.status == 200:
@@ -43,7 +46,7 @@ def login(userId):
 
 @app.route('api/player/logout/<int:userId>', method=['POST'])
 def logout(userId):
-    return make_response({"message":"User succuesfully loged out."}, 200)
+    return make_response({"message":"User succuesfully logged out."}, 200)
 
 def create_app():
     return app
