@@ -4,6 +4,7 @@ from flask import Flask, request, make_response
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
 from python_json_config import ConfigBuilder
+from datetime import datetime
 
 builder = ConfigBuilder()
 config = builder.parse_config('../config.json')
@@ -52,7 +53,7 @@ def purchase_in_game_currency():
         data = request.get_json()
         in_game_currency = data.get('ingameMount')
         user_id = data.get('userId')
-        time_stamp=data.get('timeStamp')
+        
 
         # Check if required fields are present
         if in_game_currency is None or user_id is None:
@@ -68,8 +69,8 @@ def purchase_in_game_currency():
         # Define the payload to send to the database manager service
         payload = {
             'userId': user_id
-            'timeStamp': time_stamp
-            'ingameMount': in_game_currency,
+            'timeStamp': datetime.now()
+            'ingameMount': in_game_currency
             'realMount': real_amount
         }
 
