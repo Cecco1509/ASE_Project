@@ -53,6 +53,59 @@ services:
       context: ./DBManager
       dockerfile: Dockerfile
     container_name: dbmanager
+    depends_on:
+      - auctiondatabase
+      - authdatabase
+      - gachadatabase
+      - paymentdatabase
+      - transactiondatabase
+      - userdatabase
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./DBManager:/DBManager
+
+  authdatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    container_name: authdatabase
+
+  gachadatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    container_name: gachadatabase
+
+  userdatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    container_name: userdatabase
+
+  paymentdatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    container_name: paymentdatabase
+
+  auctiondatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    container_name: auctiondatabase
+  
+  transactiondatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    container_name: transactiondatabase
 
   gachasadmin:
     build:
@@ -107,3 +160,5 @@ services:
       context: ./UsersUser
       dockerfile: Dockerfile
     container_name: usersuser
+
+
