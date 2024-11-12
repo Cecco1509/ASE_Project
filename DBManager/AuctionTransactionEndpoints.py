@@ -17,6 +17,13 @@ def get_single_auctiontransaction(transactionId):
         return make_response(jsonify(transaction.to_dict()), 200)
     return make_response(jsonify({"message":"Auction transaction not found"}), 404)
 
+@app.route('/auctiontransaction/user/<int:userId>', methods=['GET'])
+def get_single_auctiontransaction(userId):
+    transactions = db.session.execute(db.select(AuctionTransaction).where(AuctionTransaction.sellerId==userId||AuctionTransaction.buyerId==userId)).scalar()
+    if transactions:
+        return make_response(jsonify(transactions.to_dict()), 200)
+    return make_response(jsonify({"message":"Auction transactions not found"}), 404)
+
 @app.route('/auctiontransaction', methods=['POST'])
 def create_transaction():
     json_data = request.get_json()
