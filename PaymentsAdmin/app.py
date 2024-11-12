@@ -15,7 +15,8 @@ DATABASE_MANAGER_URL = 'http://dbmanager:5000'
 def get_transaction_history(user_id):
     try:
         # Prepare the request URL for fetching transaction history
-        transaction_history_url = f"{DATABASE_MANAGER_URL}/history/{user_id}"
+        transaction_history_url = DATABASE_MANAGER_URL+f'/currencytransaction/{user_id}'
+        
 
         # Make a GET request to the database manager service to fetch the transaction history
         response = requests.get(transaction_history_url)
