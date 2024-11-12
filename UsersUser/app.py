@@ -9,12 +9,12 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 def create_app():
     return app
 
-DB_MANAGER_USERS_URL = 'http://dbmanager:5000'
+DB_MANAGER_URL = 'http://dbmanager:5000'
 
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
 def getPlayerInformation(user_id):
     try:
-        response = requests.get(f"{DATABASE_API_URL}/{user_id}")
+        response = requests.get(f'{DB_MANAGER_URL}/user/{user_id}')
         
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
@@ -25,32 +25,27 @@ def getPlayerInformation(user_id):
 
 @app.route('/api/player/update/<int:user_id>', methods=['PUT'])
 def updatePlayerInformation(user_id):
-    new_profile_pic = request.json['profile_pic']
-    if 'profile_pic' not in request.json:
+    payload = request.json['profilePicture']
+    if payload:
+        response = requests.get(f'{DB_MANAGER_URL}/user/{user_id}')
+        if response:
+            status_data=response['status']
+            ingameCurrency_data=response['ingameCurrency']
+            profilePicture_data=response['profilePicture']
+            update_data={
+                'status':status_data,
+                'ingameCurrency':ingameCurrency_data,
+                'profilePicture':profilePicture_data
+            }
+            update_response = requests.put(f'{DB_MANAGER_URL}/user/{user_id}', json=update_data)
+            return update_response
+    else:
         return make_response(jsonify({"error": "No profile picture provided"}), 400)
 
-    response = requests.get(f"{DATABASE_API_URL}/{user_id}")
-
-    if response.status_code == 404:
-        return make_response(jsonify({"error": "Player not found"}), 404)
-    elif response.status_code==500:
-        return make_response(jsonify({"error":"While updating user"}), 500)
-
-
-    update_data = {
-        'profile_pic': new_profile_pic
-    }
-    update_response = requests.put(f"{DATABASE_API_URL}/{user_id}", json=update_data)
-
-    if update_response.status_code == 200:
-        updated_player = update_response.json()
-        return make_response(jsonify(updated_player), 200)
-    else:
-        return make_response(jsonify({"error": "Failed to update profile picture"}), 500)
 
 @app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
 def delete_player(user_id):
-    delete_response = requests.delete(f"{DATABASE_API_URL}/{user_id}")  
+    delete_response = requests.delete(f'{DB_MANAGER_URL}/user/{user_id}')  
     if delete_response.status_code == 200:
         return make_response(jsonify({"message": "Player successfully deleted"}), 200)
     elif delete_response.status_code == 500:
