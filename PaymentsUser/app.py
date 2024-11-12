@@ -17,7 +17,7 @@ DATABASE_MANAGER_URL = 'http://dbmanager:5000'  # Replace with actual URL
 def get_transaction_history(user_id):
     try:
         # Send a GET request to the database manager service to fetch transaction history
-        response = requests.get(f"{DATABASE_MANAGER_URL}/{user_id}")
+        response = requests.get({DATABASE_MANAGER_URL}+ f'/currencytransaction/{user_id}')
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -47,8 +47,9 @@ def purchase_in_game_currency():
     try:
         # Extract data from request body
         data = request.get_json()
-        in_game_currency = data.get('in_game_currency')
-        user_id = data.get('user_id')
+        in_game_currency = data.get('ingameMount')
+        user_id = data.get('userId')
+        time_stamp=data.get('timeStamp')
 
         # Check if required fields are present
         if in_game_currency is None or user_id is None:
@@ -59,13 +60,14 @@ def purchase_in_game_currency():
 
         # Define the payload to send to the database manager service
         payload = {
-            'user_id': user_id,
-            'in_game_currency': in_game_currency,
-            'real_amount': real_amount
+            'userId': profile_picture
+            'timeStamp': time_stamp
+            'ingameMount': in_game_currency,
+            'realMount': real_amount
         }
 
         # Send a POST request to the database manager service to process the purchase
-        response = requests.post(f"{DATABASE_MANAGER_URL}/purchase", json=payload)
+        response = requests.post({DATABASE_MANAGER_URL}+f'/currencytransaction', json=payload)
         
         # Check if the request was successful
         if response.status_code == 200:  # Assuming 200 for successful creation
@@ -106,7 +108,8 @@ def decrease_in_game_currency(user_id):
             return make_response(jsonify({'error': 'amount must be greater than zero'}), 400)
 
         # Fetch the user's current balance from the database manager
-        balance_response = requests.get(f"{DATABASE_MANAGER_URL}/balance/{user_id}")
+        balance_response = requests.get({DATABASE_MANAGER_URL}+ f'/user/{user_id}')
+
         
         if balance_response.status_code == 404:
             return make_response(jsonify({'error': 'User not found'}), 404)
@@ -116,6 +119,9 @@ def decrease_in_game_currency(user_id):
         # Parse the balance data from the response
         user_data = balance_response.json()
         in_game_amount = user_data.get('in_game_amount')
+        profile_picture= user_data.get('profilePicture')
+        status=user_data.get('status')
+
 
         # Check if the amount exceeds the current balance
         if amount > in_game_amount:
@@ -123,12 +129,13 @@ def decrease_in_game_currency(user_id):
 
         # Define the payload to send to the database manager service
         payload = {
-            'user_id': user_id,
-            'balance': in_game_amount-amount
+            'status': status
+            'profilePicture': profile_picture
+            'ingameCurrency': in_game_amount-amount
         }
 
         # Send a PUT request to the database manager service to decrease the balance
-        response = requests.put(f"{DATABASE_MANAGER_URL}/update_balance", json=payload)
+        response = requests.put({DATABASE_MANAGER_URL}+f'/user/{user_id}', json=payload)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -153,7 +160,7 @@ def decrease_in_game_currency(user_id):
         return make_response(jsonify({'error': f'Missing key: {str(e)}'}), 400)
 
 
-@app.route('/api/player/currency/increase/<int:user_id>', methods=['POST'])
+@app.route('/api/player/currency/increase/<int:user_id>', methods=['PUT'])
 def increase_currency(user_id):
     try:
         # Get the amount to increase from the JSON payload
@@ -168,7 +175,7 @@ def increase_currency(user_id):
         if amount <= 0:
             return make_response(jsonify({'error': 'Amount must be a positive number'}), 400)
 
-        balance_response = requests.get(f"{DATABASE_MANAGER_URL}/balance/{user_id}")
+        balance_response = requests.get({DATABASE_MANAGER_URL}+ f'/user/{user_id}')
         
         if balance_response.status_code == 404:
             return make_response(jsonify({'error': 'User not found'}), 404)
@@ -178,15 +185,18 @@ def increase_currency(user_id):
         # Parse the balance data from the response
         user_data = balance_response.json()
         in_game_amount = user_data.get('in_game_amount')
+        profile_picture= user_data.get('profilePicture')
+        status=user_data.get('status')
 
         # Prepare the payload to send to the Database Manager service
-        transaction_data = {
-            'user_id': user_id,
-            'balance': in_game_amount+amount
+        payload = {
+            'status': status
+            'profilePicture': profile_picture
+            'ingameCurrency': in_game_amount+amount
         }
 
         # Make a POST request to the database manager's /transactions endpoint
-        response = requests.post(DATABASE_MANAGER_URL, json=transaction_data)
+        response = requests.put({DATABASE_MANAGER_URL}+f'/user/{user_id}', json=payload)
 
         # Check if the request was successful
         if response.status_code == 200:
