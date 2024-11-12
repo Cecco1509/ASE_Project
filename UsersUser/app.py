@@ -32,11 +32,10 @@ def updatePlayerInformation(user_id):
         if response:
             status_data=response['status']
             ingameCurrency_data=response['ingameCurrency']
-            profilePicture_data=response['profilePicture']
             update_data={
                 'status':status_data,
                 'ingameCurrency':ingameCurrency_data,
-                'profilePicture':profilePicture_data
+                'profilePicture':payload
             }
             update_response = requests.put(f'{config.urls.db_manager}/user/{user_id}', json=update_data)
             return update_response
