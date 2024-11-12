@@ -17,6 +17,13 @@ def get_single_aaccount(accountId):
         return make_response(jsonify(account.to_dict()), 200)
     return make_response(jsonify({"message":"Account not found"}), 404)
 
+@app.route('/account/username/<str:username>', methods=['GET'])
+def get_account_by_username(username):
+    account = db.session.execute(db.select(User).where(Account.username==username)).scalar()
+    if account:
+        return make_response(jsonify(account.to_dict()), 200)
+    return make_response(jsonify({"message":"Account not found"}), 404)
+
 @app.route('/account', methods=['POST'])
 def create_account():
     json_data = request.get_json()
