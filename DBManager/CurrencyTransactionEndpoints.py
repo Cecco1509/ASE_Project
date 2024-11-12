@@ -22,7 +22,7 @@ def get_transactions_for_user(userId):
 def create_currency_transaction():
     json_data = request.get_json()
     if json_data:
-        transaction = CurrencyTransaction(userId=json_data['userId'], realMount=json_data['realMount'], ingameMount=json_data['ingameMount'],timestamp=json_data['timestamp'])
+        transaction = CurrencyTransaction(userId=json_data['userId'], realAmount=json_data['realAmount'], ingameAmount=json_data['ingameAmount'],timestamp=json_data['timestamp'])
         db.session.add(transaction)
         db.session.commit()
         return make_response(jsonify(transaction.id), 200)

@@ -127,15 +127,15 @@ class CurrencyTransaction(db.Model):
     __tablename__ = 'currencyTransaction'
     id: Mapped[int] = mapped_column(primary_key=True)
     userId: Mapped[int]
-    realMount: Mapped[float]
-    ingameMount: Mapped[float]
+    realAmount: Mapped[float]
+    ingameAmount: Mapped[float]
     timestamp: Mapped[datetime]
     def to_dict(self):
         return {
             'id': self.id,
             'userId': self.userId,
-            'realMount': self.realMount,
-            'ingameMount': self.ingameMount,
+            'realAmount': self.realAmount,
+            'ingameAmount': self.ingameAmount,
             'timestamp': self.timestamp
         }
 
