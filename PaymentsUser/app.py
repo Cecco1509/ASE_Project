@@ -56,14 +56,18 @@ def purchase_in_game_currency():
 
         # Check if required fields are present
         if in_game_currency is None or user_id is None:
-            return make_response(jsonify({'error': 'in_game_currency and user_id are required'}), 400)m
+            return make_response(jsonify({'error': 'in_game_currency and user_id are required'}), 400)
+
+        if in_game_currency <=0:     
+            return make_response(jsonify({'error': 'in game currency must be greater than zero'}), 400)
+
 
         # Calculate the real amount of money based on the in-game currency and currency rate
         real_amount = in_game_currency * config.exchange_price
 
         # Define the payload to send to the database manager service
         payload = {
-            'userId': profile_picture
+            'userId': user_id
             'timeStamp': time_stamp
             'ingameMount': in_game_currency,
             'realMount': real_amount
@@ -121,7 +125,7 @@ def decrease_in_game_currency(user_id):
         
         # Parse the balance data from the response
         user_data = balance_response.json()
-        in_game_amount = user_data.get('in_game_amount')
+        in_game_amount = user_data.get('ingameMount')
         profile_picture= user_data.get('profilePicture')
         status=user_data.get('status')
 
