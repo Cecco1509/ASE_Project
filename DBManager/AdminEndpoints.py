@@ -33,8 +33,8 @@ def update_admin(adminId):
     if json_data:
         admin = db.session.execute(db.select(Admin).where(Admin.id==AdminId)).scalar_one()
         if admin:
-            admin.username=json_data.username
-            admin.password=json_data.password
+            admin.username=json_data['username']
+            admin.password=json_data['password']
             admin.verified = True
             db.session.commit()
             return make_response(jsonify({"message":"Admin sucessfully updated."}), 200)

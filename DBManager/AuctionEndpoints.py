@@ -33,12 +33,12 @@ def update_auction(auctionId):
     if json_data:
         auction = db.session.execute(db.select(Auction).where(Auction.id==auctionId)).scalar_one()
         if auction:
-            auction.gachaCollectionId=json_data.gachaCollectionId
-            auction.auctionStart=json_data.auctionStart
-            auction.auctionEnd=json_data.auctionEnd
-            auction.minimumBid=json_data.minimumBid
-            auction.timestamp=json_data.timestamp
-            auction.status=json_data.status
+            auction.gachaCollectionId=json_data['gachaCollectionId']
+            auction.auctionStart=json_data['auctionStart']
+            auction.auctionEnd=json_data['auctionEnd']
+            auction.minimumBid=json_data['minimumBid']
+            auction.timestamp=json_data['timestamp']
+            auction.status=json_data['status']
             auction.verified = True
             db.session.commit()
             return make_response(jsonify({"message":"Auction sucessfully updated."}), 200)

@@ -40,10 +40,10 @@ def update_bid(bidId):
     if json_data:
         bid = db.session.execute(db.select(AuctionBid).where(AuctionBid.id==bidId)).scalar_one()
         if bid:
-            bid.userId=json_data.userId
-            bid.bidAmount=json_data.bidAmount
-            bid.auctionId=json_data.auctionId
-            bid.timestamp=json_data.timestamp
+            bid.userId=json_data['userId']
+            bid.bidAmount=json_data['bidAmount']
+            bid.auctionId=json_data['auctionId']
+            bid.timestamp=json_data['timestamp']
             bid.verified = True
             db.session.commit()
             return make_response(jsonify({"message":"Auction bid sucessfully updated."}), 200)

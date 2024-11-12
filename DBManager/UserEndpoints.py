@@ -34,9 +34,9 @@ def update_user(userId):
     if json_data:
         user = db.session.execute(db.select(User).where(User.id==userId)).scalar_one()
         if user:
-            user.ingameCurrency=json_data.ingameCurrency
-            user.profilePicture=json_data.profilePicture
-            user.status=json_data.status
+            user.ingameCurrency=json_data['ingameCurrency']
+            user.profilePicture=json_data['profilePicture']
+            user.status=json_data['status']
             user.verified = True
             db.session.commit()
             return make_response(jsonify({"messgae":"User sucessfully updated."}), 200)

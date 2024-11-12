@@ -33,10 +33,10 @@ def update_gacha(gachaId):
     if json_data:
         gacha = db.session.execute(db.select(Gacha).where(id=gachaId)).scalar_one()
         if gacha:
-            gacha.name=json_data.name
-            gacha.image=json_data.image
-            gacha.rarityPercent=json_data.rarityPercent
-            gacha.description=json_data.description
+            gacha.name=json_data['name']
+            gacha.image=json_data['image']
+            gacha.rarityPercent=json_data['rarityPercent']
+            gacha.description=json_data['description']
             gacha.verified = True
             db.session.commit()
             return make_response(jsonify({"message":"Gacha sucessfully updated."}), 200)

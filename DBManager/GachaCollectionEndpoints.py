@@ -33,10 +33,10 @@ def update_gachacollection(collectionId):
     if json_data:
         collection = db.session.execute(db.select(GachaCollection).where(GachaCollection.id==gachaId)).scalar_one()
         if collection:
-            collection.gachaId=json_data.gachaId
-            collection.userId=json_data.userId
-            collection.timestamp=json_data.timestamp
-            collection.source=json_data.source
+            collection.gachaId=json_data['gachaId']
+            collection.userId=json_data['userId']
+            collection.timestamp=json_data['timestamp']
+            collection.source=json_data['source']
             collection.verified = True
             db.session.commit()
             return make_response(jsonify({"message":"Gacha collection sucessfully updated."}), 200)

@@ -33,10 +33,10 @@ def update_transaction(transactionId):
     if json_data:
         transaction = db.session.execute(db.select(AuctionTransaction).where(AuctionTransaction.id=transactionId)).scalar_one()
         if transaction:
-            transaction.sellerId=json_data.sellerId
-            transaction.buyerId=json_data.buyerId
-            transaction.auctionBidId=json_data.auctionBidId
-            transaction.timestamp=json_data.timestamp
+            transaction.sellerId=json_data['sellerId']
+            transaction.buyerId=json_data['buyerId']
+            transaction.auctionBidId=json_data['auctionBidId']
+            transaction.timestamp=json_data['timestamp']
             transaction.verified = True
             db.session.commit()
             return make_response(jsonify({"messgae":"Transaction sucessfully updated."}), 200)

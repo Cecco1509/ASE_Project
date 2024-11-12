@@ -33,8 +33,8 @@ def update_account(accountId):
     if json_data:
         account = db.session.execute(db.select(Account).where(Account.id==accountId)).scalar_one()
         if account:
-            account.username=json_data.username
-            account.password=json_data.password
+            account.username=json_data['username']
+            account.password=json_data['password']
             account.verified = True
             db.session.commit()
             return make_response(jsonify({"message":"Account sucessfully updated."}), 200)
