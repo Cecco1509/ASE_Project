@@ -143,7 +143,7 @@ def decrease_in_game_currency(user_id):
         }
 
         # Send a PUT request to the database manager service to decrease the balance
-        response = requests.put(config.urls.dbmanager+f'/user/{user_id}', json=payload)
+        response = requests.put(config.urls.db_manager+f'/user/{user_id}', json=payload)
         
         # Check if the request was successful
         if response.status_code == 200:
