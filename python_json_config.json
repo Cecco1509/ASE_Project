@@ -1,5 +1,4 @@
-{
-    "urls":{
+{  "urls":{
 
         "payments_admin_microservice": "http://paymentsadmin:5000", 
         "payments_player_microservice": "http://paymentsuser:5000",
