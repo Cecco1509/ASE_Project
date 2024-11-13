@@ -3,16 +3,24 @@ from flask import Flask, request, make_response
 from flask_sqlalchemy import SQLAlchemy
 import pyodbc
 from dbsetup import setup
+from python_json_config import ConfigBuilder
+
+builder = ConfigBuilder()
+config = builder.parse_config('./config.json')
+
+def create_connection_string(db):
+    return f'mssql+pyodbc://{db.username}:{db.password}@{db.server}:{db.port}/{db.name}?driver=ODBC+Driver+17+for+SQL+Server'
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://sa:Password1.@authdatabase:1433/AuthDatabase?driver=ODBC+Driver+17+for+SQL+Server'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = create_connection_string(config.databases.auth)
 app.config['SQLALCHEMY_BINDS'] = {
-    'gachaDatabase': 'mssql+pyodbc://sa:Password1.@gachadatabase:1433/GachaDatabase?driver=ODBC+Driver+17+for+SQL+Server',
-    'userDatabase': 'mssql+pyodbc://sa:Password1.@userdatabase:1433/UserDatabase?driver=ODBC+Driver+17+for+SQL+Server',
-    'paymentDatabase': 'mssql+pyodbc://sa:Password1.@paymentdatabase:1433/PaymentDatabase?driver=ODBC+Driver+17+for+SQL+Server',
-    'auctionDatabase': 'mssql+pyodbc://sa:Password1.@auctiondatabase:1433/AuctionDatabase?driver=ODBC+Driver+17+for+SQL+Server',
-    'transactionDatabase': 'mssql+pyodbc://sa:Password1.@transactiondatabase:1433/TransactionDatabase?driver=ODBC+Driver+17+for+SQL+Server'
+    'gachaDatabase': create_connection_string(config.databases.gacha),
+    'userDatabase': create_connection_string(config.databases.user),
+    'paymentDatabase': create_connection_string(config.databases.payment),
+    'auctionDatabase': create_connection_string(config.databases.auction),
+    'transactionDatabase': create_connection_string(config.databases.transaction)
 }
 
 setup()
@@ -24,6 +32,7 @@ import AccountEndpoints
 import AdminEndpoints
 import AuctionEndpoints
 import AuctionBidEndpoints
+import AuctionTransactionEndpoints
 import CurrencyTransactionEndpoints
 import UserEndpoints
 import GachaCollectionEndpoints
