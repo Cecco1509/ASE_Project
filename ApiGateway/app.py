@@ -9,8 +9,10 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 def create_app():
     return app
 
+
+
 builder = ConfigBuilder()
-config = builder.parse_config('../config.json')
+config = builder.parse_config('/app/config.json')
 
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
 def getPlayerInformation(user_id):
