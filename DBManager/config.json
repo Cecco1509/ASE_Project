@@ -1,0 +1,47 @@
+{
+    "databases":{
+        "auth":{
+            "server":"authdatabase",
+            "port":"1433",
+            "name":"authdatabase",
+            "username":"sa",
+            "password":"Password1."
+        },
+        "user":{
+            "server":"userdatabase",
+            "port":"1433",
+            "name":"userdatabase",
+            "username":"sa",
+            "password":"Password1."
+        },
+        "gacha":{
+            "server":"gachadatabase",
+            "port":"1433",
+            "name":"gachadatabase",
+            "username":"sa",
+            "password":"Password1."
+        },
+        "payment":{
+            "server":"paymentdatabase",
+            "port":"1433",
+            "name":"paymentdatabase",
+            "username":"sa",
+            "password":"Password1."
+        },
+        "auction":{
+            "server":"auctiondatabase",
+            "port":"1433",
+            "name":"auctiondatabase",
+            "username":"sa",
+            "password":"Password1."
+        },
+        "transaction":{
+            "server":"transactiondatabase",
+            "port":"1433",
+            "name":"transactiondatabase",
+            "username":"sa",
+            "password":"Password1."
+        }
+    }
+
+}

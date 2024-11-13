@@ -7,12 +7,17 @@ from flask import Flask, request, make_response, jsonify
 def get_all_accounts():
     accounts = db.session.execute(db.select(Account)).scalars()
     if accounts:
-        return make_response(jsonify(accounts), 200)
+        return make_response(jsonify([account.to_dict() for account in accounts]), 200)
     return make_response(jsonify({"message":"Accounts not found"}), 404)
 
 @app.route('/account/<int:accountId>', methods=['GET'])
 def get_single_aaccount(accountId):
-    account = db.session.execute(db.select(Account).where(Account.id==accountId)).scalar()
+    account = db.get_or_404(Account, accountId)
+    return make_response(jsonify(account.to_dict()), 200)
+
+@app.route('/account/username/<string:username>', methods=['GET'])
+def get_account_by_username(username):
+    account = db.session.execute(db.select(User).where(Account.username==username)).scalar_one()
     if account:
         return make_response(jsonify(account.to_dict()), 200)
     return make_response(jsonify({"message":"Account not found"}), 404)
@@ -31,21 +36,17 @@ def create_account():
 def update_account(accountId):
     json_data = request.get_json()
     if json_data:
-        account = db.session.execute(db.select(Account).where(Account.id==accountId)).scalar_one()
-        if account:
-            account.username=json_data['username']
-            account.password=json_data['password']
-            account.verified = True
-            db.session.commit()
+        account = db.get_or_404(Account, accountId)
+        account.username=json_data['username']
+        account.password=json_data['password']
+        account.verified = True
+        db.session.commit()
             return make_response(jsonify({"message":"Account sucessfully updated."}), 200)
-        return make_response(jsonify({"message":"Requested account does not exist"}), 404)
     return make_response(jsonify({"message":"Invalid account data"}), 400)
 
 @app.route('/account/<int:accountId>', methods=['DELETE'])
-def delete_account(acoountId):
-    account = db.session.execute(db.select(Account).where(Account.id==accountId)).scalar_one()
-    if account:
-            db.session.delete(account)
-            db.session.commit()
-            return make_response(jsonify({"messgae":"Account sucessfully deleted."}), 200)
-    return make_response(jsonify({"message":"Requested account does not exist"}), 404)
+def delete_account(accountId):
+    account = db.get_or_404(Account, accountId)
+    db.session.delete(account)
+    db.session.commit()
+    return make_response(jsonify({"message":"Account sucessfully deleted."}), 200)
