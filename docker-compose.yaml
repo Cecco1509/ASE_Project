@@ -23,7 +23,9 @@ services:
       - usersuser
     ports:
       - "8080:5000"
-
+    volumes:
+      - ./config.json:/app/config.json  # Mounts config.json into the container
+   
   auctionsadmin:
     build:
       context: ./AuctionsAdmin
@@ -154,7 +156,9 @@ services:
       context: ./UsersAdmin
       dockerfile: Dockerfile
     container_name: usersadmin
-
+    volumes:
+      - ./config.json:/app/config.json  # Mounts config.json into the container
+   
   usersuser:
     build:
       context: ./UsersUser

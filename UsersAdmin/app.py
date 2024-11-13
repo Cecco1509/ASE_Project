@@ -6,14 +6,8 @@ from werkzeug.exceptions import NotFound
 from python_json_config import ConfigBuilder
 
 builder = ConfigBuilder()
-config = builder.parse_config('../config.json')
+config = builder.parse_config('/app/config.json')
 app = Flask(__name__, instance_relative_config=True)
-
-class StatusEnum(Enum):
-    ACTIVE = "active"
-    INACTIVE = "unknown"
-    BANNED = "banned"
-
 
 @app.route('/api/admin/users', methods=['GET'])
 def get_players():
