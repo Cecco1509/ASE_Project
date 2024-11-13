@@ -6,7 +6,7 @@ from dbsetup import setup
 from python_json_config import ConfigBuilder
 
 builder = ConfigBuilder()
-config = builder.parse_config('./config.json')
+config = builder.parse_config('/app/config.json')
 
 def create_connection_string(db):
     return f'mssql+pyodbc://{db.username}:{db.password}@{db.server}:{db.port}/{db.name}?driver=ODBC+Driver+17+for+SQL+Server'

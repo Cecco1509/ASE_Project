@@ -22,7 +22,9 @@ services:
       - usersadmin
       - usersuser
     ports:
-      - "8081:8080"
+      - "8080:8080"
+    volumes:
+      - ./config.json:/app/config.json
 
   auctionsadmin:
     build:
@@ -60,10 +62,8 @@ services:
       - paymentdatabase
       - transactiondatabase
       - userdatabase
-    ports:
-      - "5000:5000"
     volumes:
-      - ./DBManager:/DBManager
+      - ./config.json:/app/config.json
 
   authdatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest

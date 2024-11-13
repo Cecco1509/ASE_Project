@@ -3,7 +3,7 @@ import pyodbc
 from python_json_config import ConfigBuilder
 
 builder = ConfigBuilder()
-config = builder.parse_config('./config.json')
+config = builder.parse_config('/app/config.json')
 
 def single_db_setup(db):
     try:
