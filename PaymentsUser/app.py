@@ -68,9 +68,9 @@ def purchase_in_game_currency():
 
         # Define the payload to send to the database manager service
         payload = {
-            'userId': user_id
-            'timeStamp': datetime.now()
-            'Am': in_game_currency
+            'userId': user_id,
+            'timeStamp': datetime.now(),
+            'Am': in_game_currency,
             'realAmount': real_amount
         }
 
@@ -137,8 +137,8 @@ def decrease_in_game_currency(user_id):
 
         # Define the payload to send to the database manager service
         payload = {
-            'status': status
-            'profilePicture': profile_picture
+            'status': status,
+            'profilePicture': profile_picture,
             'ingameCurrency': in_game_amount-amount
         }
 
@@ -198,8 +198,8 @@ def increase_currency(user_id):
 
         # Prepare the payload to send to the Database Manager service
         payload = {
-            'status': status
-            'profilePicture': profile_picture
+            'status': status,
+            'profilePicture': profile_picture,
             'ingameCurrency': in_game_amount+amount
         }
 
