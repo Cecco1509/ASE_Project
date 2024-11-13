@@ -12,7 +12,7 @@ def get_all_gachascollections():
 
 @app.route('/gachacollection/<int:userId>', methods=['GET'])
 def get_gachacollection_for_user(userId):
-    collections = db.session.execute(db.select(GachaCollection).where(Gachacollection.userId==userId)).scalars()
+    collections = db.session.execute(db.select(GachaCollection).where(GachaCollection.userId==userId)).scalars()
     if collections:
         return make_response(jsonify([collection.to_dict() for collection in collections]), 200)
     return make_response(jsonify({"message":"Gacha collection not found"}), 404)
@@ -24,7 +24,7 @@ def create_gachacollection():
         collection = GachaCollection(gachaId=json_data['gachaId'], userId=json_data['userId'], timestamp=json_data['timestamp'], source=json_data['source'])
         db.session.add(collection)
         db.session.commit()
-        return make_response(jsonify(collection.id), 200)
+        return make_response(jsonify({"collectionId":collection.id}), 200)
     return make_response(jsonify({"message":"Invalid gacha collection data"}), 400)
 
 @app.route('/gachacollection/<int:collectionId>', methods=['PUT'])

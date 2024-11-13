@@ -22,10 +22,10 @@ def get_single_user(userId):
 def create_user():
     json_data = request.get_json()
     if json_data:
-        user = User(authId=json_data['authId'], profilePicture=json_data['profilePicture'], ingameCurrency=json_data['ingameCurrency'],registrationDate=json_data['registrationDate'], status=json_data['status'])
+        user = User(authId=json_data['authId'], profilePicture=json_data['profilePicture'], ingameCurrency=json_data['ingameCurrency'],registrationDate=json_data['registrationDate'], status=UserStatus[json_data['status']])
         db.session.add(user)
         db.session.commit()
-        return make_response(jsonify(user.id), 200)
+        return make_response(jsonify({"userId":user.id}), 200)
     return make_response(jsonify({"message":"Invalid user data"}), 400)
 
 @app.route('/user/<int:userId>', methods=['PUT'])

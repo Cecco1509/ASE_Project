@@ -32,6 +32,7 @@ import AccountEndpoints
 import AdminEndpoints
 import AuctionEndpoints
 import AuctionBidEndpoints
+import AuctionTransactionEndpoints
 import CurrencyTransactionEndpoints
 import UserEndpoints
 import GachaCollectionEndpoints

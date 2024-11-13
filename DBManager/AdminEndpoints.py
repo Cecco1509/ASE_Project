@@ -22,7 +22,7 @@ def create_admin():
         admin = Admin(username=json_data['username'], password=json_data['password'])
         db.session.add(admin)
         db.session.commit()
-        return make_response(jsonify(admin.id), 200)
+        return make_response(jsonify({"adminId":admin.id}), 200)
     return make_response(jsonify({"message":"Invalid admin data"}), 400)
 
 @app.route('/admin/<int:adminId>', methods=['PUT'])

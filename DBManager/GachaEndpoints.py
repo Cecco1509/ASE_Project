@@ -22,7 +22,7 @@ def create_gacha():
         gacha = Gacha(name=json_data['name'], image=json_data['image'], rarityPercent=json_data['rarityPercent'], description=json_data['description'])
         db.session.add(gacha)
         db.session.commit()
-        return make_response(jsonify(gacha.id), 200)
+        return make_response(jsonify({"gachaId":gacha.id}), 200)
     return make_response(jsonify({"message":"Invalid gacha data"}), 400)
 
 @app.route('/gacha/<int:gachaId>', methods=['PUT'])
