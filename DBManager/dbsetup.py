@@ -19,7 +19,7 @@ def single_db_setup(db):
         cursor.close()
         conn.close()
     except:
-        print("Database {db.server}:{db.port} unavailable.")
+        print(f"Database {db.server}:{db.port} unavailable.")
 def setup():
     single_db_setup(config.databases.auth)
     single_db_setup(config.databases.gacha)

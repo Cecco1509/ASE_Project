@@ -8,12 +8,12 @@ from enums import UserStatus
 def get_all_currency_transactions():
     currencytransactions = db.session.execute(db.select(CurrencyTransaction)).scalars()
     if currencytransactions:
-        return make_response(jsonify(currencytransactions), 200)
+        return make_response(jsonify([currencytransaction.to_dict() for currencytransaction in currencytransactions]), 200)
     return make_response(jsonify({"message":"Currency transactions not found"}), 404)
 
 @app.route('/currencytransaction/<int:userId>', methods=['GET'])
 def get_transactions_for_user(userId):
-    currencytransaction = db.session.execute(db.select(CurrencyTransaction).where(CurrencyTransaction.userId == userId)).scalar()
+    currencytransaction = db.session.execute(db.select(CurrencyTransaction).where(CurrencyTransaction.userId == userId)).scalars()
     if currencytransaction:
         return make_response(jsonify(currencytransaction.to_dict()), 200)
     return make_response(jsonify({"message":"Currency transactions not found"}), 404)
@@ -30,9 +30,7 @@ def create_currency_transaction():
 
 @app.route('/currencytransaction/<int:transactionId>', methods=['DELETE'])
 def delete_currency_transaction(transactionId):
-    transaction = db.session.execute(db.select(CurrencyTransaction).where(CurrencyTransaction.id==transactionId)).scalar_one()
-    if transaction:
-            db.session.delete(transaction)
-            db.session.commit()
-            return make_response(jsonify({"messgae":"Transaction sucessfully deleted."}), 200)
-    return make_response(jsonify({"message":"Requested transaction does not exist"}), 404)
+    transaction = db.get_or_404(CurrencyTransaction, transactionId)
+    db.session.delete(transaction)
+    db.session.commit()
+    return make_response(jsonify({"messgae":"Transaction sucessfully deleted."}), 200)

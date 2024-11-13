@@ -7,21 +7,19 @@ from flask import Flask, request, make_response, jsonify
 def get_all_auction_transactions():
     transactions = db.session.execute(db.select(AuctionTransaction)).scalars()
     if transactions:
-        return make_response(jsonify(transactions), 200)
+        return make_response(jsonify([transaction.to_dict() for transaction in transactions]), 200)
     return make_response(jsonify({"message":"Auction transactions not found"}), 404)
 
 @app.route('/auctiontransaction/<int:transactionId>', methods=['GET'])
 def get_single_auctiontransaction(transactionId):
-    transaction = db.session.execute(db.select(AuctionTransaction).where(AuctionTransaction.id==transactionId)).scalar()
-    if transaction:
-        return make_response(jsonify(transaction.to_dict()), 200)
-    return make_response(jsonify({"message":"Auction transaction not found"}), 404)
+    transaction = db.get_or_404(auctiontransaction, transactionId)
+    return make_response(jsonify(transaction.to_dict()), 200)
 
 @app.route('/auctiontransaction/user/<int:userId>', methods=['GET'])
-def get_single_auctiontransaction(userId):
-    transactions = db.session.execute(db.select(AuctionTransaction).where(AuctionTransaction.sellerId==userId||AuctionTransaction.buyerId==userId)).scalar()
+def get_auctiontransactions_for_user(userId):
+    transactions = db.session.execute(db.select(AuctionTransaction).where(AuctionTransaction.sellerId==userId or AuctionTransaction.buyerId==userId)).scalars()
     if transactions:
-        return make_response(jsonify(transactions.to_dict()), 200)
+        return make_response(jsonify([transaction.to_dict() for transaction in transactions]), 200)
     return make_response(jsonify({"message":"Auction transactions not found"}), 404)
 
 @app.route('/auctiontransaction', methods=['POST'])
@@ -38,23 +36,19 @@ def create_transaction():
 def update_transaction(transactionId):
     json_data = request.get_json()
     if json_data:
-        transaction = db.session.execute(db.select(AuctionTransaction).where(AuctionTransaction.id=transactionId)).scalar_one()
-        if transaction:
-            transaction.sellerId=json_data['sellerId']
-            transaction.buyerId=json_data['buyerId']
-            transaction.auctionBidId=json_data['auctionBidId']
-            transaction.timestamp=json_data['timestamp']
-            transaction.verified = True
-            db.session.commit()
-            return make_response(jsonify({"messgae":"Transaction sucessfully updated."}), 200)
-        return make_response(jsonify({"message":"Requested transaction does not exist"}), 404)
+        transaction = db.get_or_404(AuctionTransaction, transactionId)
+        transaction.sellerId=json_data['sellerId']
+        transaction.buyerId=json_data['buyerId']
+        transaction.auctionBidId=json_data['auctionBidId']
+        transaction.timestamp=json_data['timestamp']
+        transaction.verified = True
+        db.session.commit()
+        return make_response(jsonify({"messgae":"Transaction sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid transaction data"}), 400)
 
 @app.route('/transaction/<int:transactionId>', methods=['DELETE'])
 def delete_transaction(transactionId):
-    transaction = db.session.execute(db.select(transaction).filter_by(id=transactionId)).scalar_one()
-    if transaction:
-            db.session.delete(transaction)
-            db.session.commit()
-            return make_response(jsonify({"messgae":"Transaction sucessfully deleted."}), 200)
-    return make_response(jsonify({"message":"Requested transaction does not exist"}), 404)
+    transaction = db.get_or_404(AuctionTransaction, transactionId)
+    db.session.delete(transaction)
+    db.session.commit()
+    return make_response(jsonify({"messgae":"Transaction sucessfully deleted."}), 200)
