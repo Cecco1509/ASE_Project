@@ -1,5 +1,7 @@
 {
     "databases":{
+       "timeout" :1, 
+       "retries":5,
         "auth":{
             "server":"authdatabase",
             "port":"1433",
@@ -42,6 +44,13 @@
             "username":"sa",
             "password":"Password1."
         }
+    },
+    "dbmanagers":{
+        "user":"http://userdbmanager:5000",
+        "auth":"http://authdbmanager:5000",
+        "auction":"http://auctiondbmanager:5000",
+        "gacha":"http://gachadbmanager:5000",
+        "transaction":"http://transactiondbmanager:5000",
+        "payment":"http://paymentdbmanager:5000"
     }
-
 }
