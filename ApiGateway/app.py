@@ -97,6 +97,12 @@ def update_gacha_collection(collectionId):
     response = requests.put(GACHAS_USER_URL + f'/api/player/gacha/player-collection/{collectionId}', json=json_data)
     return make_response(jsonify(response.json()), response.status_code)
 
+@app.route('/api/player/gacha/player-collection/<int:collectionId>', methods=['DELETE'])
+@handle_errors
+def delete_gacha_collection(collectionId):
+    response = requests.delete(GACHAS_USER_URL + f'/api/player/gacha/player-collection/{collectionId}')
+    return make_response(jsonify(response.json()), response.status_code)
+
 # TODO: create separate files and import them here
 
 def create_app():

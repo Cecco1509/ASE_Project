@@ -61,6 +61,7 @@ def is_valid_gacha_collection_data(data):
 @app.route('/api/player/gacha/player-collection/<int:collectionId>', methods=['PUT'])
 @handle_errors
 def update_gacha_collection(collectionId):
+    """Update a gacha collection item."""
     json_data = request.get_json()
 
     if not json_data:
@@ -75,6 +76,13 @@ def update_gacha_collection(collectionId):
     
     response = requests.put(f'{DB_MANAGER_GACHA_URL}/gachacollection/{collectionId}', json=json_data)
     return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/player/gacha/player-collection/<int:collectionId>', methods=['DELETE'])
+@handle_errors
+def delete_gacha_collection(collectionId):
+    """Delete a gacha collection item."""
+    response = requests.delete(f'{DB_MANAGER_GACHA_URL}/gachacollection/{collectionId}')
+    return make_response(jsonify(response.json()), 200)
 
 def create_app():
     return app
