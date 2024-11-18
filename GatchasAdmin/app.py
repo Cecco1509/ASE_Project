@@ -74,5 +74,26 @@ def is_valid_gacha_data(data):
 
     return True, "Data is valid"
 
+"""Update a gacha item."""
+# TODO: use patch instead of put, so we can only update the fields that are provided
+@app.route('/api/admin/gacha/<int:gachaId>', methods=['PUT'])
+@handle_errors
+def update_gacha(gachaId):
+    """Update a gacha item."""
+    json_data = request.get_json()
+
+    # check if data is valid
+    if not json_data:
+        return make_response(jsonify({"message":"No JSON data provided"}), 400)
+    
+    is_valid, validation_message = is_valid_gacha_data(json_data)
+    if not is_valid:
+        return make_response(jsonify({"message": validation_message}), 400)
+
+    # all data is valid, send to the DB manager
+    response = requests.put(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}', json=json_data)
+    response.raise_for_status()
+    return make_response(jsonify(response.json()), 200)
+
 def create_app():
     return app

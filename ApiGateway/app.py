@@ -43,6 +43,18 @@ def create_gacha():
     # i commented this line so the 400 error message will be returned the same, otherwise, the error message will be ovverriden
     return make_response(jsonify(response.json()), response.status_code)
 
+@app.route('/api/admin/gacha/<int:gachaId>', methods=['PUT'])
+@handle_errors
+def update_gacha(gachaId):
+    """Update a gacha item."""
+    json_data = request.get_json()
+
+    if not json_data:
+        return make_response(jsonify({"message":"No JSON data provided"}), 400)
+
+    response = requests.put(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gachaId}', json=json_data)
+    return make_response(jsonify(response.json()), 200)
+
 # TODO: create separate files and import them here
 
 def create_app():
