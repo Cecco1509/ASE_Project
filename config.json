@@ -52,5 +52,8 @@
         "gacha":"http://gachadbmanager:5000",
         "transaction":"http://transactiondbmanager:5000",
         "payment":"http://paymentdbmanager:5000"
+    },
+    "services":{
+        "gachasadmin":"http://gachasadmin:5000"
     }
 }
