@@ -95,5 +95,14 @@ def update_gacha(gachaId):
     response.raise_for_status()
     return make_response(jsonify(response.json()), 200)
 
+"""Delete a gacha item.""" 
+@app.route('/api/admin/gacha/<int:gachaId>', methods=['DELETE'])
+@handle_errors
+def delete_gacha(gachaId):
+    """Delete a gacha item."""
+    response = requests.delete(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}')
+    response.raise_for_status()
+    return make_response(jsonify(response.json()), 200)
+
 def create_app():
     return app

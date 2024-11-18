@@ -55,6 +55,14 @@ def update_gacha(gachaId):
     response = requests.put(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gachaId}', json=json_data)
     return make_response(jsonify(response.json()), 200)
 
+@app.route('/api/admin/gacha/<int:gachaId>', methods=['DELETE'])
+@handle_errors
+def delete_gacha(gachaId):
+    """Delete a gacha item."""
+    response = requests.delete(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gachaId}')
+    response.raise_for_status()
+    return make_response(jsonify(response.json()), 200)
+
 # TODO: create separate files and import them here
 
 def create_app():
