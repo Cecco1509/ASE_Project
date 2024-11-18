@@ -2,7 +2,6 @@ from app import app
 from app import db
 from models import *
 from flask import Flask, request, make_response, jsonify
-from enums import UserStatus
 
 @app.route('/user', methods=['GET'])
 def get_all_users():
