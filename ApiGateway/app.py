@@ -11,7 +11,9 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 GACHAS_ADMIN_URL = config.services.gachasadmin
+GACHAS_USER_URL = config.services.gachasuser
 
+"""GatchasAdmin ENDPOINTS"""
 @app.route('/api/admin/gacha', methods=['GET'])
 @handle_errors
 def admin_gacha():
@@ -71,6 +73,15 @@ def admin_gachacollection():
     response.raise_for_status()
     gacha_collections = response.json()
     return make_response(jsonify(gacha_collections), 200)
+
+"""GatchasUser ENDPOINTS"""
+
+@app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
+@handle_errors
+def get_gacha_collection(userId):
+    response = requests.get(GACHAS_USER_URL + f'/api/player/gacha/player-collection/{userId}')
+    response.raise_for_status()
+    return make_response(response.json(), 200)
 
 # TODO: create separate files and import them here
 

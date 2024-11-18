@@ -11,12 +11,12 @@ services:
       # - auctionsuser
       # - authadmin
       # - authuser
-      - authdbmanager
-      - auctiondbmanager
-      - userdbmanager
+      # - authdbmanager
+      # - auctiondbmanager
+      # - userdbmanager
       - gachadbmanager
-      - transactiondbmanager
-      - paymentdbmanager
+      # - transactiondbmanager
+      # - paymentdbmanager
       - gachasadmin
       - gachasuser
       # - paymentsadmin
@@ -60,25 +60,25 @@ services:
   #     dockerfile: Dockerfile
   #   container_name: authuser
 
-  authdbmanager:
-    build:
-      context: ./AuthDBManager
-      dockerfile: Dockerfile
-    container_name: authdbmanager
-    depends_on:
-      - authdatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # authdbmanager:
+  #   build:
+  #     context: ./AuthDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: authdbmanager
+  #   depends_on:
+  #     - authdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  auctiondbmanager:
-    build:
-      context: ./AuctionDBManager
-      dockerfile: Dockerfile
-    container_name: auctiondbmanager
-    depends_on:
-      - auctiondatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # auctiondbmanager:
+  #   build:
+  #     context: ./AuctionDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: auctiondbmanager
+  #   depends_on:
+  #     - auctiondatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
   gachadbmanager:
     build:
@@ -95,42 +95,42 @@ services:
       - FLASK_DEBUG=1
       - FLASK_APP=./GachaDBManager/app.py
 
-  paymentdbmanager:
-    build:
-      context: ./PaymentDBManager
-      dockerfile: Dockerfile
-    container_name: paymentdbmanager
-    depends_on:
-      - paymentdatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # paymentdbmanager:
+  #   build:
+  #     context: ./PaymentDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: paymentdbmanager
+  #   depends_on:
+  #     - paymentdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  transactiondbmanager:
-    build:
-      context: ./TransactionDBManager
-      dockerfile: Dockerfile
-    container_name: transactiondbmanager
-    depends_on:
-      - transactiondatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # transactiondbmanager:
+  #   build:
+  #     context: ./TransactionDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: transactiondbmanager
+  #   depends_on:
+  #     - transactiondatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  userdbmanager:
-    build:
-      context: ./UserDBManager
-      dockerfile: Dockerfile
-    container_name: userdbmanager
-    depends_on:
-      - userdatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # userdbmanager:
+  #   build:
+  #     context: ./UserDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: userdbmanager
+  #   depends_on:
+  #     - userdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  authdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: authdatabase
+  # authdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: authdatabase
 
   gachadatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -139,33 +139,33 @@ services:
       - ACCEPT_EULA=Y
     container_name: gachadatabase
 
-  userdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: userdatabase
+  # userdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: userdatabase
 
-  paymentdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: paymentdatabase
+  # paymentdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: paymentdatabase
 
-  auctiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: auctiondatabase
+  # auctiondatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: auctiondatabase
   
-  transactiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: transactiondatabase
+  # transactiondatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: transactiondatabase
 
   gachasadmin:
     build:
