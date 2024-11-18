@@ -1,11 +1,9 @@
 import requests, time
-
 from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
 from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
-import re
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
@@ -13,6 +11,7 @@ builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 DB_MANAGER_GACHA_URL = config.dbmanagers.gacha
 
+"""Fetch all gacha items."""
 @app.route('/api/admin/gacha', methods=['GET'])
 @handle_errors
 def get_all_gacha():
@@ -22,6 +21,7 @@ def get_all_gacha():
     gacha_items = response.json()
     return make_response(jsonify(gacha_items), 200)
 
+"""Fetch a single gacha item by ID."""
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
 def get_single_gacha(gachaId):
@@ -103,6 +103,16 @@ def delete_gacha(gachaId):
     response = requests.delete(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}')
     response.raise_for_status()
     return make_response(jsonify(response.json()), 200)
+
+"""Get all gacha collections."""
+@app.route('/api/admin/gachacollection', methods=['GET'])
+@handle_errors
+def get_all_gachacollections():
+    """Fetch all gacha collections."""
+    response = requests.get(DB_MANAGER_GACHA_URL + f'/gachacollection')
+    response.raise_for_status()
+    gacha_collections = response.json()
+    return make_response(jsonify(gacha_collections), 200)
 
 def create_app():
     return app

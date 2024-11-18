@@ -63,6 +63,15 @@ def delete_gacha(gachaId):
     response.raise_for_status()
     return make_response(jsonify(response.json()), 200)
 
+"""Fetch all gacha collections."""
+@app.route('/api/admin/gachacollection', methods=['GET'])
+@handle_errors
+def admin_gachacollection():
+    response = requests.get(GACHAS_ADMIN_URL + '/api/admin/gachacollection')
+    response.raise_for_status()
+    gacha_collections = response.json()
+    return make_response(jsonify(gacha_collections), 200)
+
 # TODO: create separate files and import them here
 
 def create_app():
