@@ -42,6 +42,15 @@
             "username":"sa",
             "password":"Password1."
         }
+    },
+    "dbmanagers":{
+        "gacha":{
+            "url":"http://dbmanager:5000"
+        }
+    },
+    "services":{
+        "gachasadmin":{
+            "url":"http://gachasadmin:5000"
+        }
     }
-
 }

@@ -5,6 +5,7 @@ from flask import Flask, request, make_response, jsonify
 
 @app.route('/gacha', methods=['GET'])
 def get_all_gachas():
+    #return make_response(jsonify({"message":"its working"}), 200)
     gachas = db.session.execute(db.select(Gacha)).scalars()
     if gachas:
         return make_response(jsonify([gacha.to_dict() for gacha in gachas]), 200)
