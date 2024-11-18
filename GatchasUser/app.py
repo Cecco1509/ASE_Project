@@ -12,77 +12,14 @@ builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 DB_MANAGER_GACHA_URL = config.dbmanagers.gacha
 
-"""Get player's gacha collection."""
+"""Player Collection Endpoints"""
+
 @app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
 @handle_errors
 def get_gacha_collection(userId):
     response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}')
     response.raise_for_status()
     return make_response(response.json(), 200)
-
-"""Create a new gacha collection item."""
-@app.route('/api/player/gacha/player-collection', methods=['POST'])
-@handle_errors
-def create_gacha_collection():
-    json_data = request.get_json()
-
-    if not json_data:
-        return make_response(jsonify({"message":"No JSON data provided"}), 400)
-    
-    is_valid, validation_message = is_valid_gacha_collection_data(json_data)
-    if not is_valid:
-        return make_response(jsonify({"message": validation_message}), 400)
-    
-    # Add timestamp to the json data
-    json_data['timestamp'] = datetime.utcnow().isoformat()
-
-    response = requests.post(f'{DB_MANAGER_GACHA_URL}/gachacollection', json=json_data)
-    return make_response(jsonify(response.json()), response.status_code)
-
-def is_valid_gacha_collection_data(data):
-    """
-    Validate the input JSON data for creating a gacha collection item.
-    Checks for required fields, data types, and formats.
-    """
-    required_fields = {
-        "gachaId": int,
-        "userId": int,
-        "source": str,
-    }
-
-    for field, expected_type in required_fields.items():
-        if field not in data:
-            return False, f"Missing required field: {field}"
-        if not isinstance(data[field], expected_type):
-            return False, f"Invalid type for field '{field}': Expected {expected_type.__name__}"
-
-    return True, "Data is valid"
-
-@app.route('/api/player/gacha/player-collection/<int:collectionId>', methods=['PUT'])
-@handle_errors
-def update_gacha_collection(collectionId):
-    """Update a gacha collection item."""
-    json_data = request.get_json()
-
-    if not json_data:
-        return make_response(jsonify({"message":"No JSON data provided"}), 400)
-    
-    is_valid, validation_message = is_valid_gacha_collection_data(json_data)
-    if not is_valid:
-        return make_response(jsonify({"message": validation_message}), 400)
-    
-    # Add timestamp to the json data
-    json_data['timestamp'] = datetime.utcnow().isoformat()
-    
-    response = requests.put(f'{DB_MANAGER_GACHA_URL}/gachacollection/{collectionId}', json=json_data)
-    return make_response(jsonify(response.json()), response.status_code)
-
-@app.route('/api/player/gacha/player-collection/<int:collectionId>', methods=['DELETE'])
-@handle_errors
-def delete_gacha_collection(collectionId):
-    """Delete a gacha collection item."""
-    response = requests.delete(f'{DB_MANAGER_GACHA_URL}/gachacollection/{collectionId}')
-    return make_response(jsonify(response.json()), 200)
 
 def create_app():
     return app
