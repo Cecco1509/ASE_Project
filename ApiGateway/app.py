@@ -91,6 +91,16 @@ def get_gacha_collection_details(collectionId):
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
+"""System Collection Endpoints"""
+
+# Get full system gacha collection.
+@app.route('/api/player/gacha/system-collection', methods=['GET'])
+@handle_errors
+def get_system_gacha_collection():
+    response = requests.get(GACHAS_USER_URL + '/api/player/gacha/system-collection')
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
 # TODO: create separate files and import them here
 
 def create_app():

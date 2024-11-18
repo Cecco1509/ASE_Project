@@ -30,5 +30,15 @@ def get_gacha_collection_details(collectionId):
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
+"""System Collection Endpoints"""
+
+# Get full system gacha collection.
+@app.route('/api/player/gacha/system-collection', methods=['GET'])
+@handle_errors
+def get_system_gacha_collection():
+    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha')
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
 def create_app():
     return app
