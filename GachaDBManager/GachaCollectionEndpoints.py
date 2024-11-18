@@ -2,6 +2,7 @@ from app import app
 from app import db
 from models import *
 from flask import Flask, request, make_response, jsonify
+from handle_errors import handle_errors
 
 @app.route('/gachacollection', methods=['GET'])
 def get_all_gachascollections():
@@ -16,6 +17,11 @@ def get_gachacollection_for_user(userId):
     if collections:
         return make_response(jsonify([collection.to_dict() for collection in collections]), 200)
     return make_response(jsonify({"message":"Gacha collection not found"}), 404)
+
+@app.route('/gachacollection/item/<int:collectionId>', methods=['GET'])
+def get_single_gachacollection(collectionId):
+    collection = db.get_or_404(GachaCollection, collectionId)
+    return make_response(jsonify(collection.to_dict()), 200)
 
 @app.route('/gachacollection', methods=['POST'])
 def create_gachacollection():

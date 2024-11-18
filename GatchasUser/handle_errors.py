@@ -8,7 +8,15 @@ def handle_errors(func):
         try:
             return func(*args, **kwargs)
         except requests.exceptions.HTTPError as http_err:
-            return make_response(jsonify({"error": f"HTTP error occurred: {http_err}"}), 400)
+            if http_err.response.status_code == 404:
+                # Handle 404 error (resource not found)
+                return make_response(jsonify({"error": "Resource not found"}), 404)
+            elif http_err.response.status_code == 500:
+                # Handle 500 error (internal server error)
+                return make_response(jsonify({"error": "Internal server error occurred"}), 500)
+            else:
+                # General HTTP error message for other status codes (e.g., 400, 403, etc.)
+                return make_response(jsonify({"error": f"HTTP error occurred: {http_err}"}), http_err.response.status_code)
         except requests.exceptions.ConnectionError as _:
             return make_response(jsonify({"error": "Connection error. Please try again later."}), 503)
         except requests.exceptions.Timeout as _:

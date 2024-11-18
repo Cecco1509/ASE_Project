@@ -14,12 +14,21 @@ DB_MANAGER_GACHA_URL = config.dbmanagers.gacha
 
 """Player Collection Endpoints"""
 
+# Get player's gacha collection.
 @app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
 @handle_errors
 def get_gacha_collection(userId):
     response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}')
     response.raise_for_status()
-    return make_response(response.json(), 200)
+    return make_response(response.json(), response.status_code)
+
+# Get player's gacha collection item
+@app.route('/api/player/gacha/player-collection/item/<int:collectionId>', methods=['GET'])
+@handle_errors
+def get_gacha_collection_details(collectionId):
+    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/item/{collectionId}')
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
 
 def create_app():
     return app
