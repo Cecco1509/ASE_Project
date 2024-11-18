@@ -101,6 +101,14 @@ def get_system_gacha_collection():
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
+# Get details of a specific system gacha item.
+@app.route('/api/player/gacha/system-collection/<int:gachaId>', methods=['GET'])
+@handle_errors
+def get_system_gacha_details(gachaId):
+    response = requests.get(GACHAS_USER_URL + f'/api/player/gacha/system-collection/{gachaId}')
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
 # TODO: create separate files and import them here
 
 def create_app():

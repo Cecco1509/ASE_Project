@@ -40,5 +40,13 @@ def get_system_gacha_collection():
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
+# Get details of a specific system gacha item.
+@app.route('/api/player/gacha/system-collection/<int:gachaId>', methods=['GET'])
+@handle_errors
+def get_system_gacha_details(gachaId):
+    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha/{gachaId}')
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
 def create_app():
     return app
