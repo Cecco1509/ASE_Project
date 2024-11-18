@@ -21,7 +21,9 @@ def get_gachacollection_for_user(userId):
 def create_gachacollection():
     json_data = request.get_json()
     if json_data:
-        collection = GachaCollection(gachaId=json_data['gachaId'], userId=json_data['userId'], timestamp=json_data['timestamp'], source=json_data['source'])
+        timestamp = datetime.fromisoformat(json_data['timestamp'])  # Parse ISO string to datetime
+        
+        collection = GachaCollection(gachaId=json_data['gachaId'], userId=json_data['userId'], timestamp=timestamp, source=json_data['source'])
         db.session.add(collection)
         db.session.commit()
         return make_response(jsonify({"collectionId":collection.id}), 200)

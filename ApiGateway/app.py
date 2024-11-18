@@ -83,6 +83,13 @@ def get_gacha_collection(userId):
     response.raise_for_status()
     return make_response(response.json(), 200)
 
+@app.route('/api/player/gacha/player-collection', methods=['POST'])
+@handle_errors
+def create_gacha_collection():
+    json_data = request.get_json()
+    response = requests.post(GACHAS_USER_URL + '/api/player/gacha/player-collection', json=json_data)
+    return make_response(jsonify(response.json()), response.status_code)
+
 # TODO: create separate files and import them here
 
 def create_app():
