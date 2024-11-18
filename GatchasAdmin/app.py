@@ -22,6 +22,14 @@ def get_all_gacha():
     gacha_items = response.json()
     return make_response(jsonify(gacha_items), 200)
 
+@app.route('/api/admin/gacha/<int:gachaId>', methods=['GET'])
+@handle_errors
+def get_single_gacha(gachaId):
+    """Fetch a single gacha item by ID."""
+    response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}')
+    response.raise_for_status()
+    return make_response(jsonify(response.json()), 200)
+
 """Create a new gacha item."""
 @app.route('/api/admin/gacha', methods=['POST'])
 @handle_errors

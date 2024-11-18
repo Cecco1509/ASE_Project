@@ -15,14 +15,24 @@ GACHAS_ADMIN_URL = config.services.gachasadmin
 @app.route('/api/admin/gacha', methods=['GET'])
 @handle_errors
 def admin_gacha():
+    """Fetch all gacha items."""
     response = requests.get(GACHAS_ADMIN_URL + '/api/admin/gacha')
     response.raise_for_status()
     gacha_items = response.json()
     return make_response(jsonify(gacha_items), 200)
+
+@app.route('/api/admin/gacha/<int:gachaId>', methods=['GET'])
+@handle_errors
+def get_single_gacha(gachaId):
+    """Fetch a single gacha item by ID."""
+    response = requests.get(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gachaId}')
+    response.raise_for_status()
+    return make_response(jsonify(response.json()), 200)
     
 @app.route('/api/admin/gacha', methods=['POST'])
 @handle_errors
 def create_gacha():
+    """Create a new gacha item."""
     json_data = request.get_json()
 
     if not json_data:
