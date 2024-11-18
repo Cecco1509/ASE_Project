@@ -90,6 +90,13 @@ def create_gacha_collection():
     response = requests.post(GACHAS_USER_URL + '/api/player/gacha/player-collection', json=json_data)
     return make_response(jsonify(response.json()), response.status_code)
 
+@app.route('/api/player/gacha/player-collection/<int:collectionId>', methods=['PUT'])
+@handle_errors
+def update_gacha_collection(collectionId):
+    json_data = request.get_json()
+    response = requests.put(GACHAS_USER_URL + f'/api/player/gacha/player-collection/{collectionId}', json=json_data)
+    return make_response(jsonify(response.json()), response.status_code)
+
 # TODO: create separate files and import them here
 
 def create_app():

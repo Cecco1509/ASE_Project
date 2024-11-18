@@ -34,9 +34,10 @@ def update_gachacollection(collectionId):
     json_data = request.get_json()
     if json_data:
         collection = db.get_or_404(GachaCollection, collectionId)
+
         collection.gachaId=json_data['gachaId']
         collection.userId=json_data['userId']
-        collection.timestamp=json_data['timestamp']
+        collection.timestamp=datetime.fromisoformat(json_data['timestamp'])  # Parse ISO string to datetime
         collection.source=json_data['source']
         collection.verified = True
         db.session.commit()

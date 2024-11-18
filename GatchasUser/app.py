@@ -34,8 +34,7 @@ def create_gacha_collection():
         return make_response(jsonify({"message": validation_message}), 400)
     
     # Add timestamp to the json data
-    timestamp = datetime.utcnow().isoformat()
-    json_data['timestamp'] = timestamp
+    json_data['timestamp'] = datetime.utcnow().isoformat()
 
     response = requests.post(f'{DB_MANAGER_GACHA_URL}/gachacollection', json=json_data)
     return make_response(jsonify(response.json()), response.status_code)
@@ -58,6 +57,24 @@ def is_valid_gacha_collection_data(data):
             return False, f"Invalid type for field '{field}': Expected {expected_type.__name__}"
 
     return True, "Data is valid"
+
+@app.route('/api/player/gacha/player-collection/<int:collectionId>', methods=['PUT'])
+@handle_errors
+def update_gacha_collection(collectionId):
+    json_data = request.get_json()
+
+    if not json_data:
+        return make_response(jsonify({"message":"No JSON data provided"}), 400)
+    
+    is_valid, validation_message = is_valid_gacha_collection_data(json_data)
+    if not is_valid:
+        return make_response(jsonify({"message": validation_message}), 400)
+    
+    # Add timestamp to the json data
+    json_data['timestamp'] = datetime.utcnow().isoformat()
+    
+    response = requests.put(f'{DB_MANAGER_GACHA_URL}/gachacollection/{collectionId}', json=json_data)
+    return make_response(jsonify(response.json()), response.status_code)
 
 def create_app():
     return app
