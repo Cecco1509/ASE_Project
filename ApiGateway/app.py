@@ -126,7 +126,7 @@ def create_app():
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
 def getPlayerInformation(user_id):
     try:
-        response = requests.get(f'{config.urls.users_user_microservice}/api/player/profile/{user_id}')
+        response = requests.get(f'{config.services.users_user_microservice}/api/player/profile/{user_id}')
         
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
@@ -138,11 +138,11 @@ def getPlayerInformation(user_id):
 @app.route('/api/player/update/<int:user_id>', methods=['PUT'])
 def updatePlayerInformation(user_id):
     payload=request.get_json()
-    response=requests.put(f'{config.urls.users_user_microservice}/api/player/update/{user_id}',json=payload)
+    response=requests.put(f'{config.services.users_user_microservice}/api/player/update/{user_id}',json=payload)
     return response
 
 @app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
 def delete_player(user_id):
-    delete_response = requests.delete(f'{config.urls.users_user_microservice}/api/player/delete/{user_id}')
+    delete_response = requests.delete(f'{config.services.users_user_microservice}/api/player/delete/{user_id}')
     return delete_response
     

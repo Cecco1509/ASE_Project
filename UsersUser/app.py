@@ -15,7 +15,7 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
 def getPlayerInformation(user_id):
     try:
-        response = requests.get(f'{config.urls.db_manager}/user/{user_id}')
+        response = requests.get(f'{config.dbmanagers.user}/user/{user_id}')
         
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
@@ -28,7 +28,7 @@ def getPlayerInformation(user_id):
 def updatePlayerInformation(user_id):
     payload = request.json['profilePicture']
     if payload:
-        response = requests.get(f'{config.urls.db_manager}/user/{user_id}')
+        response = requests.get(f'{config.dbmanagers.user}/user/{user_id}')
         if response:
             status_data=response['status']
             ingameCurrency_data=response['ingameCurrency']
@@ -37,7 +37,7 @@ def updatePlayerInformation(user_id):
                 'ingameCurrency':ingameCurrency_data,
                 'profilePicture':payload
             }
-            update_response = requests.put(f'{config.urls.db_manager}/user/{user_id}', json=update_data)
+            update_response = requests.put(f'{config.dbmanagers.user}/user/{user_id}', json=update_data)
             return update_response
     else:
         return make_response(jsonify({"error": "No profile picture provided"}), 400)
@@ -45,7 +45,7 @@ def updatePlayerInformation(user_id):
 
 @app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
 def delete_player(user_id):
-    delete_response = requests.delete(f'{config.urls.db_manager}/user/{user_id}')  
+    delete_response = requests.delete(f'{config.dbmanagers.user}/user/{user_id}')  
     if delete_response.status_code == 200:
         return make_response(jsonify({"message": "Player successfully deleted"}), 200)
     elif delete_response.status_code == 500:
