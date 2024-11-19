@@ -1,11 +1,7 @@
 FROM python:3.12-slim
 
+ADD . /AuctionDBManager
 WORKDIR /AuctionDBManager
-
-COPY app.py /AuctionDBManager/
-COPY AuctionEndpoints.py /AuctionDBManager/
-COPY AuctionBidEndpoints.py /AuctionDBManager/
-COPY requirements.txt /AuctionDBManager/
 
 RUN pip3 install -r requirements.txt
 RUN apt-get update && apt-get install -y \
@@ -20,7 +16,6 @@ RUN curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt
 RUN apt-get update
 
 RUN ACCEPT_EULA=Y apt-get install -y unixodbc-dev msodbcsql17
-# msodbcsql17
 
 EXPOSE 5000
 
