@@ -1,214 +1,215 @@
-version: "3.8"
-
 services:
   apigateway:
     build:
       context: ./ApiGateway
       dockerfile: Dockerfile
     container_name: apigateway
+    image: digitalocean.com/webserver:latest
+    restart: unless-stopped
     depends_on:
       - auctionsadmin
-      - auctionsuser
-      - authadmin
-      - authuser
-      - authdbmanager
+      #- auctionsuser
+      #- authadmin
+      # - authuser
+      # - authdbmanager
       #- auctiondbmanager
       #- userdbmanager
       #- gachadbmanager
       #- transactiondbmanager
       #- paymentdbmanager
-      - gachasadmin
-      - gachasuser
-      - paymentsadmin
-      - paymentsuser
-      - roll
-      - transactionsadmin
-      - transactionsuser
-      - usersadmin
-      - usersuser
+      # - gachasadmin
+      # - gachasuser
+      # - paymentsadmin
+      # - paymentsuser
+      # - roll
+      # - transactionsadmin
+      # - transactionsuser
+      # - usersadmin
+      # - usersuser
     ports:
-      - "8080:8080"
+      - "80:80"
     volumes:
-      - ./config.json:/app/config.json
+      - ./ApiGateway/html:/usr/share/nginx/html
+      - ./shared/config.json:/app/config.json
 
   auctionsadmin:
     build:
       context: ./AuctionsAdmin
       dockerfile: Dockerfile
     container_name: auctionsadmin
-
-  auctionsuser:
-    build:
-      context: ./AuctionsUser
-      dockerfile: Dockerfile
-    container_name: auctionsuser
-
-  authadmin:
-    build:
-      context: ./AuthAdmin
-      dockerfile: Dockerfile
-    container_name: authadmin
-
-  authuser:
-    build:
-      context: ./AuthUser
-      dockerfile: Dockerfile
-    container_name: authuser
-
-  authdbmanager:
-    build:
-      context: ./AuthDBManager
-      dockerfile: Dockerfile
-    container_name: authdbmanager
-    depends_on:
-      - authdatabase
     volumes:
-      - ./config.json:/app/config.json
+      - ./shared/:/app/
+
+  # auctionsuser:
+  #   build:
+  #     context: ./AuctionsUser
+  #     dockerfile: Dockerfile
+  #   container_name: auctionsuser
+
+  # authadmin:
+  #   build:
+  #     context: ./AuthAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: authadmin
+
+  # authuser:
+  #   build:
+  #     context: ./AuthUser
+  #     dockerfile: Dockerfile
+  #   container_name: authuser
+
+  # authdbmanager:
+  #   build:
+  #     context: ./AuthDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: authdbmanager
+  #   depends_on:
+  #     - authdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
   auctiondbmanager:
     build:
       context: ./AuctionDBManager
       dockerfile: Dockerfile
     container_name: auctiondbmanager
-    depends_on:
-      - auctiondatabase
+    # depends_on:
+    #   - auctiondatabase
     volumes:
-      - ./config.json:/app/config.json
+      - ./shared/:/app/
 
-  gachadbmanager:
-    build:
-      context: ./GachaDBManager
-      dockerfile: Dockerfile
-    container_name: gachadbmanager
-    depends_on:
-      - gachadatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # gachadbmanager:
+  #   build:
+  #     context: ./GachaDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: gachadbmanager
+  #   # depends_on:
+  #   #   - gachadatabase
+  #   volumes:
+  #     - ./shared:/app/shared:ro
 
-  paymentdbmanager:
-    build:
-      context: ./PaymentDBManager
-      dockerfile: Dockerfile
-    container_name: paymentdbmanager
-    depends_on:
-      - paymentdatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # paymentdbmanager:
+  #   build:
+  #     context: ./PaymentDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: paymentdbmanager
+  #   depends_on:
+  #     - paymentdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  transactiondbmanager:
-    build:
-      context: ./TransactionDBManager
-      dockerfile: Dockerfile
-    container_name: transactiondbmanager
-    depends_on:
-      - transactiondatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # transactiondbmanager:
+  #   build:
+  #     context: ./TransactionDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: transactiondbmanager
+  #   depends_on:
+  #     - transactiondatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  userdbmanager:
-    build:
-      context: ./UserDBManager
-      dockerfile: Dockerfile
-    container_name: userdbmanager
-    depends_on:
-      - userdatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # userdbmanager:
+  #   build:
+  #     context: ./UserDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: userdbmanager
+  #   depends_on:
+  #     - userdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  authdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: authdatabase
+  # authdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: authdatabase
 
-  gachadatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: gachadatabase
+  # gachadatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: gachadatabase
 
-  userdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: userdatabase
+  # userdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: userdatabase
 
-  paymentdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: paymentdatabase
+  # paymentdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: paymentdatabase
 
-  auctiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: auctiondatabase
-  
-  transactiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: transactiondatabase
+  # auctiondatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: auctiondatabase
 
-  gachasadmin:
-    build:
-      context: ./GatchasAdmin
-      dockerfile: Dockerfile
-    container_name: gachasadmin
+  # transactiondatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: transactiondatabase
 
-  gachasuser:
-    build:
-      context: ./GatchasUser
-      dockerfile: Dockerfile
-    container_name: gachasuser
+  # gachasadmin:
+  #   build:
+  #     context: ./GatchasAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: gachasadmin
 
-  paymentsadmin:
-    build:
-      context: ./PaymentsAdmin
-      dockerfile: Dockerfile
-    container_name: paymentsadmin
+  # gachasuser:
+  #   build:
+  #     context: ./GatchasUser
+  #     dockerfile: Dockerfile
+  #   container_name: gachasuser
 
-  paymentsuser:
-    build:
-      context: ./PaymentsUser
-      dockerfile: Dockerfile
-    container_name: paymentsuser
+  # paymentsadmin:
+  #   build:
+  #     context: ./PaymentsAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: paymentsadmin
 
-  roll:
-    build:
-      context: ./Roll
-      dockerfile: Dockerfile
-    container_name: roll
+  # paymentsuser:
+  #   build:
+  #     context: ./PaymentsUser
+  #     dockerfile: Dockerfile
+  #   container_name: paymentsuser
 
-  transactionsadmin:
-    build:
-      context: ./TransactionsAdmin
-      dockerfile: Dockerfile
-    container_name: transactionsadmin
+  # roll:
+  #   build:
+  #     context: ./Roll
+  #     dockerfile: Dockerfile
+  #   container_name: roll
 
-  transactionsuser:
-    build:
-      context: ./TransactionsUser
-      dockerfile: Dockerfile
-    container_name: transactionsuser
+  # transactionsadmin:
+  #   build:
+  #     context: ./TransactionsAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: transactionsadmin
 
-  usersadmin:
-    build:
-      context: ./UsersAdmin
-      dockerfile: Dockerfile
-    container_name: usersadmin
+  # transactionsuser:
+  #   build:
+  #     context: ./TransactionsUser
+  #     dockerfile: Dockerfile
+  #   container_name: transactionsuser
 
-  usersuser:
-    build:
-      context: ./UsersUser
-      dockerfile: Dockerfile
-    container_name: usersuser
+  # usersadmin:
+  #   build:
+  #     context: ./UsersAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: usersadmin
 
-
+  # usersuser:
+  #   build:
+  #     context: ./UsersUser
+  #     dockerfile: Dockerfile
+  #   container_name: usersuser

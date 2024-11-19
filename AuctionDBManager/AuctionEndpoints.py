@@ -1,6 +1,6 @@
 from app import app
 from app import db
-from models import *
+from shared.models import Auction
 from flask import Flask, request, make_response, jsonify
 
 @app.route('/auction/<string:status>', methods=['GET'])
@@ -40,6 +40,14 @@ def update_auction(auctionId):
         db.session.commit()
         return make_response(jsonify({"message":"Auction sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid auction data"}), 400)
+
+@app.route('/auction/<int:userId>/<string:status>', methods=['GET'])
+def user_history(userId, status):
+    
+    auctions = db.session.execute(db.select(Auction).where(Auction.status==status, Auction.createdBy==userId)).scalars()
+    if auctions:
+        return make_response(jsonify([auction.to_dict() for auction in auctions]), 200)
+    return make_response(jsonify({"message":"Auctions not found"}), 404)
 
 @app.route('/auction/<int:auctionId>', methods=['DELETE'])
 def delete_auction(auctionId):

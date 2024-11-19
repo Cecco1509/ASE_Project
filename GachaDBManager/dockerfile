@@ -3,6 +3,10 @@ FROM python:3.12-slim
 ADD . /GachaDBManager
 WORKDIR /GachaDBManager
 
+COPY app.py /GachaDBManager/
+COPY GachaCollectionEndpoints.py /GachaDBManager/
+COPY GachaEndpoints.py /GachaDBManager/
+
 RUN pip3 install -r requirements.txt
 RUN apt-get update && apt-get install -y \
     curl \
@@ -15,8 +19,8 @@ RUN curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt
 
 RUN apt-get update 
 
-#&& apt-get install -y curl gnupg2 ca-certificates lsb-release
-RUN ACCEPT_EULA=Y apt-get install -y unixodbc-dev msodbcsql17
+RUN ACCEPT_EULA=Y apt-get install -y unixodbc-dev 
+#msodbcsql17
 
 EXPOSE 5000
 

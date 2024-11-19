@@ -32,7 +32,7 @@ for i in range(config.databases.retries):
         time.sleep(config.databases.timeout)
 
 db = SQLAlchemy(app)
-import models
+from app.models import models
 import GachaEndpoints
 import GachaCollectionEndpoints
 

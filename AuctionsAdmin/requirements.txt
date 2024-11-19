@@ -1,2 +1,4 @@
 Flask
 requests
+python_json_config
+flask-sqlalchemy

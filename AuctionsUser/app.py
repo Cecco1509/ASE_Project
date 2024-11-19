@@ -1,6 +1,11 @@
+import functools
+import os
+import threading
 import requests, time
+from flask import jsonify
+from ..DBManager.models import Auction, Bids
 
-from flask import Flask, request, make_response 
+from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
 

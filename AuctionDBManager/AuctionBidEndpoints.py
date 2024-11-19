@@ -1,7 +1,7 @@
 from app import app
 from app import db
-from models import *
 from flask import Flask, request, make_response, jsonify
+from models import AuctionBid
 
 @app.route('/auctionbid', methods=['GET'])
 def get_all_auction_bids():
