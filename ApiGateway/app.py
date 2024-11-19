@@ -12,11 +12,11 @@ config = builder.parse_config('/app/config.json')
 
 @app.route('/api/player/register', methods=['POST'])
 def register_user():
-    return request.post(f"{config.services.authuser}/api/player/register", payload=request.get_json())
+    return request.post(f"{config.services.authuser}/api/player/register", json=request.get_json())
 
-@app.route('/api/player/login/<int:userId>', methods=['POST'])
+@app.route('/api/player/login', methods=['POST'])
 def login(userId):
-    return request.post(f"{config.services.authuser}/api/player/login/{userId}")
+    return request.post(f"{config.services.authuser}/api/player/login", json=request.get_josn())
 
 @app.route('api/player/logout/<int:userId>', method=['POST'])
 def logout(userId):
