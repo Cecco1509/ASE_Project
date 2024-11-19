@@ -22,7 +22,7 @@ def create_auction():
         auction = Auction(gachaCollectionId=json_data['gachaCollectionId'], auctionStart=json_data['auctionStart'], auctionEnd=json_data['auctionEnd'], minimumBid=json_data['minimumBid'], timestamp=json_data['timestamp'],status=json_data['status'])
         db.session.add(auction)
         db.session.commit()
-        return make_response(jsonify(auction.id), 200)
+        return make_response(jsonify({"auctionId":auction.id}), 200)
     return make_response(jsonify({"message":"Invalid auction data"}), 400)
 
 @app.route('/auction/<int:auctionId>', methods=['PUT'])

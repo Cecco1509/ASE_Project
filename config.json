@@ -1,9 +1,65 @@
 {
-    "urls":{
-        "payments_admin_microservice": "http://paymentsadmin:5000", 
-        "payments_player_microservice": "http://paymentsuser:5000",
-        "users_user_microservice":"http://usersuser:5000",
-        "db_manager": "db_manager:5000"
-    }, 
-    "exchange_price": 50
+    "databases":{
+       "timeout" :1, 
+       "retries":5,
+        "auth":{
+            "server":"authdatabase",
+            "port":"1433",
+            "name":"authdatabase",
+            "username":"sa",
+            "password":"Password1."
+        },
+        "user":{
+            "server":"userdatabase",
+            "port":"1433",
+            "name":"userdatabase",
+            "username":"sa",
+            "password":"Password1."
+        },
+        "gacha":{
+            "server":"gachadatabase",
+            "port":"1433",
+            "name":"gachadatabase",
+            "username":"sa",
+            "password":"Password1."
+        },
+        "payment":{
+            "server":"paymentdatabase",
+            "port":"1433",
+            "name":"paymentdatabase",
+            "username":"sa",
+            "password":"Password1."
+        },
+        "auction":{
+            "server":"auctiondatabase",
+            "port":"1433",
+            "name":"auctiondatabase",
+            "username":"sa",
+            "password":"Password1."
+        },
+        "transaction":{
+            "server":"transactiondatabase",
+            "port":"1433",
+            "name":"transactiondatabase",
+            "username":"sa",
+            "password":"Password1."
+        }
+    },
+    "dbmanagers":{
+        "user":"http://userdbmanager:5000",
+        "auth":"http://authdbmanager:5000",
+        "auction":"http://auctiondbmanager:5000",
+        "gacha":"http://gachadbmanager:5000",
+        "transaction":"http://transactiondbmanager:5000",
+        "payment":"http://paymentdbmanager:5000"
+    },
+    "services":{
+        "gachasadmin":"http://gachasadmin:5000",
+        "gachasuser":"http://gachasuser:5000",
+        "users_user_microservice":"http://usersuser:5000"
+
+    },
+    "system_settings":{
+        "gacha_roll_price":100
+    }
 }
