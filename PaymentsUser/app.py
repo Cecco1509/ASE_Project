@@ -1,4 +1,4 @@
-import requests, time
+import requests, time, jsonify
 
 from flask import Flask, request, make_response 
 from requests.exceptions import ConnectionError, HTTPError
