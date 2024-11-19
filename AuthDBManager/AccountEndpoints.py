@@ -29,7 +29,7 @@ def create_account():
         account = Account(username=json_data['username'], password=json_data['password'])
         db.session.add(account)
         db.session.commit()
-        return make_response(jsonify(account.id), 200)
+        return make_response(jsonify({"accountId":account.id}), 200)
     return make_response(jsonify({"message":"Invalid account data"}), 400)
 
 @app.route('/account/<int:accountId>', methods=['PUT'])

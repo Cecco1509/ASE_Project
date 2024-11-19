@@ -29,14 +29,14 @@ def create_auctionbid():
         bid = AuctionBid(userId=json_data['userId'], bidAmount=json_data['bidAmount'], auctionId=json_data['auctionId'], timestamp=json_data['timestamp'])
         db.session.add(bid)
         db.session.commit()
-        return make_response(jsonify(bid.id), 200)
+        return make_response(jsonify({"bidId":bid.id}), 200)
     return make_response(jsonify({"message":"Invalid auction bid data"}), 400)
 
 @app.route('/auctionbid/<int:bidId>', methods=['PUT'])
 def update_bid(bidId):
     json_data = request.get_json()
     if json_data:
-        bid = db.get_or_404(auctionbid, bidId)
+        bid = db.get_or_404(AuctionBid, bidId)
         bid.userId=json_data['userId']
         bid.bidAmount=json_data['bidAmount']
         bid.auctionId=json_data['auctionId']

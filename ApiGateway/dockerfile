@@ -1,7 +1,7 @@
 FROM python:3.12-slim
 
-ADD . /ApiGateway
 WORKDIR /ApiGateway
+ADD * /ApiGateway
 
 RUN pip3 install -r requirements.txt
 
