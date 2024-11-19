@@ -7,73 +7,78 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway
     depends_on:
-      - auctionsadmin
-      - auctionsuser
-      - authadmin
-      - authuser
-      - authdbmanager
-      #- auctiondbmanager
-      #- userdbmanager
-      #- gachadbmanager
-      #- transactiondbmanager
-      #- paymentdbmanager
+      # - auctionsadmin
+      # - auctionsuser
+      # - authadmin
+      # - authuser
+      # - authdbmanager
+      # - auctiondbmanager
+      - userdbmanager
+      - gachadbmanager
+      # - transactiondbmanager
+      # - paymentdbmanager
       - gachasadmin
       - gachasuser
-      - paymentsadmin
-      - paymentsuser
-      - roll
-      - transactionsadmin
-      - transactionsuser
-      - usersadmin
-      - usersuser
+      # - paymentsadmin
+      # - paymentsuser
+      # - roll
+      # - transactionsadmin
+      # - transactionsuser
+      # - usersadmin
+      # - usersuser
     ports:
-      - "8080:8080"
+      - "5000:5000"
     volumes:
       - ./config.json:/app/config.json
+      - .:/ApiGateway
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./ApiGateway/app.py
 
-  auctionsadmin:
-    build:
-      context: ./AuctionsAdmin
-      dockerfile: Dockerfile
-    container_name: auctionsadmin
+  # auctionsadmin:
+  #   build:
+  #     context: ./AuctionsAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: auctionsadmin
 
-  auctionsuser:
-    build:
-      context: ./AuctionsUser
-      dockerfile: Dockerfile
-    container_name: auctionsuser
+  # auctionsuser:
+  #   build:
+  #     context: ./AuctionsUser
+  #     dockerfile: Dockerfile
+  #   container_name: auctionsuser
 
-  authadmin:
-    build:
-      context: ./AuthAdmin
-      dockerfile: Dockerfile
-    container_name: authadmin
+  # authadmin:
+  #   build:
+  #     context: ./AuthAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: authadmin
 
-  authuser:
-    build:
-      context: ./AuthUser
-      dockerfile: Dockerfile
-    container_name: authuser
+  # authuser:
+  #   build:
+  #     context: ./AuthUser
+  #     dockerfile: Dockerfile
+  #   container_name: authuser
 
-  authdbmanager:
-    build:
-      context: ./AuthDBManager
-      dockerfile: Dockerfile
-    container_name: authdbmanager
-    depends_on:
-      - authdatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # authdbmanager:
+  #   build:
+  #     context: ./AuthDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: authdbmanager
+  #   depends_on:
+  #     - authdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  auctiondbmanager:
-    build:
-      context: ./AuctionDBManager
-      dockerfile: Dockerfile
-    container_name: auctiondbmanager
-    depends_on:
-      - auctiondatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # auctiondbmanager:
+  #   build:
+  #     context: ./AuctionDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: auctiondbmanager
+  #   depends_on:
+  #     - auctiondatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
   gachadbmanager:
     build:
@@ -84,26 +89,31 @@ services:
       - gachadatabase
     volumes:
       - ./config.json:/app/config.json
+      - .:/GachaDBManager
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./GachaDBManager/app.py
 
-  paymentdbmanager:
-    build:
-      context: ./PaymentDBManager
-      dockerfile: Dockerfile
-    container_name: paymentdbmanager
-    depends_on:
-      - paymentdatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # paymentdbmanager:
+  #   build:
+  #     context: ./PaymentDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: paymentdbmanager
+  #   depends_on:
+  #     - paymentdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  transactiondbmanager:
-    build:
-      context: ./TransactionDBManager
-      dockerfile: Dockerfile
-    container_name: transactiondbmanager
-    depends_on:
-      - transactiondatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # transactiondbmanager:
+  #   build:
+  #     context: ./TransactionDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: transactiondbmanager
+  #   depends_on:
+  #     - transactiondatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
   userdbmanager:
     build:
@@ -114,13 +124,18 @@ services:
       - userdatabase
     volumes:
       - ./config.json:/app/config.json
-
-  authdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
+      - .:/UserDBManager
     environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: authdatabase
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./UserDBManager/app.py
+
+  # authdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: authdatabase
 
   gachadatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -136,79 +151,93 @@ services:
       - ACCEPT_EULA=Y
     container_name: userdatabase
 
-  paymentdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: paymentdatabase
+  # paymentdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: paymentdatabase
 
-  auctiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: auctiondatabase
+  # auctiondatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: auctiondatabase
   
-  transactiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: transactiondatabase
+  # transactiondatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: transactiondatabase
 
   gachasadmin:
     build:
       context: ./GatchasAdmin
       dockerfile: Dockerfile
     container_name: gachasadmin
+    volumes:
+      - ./config.json:/app/config.json
+      - .:/GatchasAdmin
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./GatchasAdmin/app.py
 
   gachasuser:
     build:
       context: ./GatchasUser
       dockerfile: Dockerfile
     container_name: gachasuser
+    volumes:
+      - ./config.json:/app/config.json
+      - .:/GatchasUser
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./GatchasUser/app.py
 
-  paymentsadmin:
-    build:
-      context: ./PaymentsAdmin
-      dockerfile: Dockerfile
-    container_name: paymentsadmin
+  # paymentsadmin:
+  #   build:
+  #     context: ./PaymentsAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: paymentsadmin
 
-  paymentsuser:
-    build:
-      context: ./PaymentsUser
-      dockerfile: Dockerfile
-    container_name: paymentsuser
+  # paymentsuser:
+  #   build:
+  #     context: ./PaymentsUser
+  #     dockerfile: Dockerfile
+  #   container_name: paymentsuser
 
-  roll:
-    build:
-      context: ./Roll
-      dockerfile: Dockerfile
-    container_name: roll
+  # roll:
+  #   build:
+  #     context: ./Roll
+  #     dockerfile: Dockerfile
+  #   container_name: roll
 
-  transactionsadmin:
-    build:
-      context: ./TransactionsAdmin
-      dockerfile: Dockerfile
-    container_name: transactionsadmin
+  # transactionsadmin:
+  #   build:
+  #     context: ./TransactionsAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: transactionsadmin
 
-  transactionsuser:
-    build:
-      context: ./TransactionsUser
-      dockerfile: Dockerfile
-    container_name: transactionsuser
+  # transactionsuser:
+  #   build:
+  #     context: ./TransactionsUser
+  #     dockerfile: Dockerfile
+  #   container_name: transactionsuser
 
-  usersadmin:
-    build:
-      context: ./UsersAdmin
-      dockerfile: Dockerfile
-    container_name: usersadmin
+  # usersadmin:
+  #   build:
+  #     context: ./UsersAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: usersadmin
 
-  usersuser:
-    build:
-      context: ./UsersUser
-      dockerfile: Dockerfile
-    container_name: usersuser
+  # usersuser:
+  #   build:
+  #     context: ./UsersUser
+  #     dockerfile: Dockerfile
+  #   container_name: usersuser
 
 
