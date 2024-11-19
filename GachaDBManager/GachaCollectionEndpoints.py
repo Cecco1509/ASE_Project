@@ -2,7 +2,6 @@ from app import app
 from app import db
 from models import *
 from flask import Flask, request, make_response, jsonify
-from handle_errors import handle_errors
 
 @app.route('/gachacollection', methods=['GET'])
 def get_all_gachascollections():
@@ -27,9 +26,12 @@ def get_single_gachacollection(collectionId):
 def create_gachacollection():
     json_data = request.get_json()
     if json_data:
-        timestamp = datetime.fromisoformat(json_data['timestamp'])  # Parse ISO string to datetime
-        
-        collection = GachaCollection(gachaId=json_data['gachaId'], userId=json_data['userId'], timestamp=timestamp, source=json_data['source'])
+        collection = GachaCollection(
+            gachaId=json_data['gachaId'], 
+            userId=json_data['userId'], 
+            timestamp=datetime.utcnow(), 
+            source=json_data['source']
+        )
         db.session.add(collection)
         db.session.commit()
         return make_response(jsonify({"collectionId":collection.id}), 200)
@@ -43,7 +45,6 @@ def update_gachacollection(collectionId):
 
         collection.gachaId=json_data['gachaId']
         collection.userId=json_data['userId']
-        collection.timestamp=datetime.fromisoformat(json_data['timestamp'])  # Parse ISO string to datetime
         collection.source=json_data['source']
         collection.verified = True
         db.session.commit()

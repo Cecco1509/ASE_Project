@@ -56,5 +56,8 @@
     "services":{
         "gachasadmin":"http://gachasadmin:5000",
         "gachasuser":"http://gachasuser:5000"
+    },
+    "system_settings":{
+        "gacha_roll_price":100
     }
 }

@@ -109,6 +109,14 @@ def get_system_gacha_details(gachaId):
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
+"""Gacha Roll Endpoints"""
+@app.route('/api/player/gacha/roll', methods=['POST'])
+@handle_errors
+def roll_gacha():
+    response = requests.post(GACHAS_USER_URL + f'/api/player/gacha/roll', json=request.get_json())
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
 # TODO: create separate files and import them here
 
 def create_app():
