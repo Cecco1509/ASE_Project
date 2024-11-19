@@ -19,7 +19,7 @@ def get_all_gacha():
     response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha')
     response.raise_for_status()
     gacha_items = response.json()
-    return make_response(jsonify(gacha_items), 200)
+    return make_response(jsonify(gacha_items), response.status_code)
 
 """Fetch a single gacha item by ID."""
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['GET'])
@@ -28,7 +28,7 @@ def get_single_gacha(gachaId):
     """Fetch a single gacha item by ID."""
     response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}')
     response.raise_for_status()
-    return make_response(jsonify(response.json()), 200)
+    return make_response(jsonify(response.json()), response.status_code)
 
 """Create a new gacha item."""
 @app.route('/api/admin/gacha', methods=['POST'])
@@ -48,7 +48,7 @@ def create_gacha():
     # all data is valid, send to the DB manager
     response = requests.post(DB_MANAGER_GACHA_URL + f'/gacha', json=json_data)
     response.raise_for_status()
-    return make_response(jsonify(response.json()), 200)
+    return make_response(jsonify(response.json()), response.status_code)
 
 def is_valid_gacha_data(data):
     """
@@ -102,7 +102,7 @@ def delete_gacha(gachaId):
     """Delete a gacha item."""
     response = requests.delete(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}')
     response.raise_for_status()
-    return make_response(jsonify(response.json()), 200)
+    return make_response(jsonify(response.json()), response.status_code)
 
 """Get all gacha collections."""
 @app.route('/api/admin/gachacollection', methods=['GET'])
@@ -112,7 +112,7 @@ def get_all_gachacollections():
     response = requests.get(DB_MANAGER_GACHA_URL + f'/gachacollection')
     response.raise_for_status()
     gacha_collections = response.json()
-    return make_response(jsonify(gacha_collections), 200)
+    return make_response(jsonify(gacha_collections), response.status_code)
 
 def create_app():
     return app

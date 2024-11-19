@@ -21,7 +21,7 @@ def admin_gacha():
     response = requests.get(GACHAS_ADMIN_URL + '/api/admin/gacha')
     response.raise_for_status()
     gacha_items = response.json()
-    return make_response(jsonify(gacha_items), 200)
+    return make_response(jsonify(gacha_items), response.status_code)
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
@@ -29,7 +29,7 @@ def get_single_gacha(gachaId):
     """Fetch a single gacha item by ID."""
     response = requests.get(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gachaId}')
     response.raise_for_status()
-    return make_response(jsonify(response.json()), 200)
+    return make_response(jsonify(response.json()), response.status_code)
     
 @app.route('/api/admin/gacha', methods=['POST'])
 @handle_errors
@@ -55,7 +55,7 @@ def update_gacha(gachaId):
         return make_response(jsonify({"message":"No JSON data provided"}), 400)
 
     response = requests.put(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gachaId}', json=json_data)
-    return make_response(jsonify(response.json()), 200)
+    return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['DELETE'])
 @handle_errors
@@ -63,7 +63,7 @@ def delete_gacha(gachaId):
     """Delete a gacha item."""
     response = requests.delete(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gachaId}')
     response.raise_for_status()
-    return make_response(jsonify(response.json()), 200)
+    return make_response(jsonify(response.json()), response.status_code)
 
 """Fetch all gacha collections."""
 @app.route('/api/admin/gachacollection', methods=['GET'])
@@ -72,7 +72,7 @@ def admin_gachacollection():
     response = requests.get(GACHAS_ADMIN_URL + '/api/admin/gachacollection')
     response.raise_for_status()
     gacha_collections = response.json()
-    return make_response(jsonify(gacha_collections), 200)
+    return make_response(jsonify(gacha_collections), response.status_code)
 
 """GatchasUser ENDPOINTS"""
 
@@ -81,7 +81,7 @@ def admin_gachacollection():
 def get_gacha_collection(userId):
     response = requests.get(GACHAS_USER_URL + f'/api/player/gacha/player-collection/{userId}')
     response.raise_for_status()
-    return make_response(response.json(), 200)
+    return make_response(response.json(), response.status_code)
 
 # Get player's gacha collection item
 @app.route('/api/player/gacha/player-collection/item/<int:collectionId>', methods=['GET'])
