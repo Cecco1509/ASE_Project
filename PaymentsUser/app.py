@@ -21,7 +21,7 @@ def create_app():
 def get_transaction_history(user_id):
     try:
         # Send a GET request to the database manager service to fetch transaction history
-        response = requests.get(config.urls.db_manager+ f'/currencytransaction/{user_id}')
+        response = requests.get(config.dbamangers.payment+ f'/currencytransaction/{user_id}')
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -64,7 +64,7 @@ def purchase_in_game_currency():
 
 
         # Calculate the real amount of money based on the in-game currency and currency rate
-        real_amount = in_game_currency * config.exchange_price
+        real_amount = in_game_currency * config.system_settings.gacha_roll_price
 
         # Define the payload to send to the database manager service
         payload = {
@@ -75,7 +75,7 @@ def purchase_in_game_currency():
         }
 
         # Send a POST request to the database manager service to process the purchase
-        response = requests.post(config.urls.db_manager+f'/currencytransaction', json=payload)
+        response = requests.post(config.dbmanagers.payment+f'/currencytransaction', json=payload)
         
         # Check if the request was successful
         if response.status_code == 200:  # Assuming 200 for successful creation
@@ -116,7 +116,7 @@ def decrease_in_game_currency(user_id):
             return make_response(jsonify({'error': 'amount must be greater than zero'}), 400)
 
         # Fetch the user's current balance from the database manager
-        balance_response = requests.get(config.urls.db_manager+ f'/user/{user_id}')
+        balance_response = requests.get(config.dbmanagers.user+ f'/user/{user_id}')
 
         
         if balance_response.status_code == 404:
@@ -143,7 +143,7 @@ def decrease_in_game_currency(user_id):
         }
 
         # Send a PUT request to the database manager service to decrease the balance
-        response = requests.put(config.urls.db_manager+f'/user/{user_id}', json=payload)
+        response = requests.put(config.dbmanagers.user+f'/user/{user_id}', json=payload)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -183,7 +183,7 @@ def increase_currency(user_id):
         if amount <= 0:
             return make_response(jsonify({'error': 'Amount must be a positive number'}), 400)
 
-        balance_response = requests.get(config.urls.db_manager+ f'/user/{user_id}')
+        balance_response = requests.get(config.dbmanagers.user+ f'/user/{user_id}')
         
         if balance_response.status_code == 404:
             return make_response(jsonify({'error': 'User not found'}), 404)
@@ -204,7 +204,7 @@ def increase_currency(user_id):
         }
 
         # Make a POST request to the database manager's /transactions endpoint
-        response = requests.put(config.urls.db_manager+f'/user/{user_id}', json=payload)
+        response = requests.put(config.dbmanagers.user+f'/user/{user_id}', json=payload)
 
         # Check if the request was successful
         if response.status_code == 200:

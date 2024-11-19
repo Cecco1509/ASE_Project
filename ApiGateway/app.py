@@ -3,8 +3,6 @@ import requests, time
 from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
-from python_json_config import ConfigBuilder
-from handle_errors import handle_errors
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
@@ -129,7 +127,7 @@ def create_app():
 def get_transaction_history(user_id):
     
         # Send a GET request to the database manager service to fetch transaction history
-        response = requests.get(config.urls.payments_player_microservice+f'/api/player/currency/{user_id}')
+        response = requests.get(config.services.payments_player_microservice+f'/api/player/currency/{user_id}')
         return response
 
 
@@ -138,7 +136,7 @@ def purchase_in_game_currency():
         # Prepare payload
         data = request.get_json()
         # Send request to microservice
-        response = requests.post(f"{config.urls.payments_player_microservice}/api/player/currency/", json=data)
+        response = requests.post(f"{config.services.payments_player_microservice}/api/player/currency/", json=data)
         # Forward the microservice's response to the user
         return response
 
@@ -148,7 +146,7 @@ def decrease_in_game_currency(user_id):
         # Extract the amount to be deducted from the request body
         data = request.get_json()
         
-        response = requests.put(config.urls.payments_player_microservice+ f'/api/player/decrease/update_balance', json=data)
+        response = requests.put(config.services.payments_player_microservice+ f'/api/player/decrease/update_balance', json=data)
         
         return response
 
@@ -158,6 +156,6 @@ def increase_currency(user_id):
     
         data = request.get_json()
         
-        response = requests.put(config.urls.payments_player_microservice+ f'/api/player/increase/update_balance', json=data)
+        response = requests.put(config.services.payments_player_microservice+ f'/api/player/increase/update_balance', json=data)
 
         return response
