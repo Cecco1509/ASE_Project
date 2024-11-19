@@ -12,7 +12,7 @@ services:
       #- authadmin
       # - authuser
       # - authdbmanager
-      #- auctiondbmanager
+      - auctiondbmanager
       #- userdbmanager
       #- gachadbmanager
       #- transactiondbmanager
@@ -37,6 +37,8 @@ services:
       context: ./AuctionsAdmin
       dockerfile: Dockerfile
     container_name: auctionsadmin
+    depends_on:
+      - auctiondbmanager
     volumes:
       - ./shared/:/app/
 
@@ -73,20 +75,20 @@ services:
       context: ./AuctionDBManager
       dockerfile: Dockerfile
     container_name: auctiondbmanager
-    # depends_on:
-    #   - auctiondatabase
+    depends_on:
+      - auctiondatabase
     volumes:
       - ./shared/:/app/
 
-  # gachadbmanager:
-  #   build:
-  #     context: ./GachaDBManager
-  #     dockerfile: Dockerfile
-  #   container_name: gachadbmanager
-  #   # depends_on:
-  #   #   - gachadatabase
-  #   volumes:
-  #     - ./shared:/app/shared:ro
+  gachadbmanager:
+    build:
+      context: ./GachaDBManager
+      dockerfile: Dockerfile
+    container_name: gachadbmanager
+    depends_on:
+      - gachadatabase
+    volumes:
+      - ./shared:/app/
 
   # paymentdbmanager:
   #   build:
@@ -125,12 +127,12 @@ services:
   #     - ACCEPT_EULA=Y
   #   container_name: authdatabase
 
-  # gachadatabase:
-  #   image: mcr.microsoft.com/mssql/server:2017-latest
-  #   environment:
-  #     - SA_PASSWORD=Password1.
-  #     - ACCEPT_EULA=Y
-  #   container_name: gachadatabase
+  gachadatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    container_name: gachadatabase
 
   # userdatabase:
   #   image: mcr.microsoft.com/mssql/server:2017-latest
@@ -146,12 +148,12 @@ services:
   #     - ACCEPT_EULA=Y
   #   container_name: paymentdatabase
 
-  # auctiondatabase:
-  #   image: mcr.microsoft.com/mssql/server:2017-latest
-  #   environment:
-  #     - SA_PASSWORD=Password1.
-  #     - ACCEPT_EULA=Y
-  #   container_name: auctiondatabase
+  auctiondatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    container_name: auctiondatabase
 
   # transactiondatabase:
   #   image: mcr.microsoft.com/mssql/server:2017-latest

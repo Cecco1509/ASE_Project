@@ -1,7 +1,15 @@
 from app import app
 from app import db
-from shared.models import Auction
+from models import Auction
 from flask import Flask, request, make_response, jsonify
+
+
+@app.route('/auction', methods=['GET'])
+def get_all_auctions(status):
+    auctions = db.session.execute(db.select(Auction)).scalars()
+    if auctions:
+        return make_response(jsonify([auction.to_dict() for auction in auctions]), 200)
+    return make_response(jsonify({"message":"Auctions not found"}), 404)
 
 @app.route('/auction/<string:status>', methods=['GET'])
 def get_all_auctions_with_status(status):

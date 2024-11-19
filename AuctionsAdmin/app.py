@@ -23,11 +23,11 @@ def check_auction(auction) -> bool:
     if auction.auctionStart > auction.auctionEnd:
         return False
     
-    collection = requests.get(config.dbmanagers.gacha+"/gachacollection/"+auction.gachaCollectionId, verify=False);
+    collection = requests.get(config.dbmanagers.gacha+"/gachacollection/"+auction.gachaCollectionId, verify=False)
     if collection.status_code != 200:
         return False
     
-    return True;
+    return True
 
 
 #GET /auctions: Admin view of all auctions.
@@ -50,7 +50,7 @@ def get_all_auctions():
 def get_auction(auction_id):
     print(f"GET auction", auction_id)
     try:
-        response = requests.get(config.dbmanagers.auction + f'/auction/' + auction_id, verify=False)
+        response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}', verify=False)
         response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
 
         auction = response.json()
@@ -66,12 +66,12 @@ def update_auction(auction_id):
         try:
             data = request.get_json()
             print(f"DATA -> ",data)
-            auction = data;
+            auction = data
         except Exception as e:
             print(f"ERROR -> ", e)
             return make_response(jsonify({"message": "Invalid auction data"}), 400)
         
-        check_auction(auction);
+        check_auction(auction)
 
         response = requests.put(config.dbmanagers.auction + '/auction/' + auction_id, json=auction.to_dict(), headers={
             "Content-Type": "application/json",
@@ -104,7 +104,7 @@ def user_history(user_id):
     print(f"GET History of user" + user_id)
     try:
         data = request.get_json()
-        auction = data;
+        auction = data
 
         user_collection_req = requests.get(config.dbmanagers.gacha + f'/gachacollection/' + user_id)
         user_collection_req.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)

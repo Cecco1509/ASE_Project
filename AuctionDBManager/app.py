@@ -6,7 +6,7 @@ from python_json_config import ConfigBuilder
 import time
 
 builder = ConfigBuilder()
-config = builder.parse_config('app/config.json')
+config = builder.parse_config('/app/config.json')
 
 def create_connection_string(db):
     return f'mssql+pyodbc://{db.username}:{db.password}@{db.server}:{db.port}/{db.name}?driver=ODBC+Driver+17+for+SQL+Server'
@@ -34,7 +34,7 @@ for i in range(config.databases.retries):
 db = SQLAlchemy(app)
 import sys
 sys.path.append('/app')
-from models import Auction, AuctionStatus, GachaCollection
+from models import *
 import AuctionEndpoints
 import AuctionBidEndpoints
 
