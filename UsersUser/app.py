@@ -1,6 +1,6 @@
 import requests, time
 from python_json_config import ConfigBuilder
-from flask import Flask, request, make_response 
+from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
 
