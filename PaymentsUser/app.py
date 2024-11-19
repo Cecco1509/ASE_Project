@@ -51,7 +51,7 @@ def purchase_in_game_currency():
     try:
         # Extract data from request body
         data = request.get_json()
-        in_game_currency = data.get('Am')
+        in_game_currency = data.get('ingameAmount')
         user_id = data.get('userId')
         
 
@@ -70,7 +70,7 @@ def purchase_in_game_currency():
         payload = {
             'userId': user_id,
             'timeStamp': datetime.now(),
-            'Am': in_game_currency,
+            'ingameAmount': in_game_currency,
             'realAmount': real_amount
         }
 
@@ -139,7 +139,7 @@ def decrease_in_game_currency(user_id):
         payload = {
             'status': status,
             'profilePicture': profile_picture,
-            'ingameCurrency': in_game_amount-amount
+            'ingameAmount': in_game_amount-amount
         }
 
         # Send a PUT request to the database manager service to decrease the balance
@@ -192,7 +192,7 @@ def increase_currency(user_id):
         
         # Parse the balance data from the response
         user_data = balance_response.json()
-        in_game_amount = user_data.get('in_game_amount')
+        in_game_amount = user_data.get('ingameAmount')
         profile_picture= user_data.get('profilePicture')
         status=user_data.get('status')
 
@@ -200,7 +200,7 @@ def increase_currency(user_id):
         payload = {
             'status': status,
             'profilePicture': profile_picture,
-            'ingameCurrency': in_game_amount+amount
+            'ingameAmount': in_game_amount+amount
         }
 
         # Make a POST request to the database manager's /transactions endpoint
