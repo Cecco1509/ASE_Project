@@ -1,6 +1,6 @@
 import requests, time
 
-from flask import Flask, request, make_response 
+from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
 from datetime import datetime
@@ -9,17 +9,17 @@ from python_json_config import ConfigBuilder
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
 builder = ConfigBuilder()
-config = builder.parse_config('./config.json')
+config = builder.parse_config('/app/config.json')
 
 @app.route('/api/player/register', methods=['POST'])
 def register_user():
     json_data = request.get_json()
-    if json_data |json_data['username'] | json_data['password']:
-        user = request.get(f"{config.db_manager_url}/account/username/{json_data['username']}")
+    if json_data and 'username' in json_data and 'password' in json_data and 'profilePicture' in json_data:
+        user = request.get(f"{config.dbmanagers.auth}/account/username/{json_data['username']}")
         if user:
-            return make_response(jsonify({"message":"Username taken."}), 400)
+           return make_response(jsonify({"message":"Username taken."}), 409)
         authData = {"username":json_data['username'],"password":json_data['password']}
-        response = requests.post(f"{config.db_manager_url}/account", json=authData)
+        response = requests.post(f"{config.dbmanagers.auth}/account", json=authData)
         if response.status == 200:
             userData = {
             'authId': response.get_json()['authId'],
@@ -27,24 +27,24 @@ def register_user():
             'profilePicture': json_data['profilePicture'],
             'registrationDate': datetime.now(),
             'status': "ACTIVE"}
-            response = requests.post(f"{config.db_manager_url}/user", json=userData)
+            response = requests.post(f"{config.dbmanagers.user}/user", json=userData)
             return make_response(jsonify(response.get_json()), response.status)
         return make_response(jsonify({"message":"User registration failed."}), 400)
     return make_response(jsonify({"message":"Invalid data."}), 400)
 
-@app.route('/api/player/login/<int:userId>', methods=['POST'])
-def login(userId):
+@app.route('/api/player/login', methods=['POST'])
+def login():
     json_data = request.get_json()
-    if json_data:
-        response = requests.get(f"{config.db_manager_url}/user/{userId}")
+    if json_data and 'username' in json_data and 'password' in json_data:
+        response = get_user(json_data['username'])
         response_json = response.get_json()
         if response.status == 200:
-            if json_data['username'] == response_json['username'] & json_data['password']==response_json['password']:
-                return make_response({"message":"User succesfully loged in."}, 200)
-            return make_response(jsonify({"message":"Username or password incorrect."}), 400)
+            if json_data['username'] == response_json['username'] and json_data['password']==response_json['password']:
+                return make_response({"message":"User succesfully logged in."}, 200)
+        return make_response(jsonify({"message":"Username or password incorrect."}), 400)
     return make_response(jsonify({"message":"Invalid data."}), 400)
 
-@app.route('api/player/logout/<int:userId>', method=['POST'])
+@app.route('/api/player/logout/<int:userId>', methods=['POST'])
 def logout(userId):
     return make_response({"message":"User succuesfully logged out."}, 200)
 
