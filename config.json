@@ -54,8 +54,8 @@
         "payment":"http://paymentdbmanager:5000"
     },
     "services":{
-        "auctionadmin":"http://auctionadmin:5000",
-        "auctionuser":"http://auctionuser:5000"
+        "auctionsadmin":"http://auctionsadmin:5000",
+        "auctionsuser":"http://auctionsuser:5000"
     },
     "system_settings":{
         "gacha_roll_price":100

@@ -10,8 +10,8 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
-AUCTION_ADMIN_URL = config.services.auctionadmin
-AUCTION_USER_URL = config.services.auctionuser
+AUCTION_ADMIN_URL = config.services.auctionsadmin
+AUCTION_USER_URL = config.services.auctionsuser
 GACHA_ADMIN_URL = config.services.gachaadmin
 GACHA_USER_URL = config.services.gachauser
 
@@ -62,6 +62,41 @@ def roll_gacha():
 # TODO: create separate files and import them here
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 """AuctionsAdmin ENDPOINTS"""
 @app.route('/api/admin/auction', methods=['GET'])
 @handle_errors
@@ -82,7 +117,7 @@ def get_single_auction(auctionId):
     
 @app.route('/api/admin/auction/<int:auctionId>', methods=['PUT'])
 @handle_errors
-def create_auction():
+def modify_auction():
     """Create a new auction item."""
     json_data = request.get_json()
 
@@ -90,8 +125,7 @@ def create_auction():
         return make_response(jsonify({"message":"No JSON data provided"}), 400)
 
     response = requests.post(AUCTION_ADMIN_URL + '/auction', json=json_data)
-    #response.raise_for_status()
-    # i commented this line so the 400 error message will be returned the same, otherwise, the error message will be ovverriden
+    
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/admin/auction/<int:auctionId>', methods=['PUT'])
@@ -111,7 +145,7 @@ def update_auction(auctionId):
 def auction_history():
     """GET auction history."""
     response = requests.get(AUCTION_ADMIN_URL + f'/auction/history')
-    response.raise_for_status()
+    
     return make_response(jsonify(response.json()), response.status_code)
 
 """Fetch all auction user history."""
@@ -126,7 +160,7 @@ def admin_auction_user_history(userId):
 
 """UserAuctions ENDPOINTS"""
 
-@app.route('api/player/auction/market', methods=['GET'])
+@app.route('/api/player/auction/market', methods=['GET'])
 @handle_errors
 def auction_market():
     """GET auction history."""
@@ -134,20 +168,20 @@ def auction_market():
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
 
-@app.route('api/player/auction', methods=['POST'])
+@app.route('/api/player/auction', methods=['POST'])
 @handle_errors
 def create_auction():
     response = requests.post(GACHA_USER_URL + f'/auction', json=request.get_json())
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
-@app.route('api/player/auction/<auction_id>/bid', methods=['POST'])
+@app.route('/api/player/auction/<auction_id>/bid', methods=['POST'])
 def create_bid(auctionId):
     response = requests.post(GACHA_USER_URL + f'/auction/{auctionId}/bid', json=request.get_json())
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
-@app.route('api/player/auction/history', methods=['GET'])
+@app.route('/api/player/auction/history', methods=['GET'])
 def user_auction_history(auctionId):
     response = requests.post(GACHA_USER_URL + f'/auction/history')
     response.raise_for_status()

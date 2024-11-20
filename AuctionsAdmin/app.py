@@ -87,11 +87,12 @@ def history():
     try:
 
         response = requests.get(config.dbmanagers.auction + f'/auction/2')
-        response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
+        auctions = {"auctions" : []}
 
-        auctions = response.json()
+        if response.status_code != 404:
+            auctions["auctions"] = response.json()
 
-        return make_response(jsonify({"history", auctions}), 200)
+        return make_response(jsonify(auctions), 200)
     except Exception as e:
         return make_response(jsonify({"message": str(e)}, 500))
     
