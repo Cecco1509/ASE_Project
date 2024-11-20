@@ -12,13 +12,62 @@ builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 AUCTION_ADMIN_URL = config.services.auctionadmin
 AUCTION_USER_URL = config.services.auctionuser
+GACHA_ADMIN_URL = config.services.gachaadmin
+GACHA_USER_URL = config.services.gachauser
 
-"""AuctionssAdmin ENDPOINTS"""
+
+"""GachasUser ENDPOINTS"""
+
+@app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
+@handle_errors
+def get_gacha_collection(userId):
+    response = requests.get(GACHA_USER_URL + f'/api/player/gacha/player-collection/{userId}')
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
+# Get player's gacha collection item
+@app.route('/api/player/gacha/player-collection/item/<int:collectionId>', methods=['GET'])
+@handle_errors
+def get_gacha_collection_details(collectionId):
+    response = requests.get(GACHA_USER_URL + f'/api/player/gacha/player-collection/item/{collectionId}')
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
+"""System Collection Endpoints"""
+
+# Get full system gacha collection.
+@app.route('/api/player/gacha/system-collection', methods=['GET'])
+@handle_errors
+def get_system_gacha_collection():
+    response = requests.get(GACHA_USER_URL + '/api/player/gacha/system-collection')
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
+# Get details of a specific system gacha item.
+@app.route('/api/player/gacha/system-collection/<int:gachaId>', methods=['GET'])
+@handle_errors
+def get_system_gacha_details(gachaId):
+    response = requests.get(GACHA_USER_URL + f'/api/player/gacha/system-collection/{gachaId}')
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
+"""gacha Roll Endpoints"""
+@app.route('/api/player/gacha/roll', methods=['POST'])
+@handle_errors
+def roll_gacha():
+    response = requests.post(GACHA_USER_URL + f'/api/player/gacha/roll', json=request.get_json())
+    response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
+# TODO: create separate files and import them here
+
+
+"""AuctionsAdmin ENDPOINTS"""
 @app.route('/api/admin/auction', methods=['GET'])
 @handle_errors
 def admin_auctions():
     """Fetch all auction items."""
-    response = requests.get(AUCTION_ADMIN_URL + '/api/admin/auction')
+    response = requests.get(AUCTION_ADMIN_URL + '/auction')
     response.raise_for_status()
     auction_items = response.json()
     return make_response(jsonify(auction_items), response.status_code)
@@ -27,7 +76,7 @@ def admin_auctions():
 @handle_errors
 def get_single_auction(auctionId):
     """Fetch a single auction item by ID."""
-    response = requests.get(AUCTION_ADMIN_URL + f'/api/admin/auction/{auctionId}')
+    response = requests.get(AUCTION_ADMIN_URL + f'/auction/{auctionId}')
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
     
@@ -40,7 +89,7 @@ def create_auction():
     if not json_data:
         return make_response(jsonify({"message":"No JSON data provided"}), 400)
 
-    response = requests.post(AUCTION_ADMIN_URL + '/api/admin/auction', json=json_data)
+    response = requests.post(AUCTION_ADMIN_URL + '/auction', json=json_data)
     #response.raise_for_status()
     # i commented this line so the 400 error message will be returned the same, otherwise, the error message will be ovverriden
     return make_response(jsonify(response.json()), response.status_code)
@@ -54,70 +103,55 @@ def update_auction(auctionId):
     if not json_data:
         return make_response(jsonify({"message":"No JSON data provided"}), 400)
 
-    response = requests.put(AUCTION_ADMIN_URL + f'/api/admin/auction/{auctionId}', json=json_data)
+    response = requests.put(AUCTION_ADMIN_URL + f'/auction/{auctionId}', json=json_data)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/admin/auction/history', methods=['GET'])
 @handle_errors
 def auction_history():
     """GET auction history."""
-    response = requests.get(AUCTION_ADMIN_URL + f'/api/admin/auction/history')
+    response = requests.get(AUCTION_ADMIN_URL + f'/auction/history')
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
 
-"""Fetch all auction collections."""
+"""Fetch all auction user history."""
 @app.route('/api/admin/auction/history/<int:userId>', methods=['GET'])
 @handle_errors
 def admin_auction_user_history(userId):
-    response = requests.get(AUCTION_ADMIN_URL + '/api/admin/history/{userId}')
+    response = requests.get(AUCTION_ADMIN_URL + '/history/{userId}')
     response.raise_for_status()
     auction_collections = response.json()
     return make_response(jsonify(auction_collections), response.status_code)
 
-"""AuctionsUser ENDPOINTS"""
 
-@app.route('/api/player/auction/player-collection/<int:userId>', methods=['GET'])
+"""UserAuctions ENDPOINTS"""
+
+@app.route('api/player/auction/market', methods=['GET'])
 @handle_errors
-def get_auction_collection(userId):
-    response = requests.get(AUCTION_USER_URL + f'/api/player/auction/player-collection/{userId}')
+def auction_market():
+    """GET auction history."""
+    response = requests.get(AUCTION_USER_URL + f'/auction/history')
+    response.raise_for_status()
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('api/player/auction', methods=['POST'])
+@handle_errors
+def create_auction():
+    response = requests.post(GACHA_USER_URL + f'/auction', json=request.get_json())
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
-# Get player's auction collection item
-@app.route('/api/player/auction/player-collection/item/<int:collectionId>', methods=['GET'])
-@handle_errors
-def get_auction_collection_details(collectionId):
-    response = requests.get(AUCTION_USER_URL + f'/api/player/auction/player-collection/item/{collectionId}')
+@app.route('api/player/auction/<auction_id>/bid', methods=['POST'])
+def create_bid(auctionId):
+    response = requests.post(GACHA_USER_URL + f'/auction/{auctionId}/bid', json=request.get_json())
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
-"""System Collection Endpoints"""
-
-# Get full system auction collection.
-@app.route('/api/player/auction/system-collection', methods=['GET'])
-@handle_errors
-def get_system_auction_collection():
-    response = requests.get(AUCTION_USER_URL + '/api/player/auction/system-collection')
+@app.route('api/player/auction/history', methods=['GET'])
+def user_auction_history(auctionId):
+    response = requests.post(GACHA_USER_URL + f'/auction/history')
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
-
-# Get details of a specific system auction item.
-@app.route('/api/player/auction/system-collection/<int:auctionId>', methods=['GET'])
-@handle_errors
-def get_system_auction_details(auctionId):
-    response = requests.get(AUCTION_USER_URL + f'/api/player/auction/system-collection/{auctionId}')
-    response.raise_for_status()
-    return make_response(response.json(), response.status_code)
-
-"""auction Roll Endpoints"""
-@app.route('/api/player/auction/roll', methods=['POST'])
-@handle_errors
-def roll_auction():
-    response = requests.post(AUCTION_USER_URL + f'/api/player/auction/roll', json=request.get_json())
-    response.raise_for_status()
-    return make_response(response.json(), response.status_code)
-
-# TODO: create separate files and import them here
 
 def create_app():
     return app

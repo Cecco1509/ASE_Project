@@ -15,7 +15,6 @@ def create_app():
 
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
-print(config.databases.retries)
 
 print = functools.partial(print, flush=True)
 
