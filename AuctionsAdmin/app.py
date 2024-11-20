@@ -99,22 +99,26 @@ def history():
 
 @app.route('/auction/history/<user_id>', methods=['GET'])
 def user_history(user_id):
-    print(f"GET History of user" + user_id)
+    print(f"GET History of user " + user_id)
     try:
         data = request.get_json()
         auction = data
 
-        user_collection_req = requests.get(config.dbmanagers.gacha + f'/gachacollection/{user_id}')
-        user_collection_req.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
+        user_collection_res = requests.get(config.dbmanagers.gacha + f'/gachacollection/{user_id}')
 
         auction_req = requests.get(config.dbmanagers.auction + '/auction')
-        auction_req.raise_for_status()
 
-        user_collection = user_collection_req.json()
+        user_collection = user_collection_res.json()
         auctions = auction_req.json()
+
+        if user_collection is None:
+            user_collection = {}
+
+        if auctions is None:
+            auctions = {}
 
         history = {}
 
-        return make_response(jsonify({"history":jsonify(history), "usercoll":jsonify(user_collection), "auctions": jsonify(auctions)}), 200) ## Substitute with DBManager request
+        return make_response(jsonify({"history":jsonify(history), "usercoll":user_collection, "auctions": auctions}), 200) ## Substitute with DBManager request
     except Exception as e:
         return make_response(jsonify({"message": str(e)}, 500))

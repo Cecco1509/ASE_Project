@@ -4,8 +4,6 @@ services:
       context: ./ApiGateway
       dockerfile: Dockerfile
     container_name: apigateway
-    image: digitalocean.com/webserver:latest
-    restart: unless-stopped
     depends_on:
       - auctionsadmin
       #- auctionsuser
@@ -27,9 +25,8 @@ services:
       # - usersadmin
       # - usersuser
     ports:
-      - "80:80"
+      - "5000:5000"
     volumes:
-      - ./ApiGateway/html:/usr/share/nginx/html
       - ./config.json:/app/config.json
 
   auctionsadmin:
