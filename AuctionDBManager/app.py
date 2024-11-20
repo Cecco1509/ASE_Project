@@ -32,9 +32,7 @@ for i in range(config.databases.retries):
         time.sleep(config.databases.timeout)
 
 db = SQLAlchemy(app)
-import sys
-sys.path.append('/app')
-from models import *
+import models
 import AuctionEndpoints
 import AuctionBidEndpoints
 

@@ -14,7 +14,7 @@ services:
       # - authdbmanager
       - auctiondbmanager
       #- userdbmanager
-      #- gachadbmanager
+      - gachadbmanager
       #- transactiondbmanager
       #- paymentdbmanager
       # - gachasadmin
@@ -30,7 +30,7 @@ services:
       - "80:80"
     volumes:
       - ./ApiGateway/html:/usr/share/nginx/html
-      - ./shared/config.json:/app/config.json
+      - ./config.json:/app/config.json
 
   auctionsadmin:
     build:
@@ -40,7 +40,7 @@ services:
     depends_on:
       - auctiondbmanager
     volumes:
-      - ./shared/:/app/
+      - ./config.json:/app/config.json
 
   # auctionsuser:
   #   build:
@@ -78,7 +78,7 @@ services:
     depends_on:
       - auctiondatabase
     volumes:
-      - ./shared/:/app/
+      - ./config.json:/app/config.json
 
   gachadbmanager:
     build:
@@ -88,7 +88,7 @@ services:
     depends_on:
       - gachadatabase
     volumes:
-      - ./shared:/app/
+      - ./config.json:/app/config.json
 
   # paymentdbmanager:
   #   build:
