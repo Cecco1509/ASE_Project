@@ -68,8 +68,8 @@ def is_valid_gacha_data(data):
         if not isinstance(data[field], expected_type):
             return False, f"Invalid type for field '{field}': Expected {expected_type.__name__}"
 
-    # Additional validation: rarityPercent should be between 0 and 1
-    if not (0 <= data["rarityPercent"] <= 1):
+    # Additional validation: rarityPercent should be between 0 and 100
+    if not (0 <= data["rarityPercent"] <= 100):
         return False, "Rarity percent must be a value between 0 and 1."
 
     return True, "Data is valid"
