@@ -23,7 +23,7 @@ def check_auction(auction) -> bool:
     if auction.auctionStart > auction.auctionEnd:
         return False
     
-    collection = requests.get(config.dbmanagers.gacha+"/gachacollection/"+auction.gachaCollectionId, verify=False)
+    collection = requests.get(config.dbmanagers.gacha+f"/gachacollection/{auction.gachaCollectionId}", verify=False)
     if collection.status_code != 200:
         return False
     
@@ -73,7 +73,7 @@ def update_auction(auction_id):
         
         check_auction(auction)
 
-        response = requests.put(config.dbmanagers.auction + '/auction/' + auction_id, json=auction.to_dict(), headers={
+        response = requests.put(config.dbmanagers.auction + f'/auction/{auction_id}', json=auction.to_dict(), headers={
             "Content-Type": "application/json",
         })
         response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
@@ -106,10 +106,10 @@ def user_history(user_id):
         data = request.get_json()
         auction = data
 
-        user_collection_req = requests.get(config.dbmanagers.gacha + f'/gachacollection/' + user_id)
+        user_collection_req = requests.get(config.dbmanagers.gacha + f'/gachacollection/{user_id}')
         user_collection_req.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
 
-        auction_req = requests.get(config.dbmanagers.auction + f'/auction')
+        auction_req = requests.get(config.dbmanagers.auction + '/auction')
         auction_req.raise_for_status()
 
         user_collection = user_collection_req.json()
