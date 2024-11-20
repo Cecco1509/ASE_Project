@@ -35,7 +35,6 @@ def check_auction(auction) -> bool:
 def get_all_auctions():
     print(f"GET all auctions")
     try:
-
         response = requests.get(config.dbmanagers.auction + f'/auction', verify=False)
         response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
 
@@ -43,7 +42,7 @@ def get_all_auctions():
         return make_response(jsonify(auctions), 200)
     except Exception as e:
         return make_response(jsonify({"message": str(e)}, 500))
-    
+
     
 #GET /auction/<auctions_id>: Admin view specific auction.
 @app.route('/auction/<int:auction_id>', methods=['GET'])
@@ -65,15 +64,14 @@ def update_auction(auction_id):
     try:
         try:
             data = request.get_json()
-            print(f"DATA -> ",data)
-            auction = data
         except Exception as e:
             print(f"ERROR -> ", e)
             return make_response(jsonify({"message": "Invalid auction data"}), 400)
         
-        check_auction(auction)
+        if (not check_auction(data)):
+            return make_response(jsonify({"message": "Invalid auction data"}), 400)
 
-        response = requests.put(config.dbmanagers.auction + f'/auction/{auction_id}', json=auction.to_dict(), headers={
+        response = requests.put(config.dbmanagers.auction + f'/auction/{auction_id}', json=data.to_dict(), headers={
             "Content-Type": "application/json",
         })
         response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
