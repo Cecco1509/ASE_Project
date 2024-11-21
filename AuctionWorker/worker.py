@@ -13,70 +13,70 @@ worker = Celery('auction_worker',
 
 @worker.task
 def end_auction(auctionId):
-    ## set the auction to be closed
-    ## give the money back to the users
-    ## give the gacha to the user who won
-    ## delete the gacha from the user who auctioned it
-    ## give the money to the user who auctioned it
-    auction = requests.get(config.dbmanagers.auction + f'/auction/{auctionId}').json()
-    if auction is None or auction['status'] > 1: # if the auction is already been closed returns
+    # Fetch auction details
+    auction = requests.get(f"{config.dbmanagers.auction}/auction/{auctionId}").json()
+    if not auction or auction['status'] > 1:  # Auction already closed
         return
 
+    # Close the auction
     auction['status'] = 2
-    requests.put(config.dbmanagers.auction + f'/auction/{auctionId}', json=jsonify(auction))
+    requests.put(f"{config.dbmanagers.auction}/auction/{auctionId}", json=auction)
 
-    # get the winning bid
-    bids = requests.get(config.dbmanagers.auction + f'/auctionbid/auction/{auctionId}').json()
+    # Get all bids for the auction
+    bids = requests.get(f"{config.dbmanagers.auction}/auctionbid/auction/{auctionId}").json()
+    if not bids:
+        return
 
-    winningBid = {
-        "id": None,
-        "userId": None,
-        "bidAmount": -100,
-        "auctionId": None,
-        "timestamp": None
-    }
+    # Find the winning bid
+    winningBid = max(bids, key=lambda bid: bid['bidAmount'])
 
-    for bid in bids:
-        if bid['bidAmount'] > winningBid['bidAmount']:
-            winningBid = bid
-
+    # Create a transaction
     transaction = {
-        "sellerId":auction['userId'], 
-        'buyerId':winningBid['userId'],
-        'auctionBidId':winningBid['id'], 
-        'timestamp': datetime.now()
+        "sellerId": auction['userId'],
+        "buyerId": winningBid['userId'],
+        "auctionBidId": winningBid['id'],
+        "timestamp": datetime.now().isoformat()
     }
-    
-    #
-    resp = requests.post(config.dbmanagers.transaction + f'/auctiontransaction', json=jsonify(transaction))
-    if resp.status_code != 200: return
-    
 
-    ## return money to the ones that have lost
+    resp = requests.post(f"{config.dbmanagers.transaction}/auctiontransaction", json=transaction)
+    if resp.status_code != 200:
+        return
+
+    # Return money to losing bidders
     for bid in bids:
         if bid['id'] != winningBid['id']:
-            resp = requests.put(config.services.paymentsuser + f'/api/player/currency/increase/{bid['userId']}', json=jsonify({"amount": bid['bidAmount']}))
-            if resp.status_code!= 200: print(f"Something went wrong INCREASE : {bid['userId']}")
+            resp = requests.put(
+                f"{config.services.paymentsuser}/api/player/currency/increase/{bid['userId']}",
+                json={"amount": bid['bidAmount']}
+            )
+            if resp.status_code != 200:
+                print(f"Error returning money to user {bid['userId']}")
 
-    # give money to the winning bidder
-    requests.put(config.services.paymentsuser + f'/api/player/currency/increase/{auction['userId']}', json=jsonify({"amount": winningBid['bidAmount']}))
+    # Give money to the seller
+    requests.put(
+        f"{config.services.paymentsuser}/api/player/currency/increase/{auction['userId']}",
+        json={"amount": winningBid['bidAmount']}
+    )
 
-    ##GET GACHA
+    # Fetch Gacha
+    gacha = requests.get(
+        f"{config.services.gachauser}/api/player/gacha/player-collection/item/{auction['gachaCollectionId']}"
+    ).json()
 
-    gacha = requests.get(config.services.gachauser + f'/api/player/gacha/player-collection/item/<int:collectionId>/{auction['gachaCollectionId']}')
-    ## Give gacha to user
+    # Assign Gacha to the winning bidder
     requests.post(
-        f'{config.dbmanagers.gacha}/gachacollection', 
+        f"{config.dbmanagers.gacha}/gachacollection",
         json={
-            "gachaId":auction['id'],
-            "userId":winningBid['buyerId'],
-            "source":f"{auction['id']}"
+            "gachaId": auction['id'],
+            "userId": winningBid['userId'],
+            "source": f"{auction['id']}"
         }
     )
 
-    ## remove gacha from seller user
-    requests.delete(config.dbmanagers.gacha + f'/gachacollection/{auction['gachaCollectionId']}')
+    # Remove Gacha from the seller
+    requests.delete(f"{config.dbmanagers.gacha}/gachacollection/{auction['gachaCollectionId']}")
 
-    requests.put(config.dbmanagers.transaction + f'/auctiontransaction', json=jsonify(transaction))
-    
+    # Update the transaction (if required)
+    requests.put(f"{config.dbmanagers.transaction}/auctiontransaction", json=transaction)
+
     print(f"FINISHED -> {auctionId}")
