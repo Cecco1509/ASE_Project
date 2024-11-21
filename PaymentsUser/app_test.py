@@ -2,10 +2,10 @@ import requests, time
 
 from flask import Flask, request, make_response, jsonify 
 from requests.exceptions import ConnectionError, HTTPError
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound 
 from datetime import datetime
 from python_json_config import ConfigBuilder
-from authdb_mock import *
+from paymentsdb_mock import *
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
@@ -19,7 +19,7 @@ def get_transaction_history(userId):
         transaction_history= get_history(userId)
         # Check if the request was successful
         if transaction_history['status']==200:
-            return jsonify(transaction_history)
+            return make_response (jsonify(transaction_history['data']),200)
 
         elif transaction_history['status'] == 404:
             return make_response(jsonify({'error': 'Transactions not found'}), 404)
@@ -76,7 +76,7 @@ def purchase_in_game_currency():
         
         # Check if the request was successful
         if response['status']== 200:  # Assuming 200 for successful creation
-            return make_response(jsonify({'message': 'Purchase successful', 'transaction': response.json()}), 200)
+            return make_response(jsonify({'message': 'Purchase successful', 'transaction': response['userId']}), 200)
 
         elif response['status'] == 400:
             return make_response(jsonify({'error': 'Invalid purchase request'}), 400)
@@ -119,7 +119,7 @@ def decrease_in_game_currency(userId):
             return make_response(jsonify({'error': 'Failed to retrieve user balance'}), 500)
         
         # Parse the balance data from the response
-        user_data = balance_response.json()
+        user_data = balance_response['data']
         in_game_amount = user_data.get('ingameAmount')
         profile_picture= user_data.get('profilePicture')
         status=user_data.get('status')
@@ -141,7 +141,7 @@ def decrease_in_game_currency(userId):
         
         # Check if the request was successful
         if response['status'] == 200:
-            return make_response(jsonify({'message': 'Balance decreased successfully', 'transaction': response.json()}), 200)
+            return make_response(jsonify({'message': 'Balance decreased successfully', 'transaction': response['userId']}), 200)
 
         elif response['status'] == 400:
             return make_response(jsonify({'error': 'Invalid decrease request'}), 400)
@@ -185,7 +185,7 @@ def increase_currency(userId):
             return make_response(jsonify({'error': 'Failed to retrieve user balance'}), 500)
         
         # Parse the balance data from the response
-        user_data = balance_response.json()
+        user_data = balance_response['data']
         in_game_amount = user_data.get('ingameAmount')
         profile_picture= user_data.get('profilePicture')
         status=user_data.get('status')
@@ -202,7 +202,7 @@ def increase_currency(userId):
 
         # Check if the request was successful
         if response['status'] == 200:
-            return make_response(jsonify({'message': 'Currency increased successfully', 'user_id': userId, 'amount': amount}), 200)
+            return make_response(jsonify({'message': 'Currency increased successfully', 'transaction': response['userId']}), 200)
         else:
             # Handle errors from the database manager service
             return make_response(jsonify({'error': 'Failed to update balance on database manager service'}), 500)
