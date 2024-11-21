@@ -38,12 +38,15 @@ services:
       - auctiondbmanager
     volumes:
       - ./config.json:/app/config.json
+      - ./AuctionWorker/worker.py:./celery_app.py
 
   auctionsuser:
     build:
       context: ./AuctionsUser
       dockerfile: Dockerfile
     container_name: auctionsuser
+    volumes:
+      - ./config.json:/app/config.json
 
   # authadmin:
   #   build:

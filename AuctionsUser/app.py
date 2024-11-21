@@ -11,88 +11,16 @@ from python_json_config import ConfigBuilder
 from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
+from celery_app import end_auction
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ?
 
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 
-celery_app = Celery(app.name,
-                    broker='amap://admin:mypass@rabbit:5672', 
-                    backend='rpc://')
-
-
-@celery_app.task
-def end_auction(auctionId):
-    ## set the auction to be closed
-    ## give the money back to the users
-    ## give the gacha to the user who won
-    ## delete the gacha from the user who auctioned it
-    ## give the money to the user who auctioned it
-    auction = requests.get(config.dbmanagers.auction + f'/auction/{auctionId}').json()
-    if auction is None or auction['status'] > 1: # if the auction is already been closed returns
-        return;
-
-    auction['status'] = 2
-    requests.put(config.dbmanagers.auction + f'/auction/{auctionId}', json=jsonify(auction))
-
-    # get the winning bid
-    bids = requests.get(config.dbmanagers.auction + f'/auctionbid/auction/{auctionId}').json()
-
-    winningBid = {
-        "id": None,
-        "userId": None,
-        "bidAmount": -100,
-        "auctionId": None,
-        "timestamp": None
-    }
-
-    for bid in bids:
-        if bid['bidAmount'] > winningBid['bidAmount']:
-            winningBid = bid
-
-    transaction = {
-        "sellerId":auction['userId'], 
-        'buyerId':winningBid['userId'],
-        'auctionBidId':winningBid['id'], 
-        'timestamp': datetime.now()
-    }
-    
-    #
-    resp = requests.post(config.dbmanagers.transaction + f'/auctiontransaction', json=jsonify(transaction))
-    if resp.status_code != 200: return
-    
-
-    ## return money to the ones that have lost
-    for bid in bids:
-        if bid['id'] != winningBid['id']:
-            resp = requests.put(config.services + f'/api/player/currency/increase/{bid['userId']}', json=jsonify({"amount": bid['bidAmount']}))
-            if resp.status_code!= 200: print(f"Something went wrong INCREASE : {bid['userId']}")
-
-    # give money to the winning bidder
-    requests.put(config.services.paymentsuser + f'/api/player/currency/increase/{auction['userId']}', json=jsonify({"amount": winningBid['bidAmount']}))
-
-    ##GET GACHA
-
-    gacha = requests.get(config.services.gachauser + f'/api/player/gacha/player-collection/item/<int:collectionId>/{auction['gachaCollectionId']}')
-    ## Give gacha to user
-    requests.post(
-        f'{config.dbmanagers.gacha}/gachacollection', 
-        json={
-            "gachaId":auction['id'],
-            "userId":winningBid['buyerId'],
-            "source":f"{auction['id']}"
-        }
-    )
-
-    ## remove gacha from seller user
-    requests.delete(config.dbmanagers.gacha + f'/gachacollection/{auction['gachaCollectionId']}')
-
-    requests.put(config.dbmanagers.transaction + f'/auctiontransaction', json=jsonify(transaction))
-    
-    print(f"FINISHED -> {auctionId}")
-
-
+# celery_app = Celery(app.name,
+#                     broker='amap://admin:mypass@rabbit:5672', 
+#                     backend='rpc://')
 
 # GET /api/player/auction/market: Get all active auctions in the market.
 @app.route('/auction/market', methods=['GET'])
@@ -132,7 +60,7 @@ def create_auction(userId):
         response = requests.post(config.dbmanagers.auction + '/auction', json=data)
         new_auction = response.json().get('auctionId');
 
-        r = auction_worker.add_periodic_task(args=('auctionId',new_auction), eta=end);
+        r = end_auction.apply_sync(args=('auctionId',new_auction), eta=end);
 
         return make_response(jsonify(auction=response.json()), 201)
     except Exception as err:
