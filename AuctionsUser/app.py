@@ -3,6 +3,7 @@ from datetime import datetime
 import functools
 import os
 import threading
+import sys
 import requests, time
 from flask import jsonify
 from celery import Celery
@@ -11,7 +12,9 @@ from python_json_config import ConfigBuilder
 from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
-from app.celery_app import end_auction
+
+sys.path.append("/app/")
+from celery_app import end_auction
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ?
 
