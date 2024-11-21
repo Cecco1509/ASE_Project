@@ -11,7 +11,7 @@ from python_json_config import ConfigBuilder
 from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
-from celery_app import end_auction
+from app.celery_app import end_auction
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ?
 

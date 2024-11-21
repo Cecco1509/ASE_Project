@@ -38,7 +38,6 @@ services:
       - auctiondbmanager
     volumes:
       - ./config.json:/app/config.json
-      - ./AuctionWorker/worker.py:./celery_app.py
 
   auctionsuser:
     build:
@@ -47,6 +46,7 @@ services:
     container_name: auctionsuser
     volumes:
       - ./config.json:/app/config.json
+      - ./AuctionWorker/worker.py:/app/celery_app.py
 
   # authadmin:
   #   build:
@@ -191,8 +191,8 @@ services:
       context: ./PaymentsUser
       dockerfile: Dockerfile
     container_name: paymentsuser
-  volumes:
-    - ./config.json:/app/config.json
+    volumes:
+      - ./config.json:/app/config.json
 
   # roll:
   #   build:
@@ -234,7 +234,7 @@ services:
 
   rabbit:
     hostname: rabbit
-    image: "rabbitmg: 3-management"
+    image: "rabbitmq:3-management"
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=mypass
@@ -243,7 +243,9 @@ services:
       - "5672:5672"
 
   auction_worker:
-    build: " /AuctionWorker"
+    build:
+      context: ./AuctionWorker
+      dockerfile: Dockerfile
     user: nobody
     depends_on:
       - rabbit

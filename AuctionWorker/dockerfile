@@ -8,4 +8,4 @@ RUN pip install -r /requirements.txt
 
 ADD . /AuctionWorker
 WORKDIR /AuctionWorker
-ENTRYPOINT celery -A tasks auction_worker --loglevel=info
+ENTRYPOINT celery -A worker auction_worker --loglevel=info
