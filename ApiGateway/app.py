@@ -16,6 +16,8 @@ GACHAS_ADMIN_URL = config.services.gachasadmin
 GACHAS_USER_URL = config.services.gachasuser
 
 """AuctionsAdmin ENDPOINTS"""
+
+# GET /api/admin/auction: Admin view of all auctions.
 @app.route('/api/admin/auction', methods=['GET'])
 @handle_errors
 def admin_auctions():
@@ -25,6 +27,7 @@ def admin_auctions():
     auction_items = response.json()
     return make_response(jsonify(auction_items), response.status_code)
 
+# GET /api/admin/auction/{auction_id}: View specific auction details.
 @app.route('/api/admin/auction/<int:auctionId>', methods=['GET'])
 @handle_errors
 def get_single_auction(auctionId):
@@ -33,39 +36,49 @@ def get_single_auction(auctionId):
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
     
+
+# PUT /api/admin/auction/{auction_id}: Modify a specific auction.
 @app.route('/api/admin/auction/<int:auctionId>', methods=['PUT'])
 @handle_errors
-def modify_auction():
-    """Create a new auction item."""
+def modify_auction(auctionId):
+    """Modify a existent auction item."""
+
     json_data = request.get_json()
 
     if not json_data:
-        return make_response(jsonify({"message":"No JSON data provided"}), 400)
+        return make_response(jsonify({"message": "No JSON data provided"}), 400)
 
-    response = requests.post(AUCTION_ADMIN_URL + '/auction', json=json_data)
-    
+    # External request to modify auction
+    try:
+        response = requests.put(
+            f"{AUCTION_ADMIN_URL}/auction/{auctionId}",
+            json=json_data,
+        )
+        response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+    except requests.exceptions.RequestException as e:
+        return make_response(jsonify({"message": "Failed to modify auction", "error": str(e)}), 500)
+
+    # Return the response from the external service
     return make_response(jsonify(response.json()), response.status_code)
 
-@app.route('/api/admin/auction/<int:auctionId>', methods=['PUT'])
-@handle_errors
-def update_auction(auctionId):
-    """Update a auction item."""
-    json_data = request.get_json()
-
-    if not json_data:
-        return make_response(jsonify({"message":"No JSON data provided"}), 400)
-
-    response = requests.put(AUCTION_ADMIN_URL + f'/auction/{auctionId}', json=json_data)
-    return make_response(jsonify(response.json()), response.status_code)
-
+# GET /api/admin/auction/history: Admin view of all market history (old auctions)
 @app.route('/api/admin/auction/history', methods=['GET'])
 @handle_errors
 def auction_history():
     """GET auction history."""
-    response = requests.get(AUCTION_ADMIN_URL + f'/auction/history')
-    
-    return make_response(jsonify(response.json()), response.status_code)
+    try:
+        # Make the external GET request
+        response = requests.get(f"{AUCTION_ADMIN_URL}/auction/history")
+        response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+        
+        # Return the successful response to the client
+        return make_response(jsonify(response.json()), response.status_code)
 
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to retrieve auction history: {e}")
+        return make_response(jsonify({"message": "Failed to fetch auction history"}), 500)
+
+# GET /api/admin/auction/history/{user_id}: Admin view of speceific user's market history (old auctions).
 """Fetch all auction user history."""
 @app.route('/api/admin/auction/history/<int:userId>', methods=['GET'])
 @handle_errors
@@ -78,22 +91,25 @@ def admin_auction_user_history(userId):
 
 """UserAuctions ENDPOINTS"""
 
+# GET /api/player/auction/market: Get all active auctions in the market.
 @app.route('/api/player/auction/market', methods=['GET'])
 @handle_errors
-def auction_market():
+def auction_market(userId):
     """GET auction history."""
-    response = requests.get(AUCTION_USER_URL + f'/auction/history')
+    response = requests.get(AUCTION_USER_URL + f'/auction/market')
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
 
-@app.route('/api/player/auction', methods=['POST'])
+# POST /api/player/auction/create: Create a new auction listing for a gacha item. (input: gacha id, bid min, timestamp, etc)
+@app.route('/api/player/auction/create>', methods=['POST'])
 @handle_errors
 def create_auction():
-    response = requests.post(AUCTION_USER_URL + f'/auction', json=request.get_json())
+    response = requests.post(AUCTION_USER_URL + f'/auction/create', json=request.get_json())
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
-@app.route('/api/player/auction/<auction_id>/bid', methods=['POST'])
+# POST /api/player/auction/bid/{auction_id}: Place a bid on an active auction.
+@app.route('/api/player/auction/bid/<auction_id>', methods=['POST'])
 def create_bid(auctionId):
     response = requests.post(AUCTION_USER_URL + f'/auction/{auctionId}/bid', json=request.get_json())
     response.raise_for_status()

@@ -11,7 +11,7 @@ def get_all_auctions(status):
         return make_response(jsonify([auction.to_dict() for auction in auctions]), 200)
     return make_response(jsonify({"message":"Auctions not found"}), 404)
 
-@app.route('/auction/<string:status>', methods=['GET'])
+@app.route('/auction/status/<string:status>', methods=['GET'])
 def get_all_auctions_with_status(status):
     auctions = db.session.execute(db.select(Auction).where(Auction.status==status)).scalars()
     if auctions:
@@ -50,15 +50,14 @@ def update_auction(auctionId):
         return make_response(jsonify({"message":"Auction sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid auction data"}), 400)
 
-@app.route('/auction/<int:userId>/<string:status>', methods=['GET'])
+@app.route('/auction/user/<int:userId>/<string:status>', methods=['GET'])
 def user_auctions(userId, status):
-    
     auctions = db.session.execute(db.select(Auction).where(Auction.status==status, Auction.userId==userId)).scalars()
     if auctions:
         return make_response(jsonify([auction.to_dict() for auction in auctions]), 200)
     return make_response(jsonify({"message":"Auctions not found"}), 404)
 
-@app.route('/auction/user/<int:userId>/<int:collectionId>/<int:status>', methods=['GET'])
+@app.route('/auction/<int:userId>/<int:collectionId>/<int:status>', methods=['GET'])
 def user_gacha_auction(userId, collectionId, status):
     
     auctions = db.session.execute(db.select(Auction).where(Auction.status==status, Auction.userId==userId, Auction.gachaCollectionId==collectionId)).scalars()

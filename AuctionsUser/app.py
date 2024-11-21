@@ -29,7 +29,7 @@ from celery_app import end_auction
 @app.route('/auction/market', methods=['GET'])
 def get_auctions():
     try:
-        response = requests.get(config.dbmanagers.auction + '/auction/1')
+        response = requests.get(config.dbmanagers.auction + '/auction/status/1')
         response.raise_for_status()
         return make_response(jsonify(market=response.json()), 200)
     except Exception as err:
@@ -37,8 +37,8 @@ def get_auctions():
     
 
 #POST /api/player/auction/create: Create a new auction listing for a gacha item. (input: gacha id, bid min, timestamp, etc)
-@app.route('/auction/create/<int:userId>', methods=['POST'])
-def create_auction(userId):
+@app.route('/auction/create', methods=['POST'])
+def create_auction():
     try:
         data = request.get_json()
         if (not 'gachaCollectionId' in data or
@@ -57,9 +57,9 @@ def create_auction(userId):
         if (start < now or end < now or start > end):
             return make_response(jsonify({"message": "Auction start or end time must be in the future"}), 400);
         
-        active_auction = request.get(config.dbmanagers.auction + f'/auction/user/{userId}/{data["gachaCollectionId"]}/1')
+        active_auction = request.get(config.dbmanagers.auction + f'/auction/user/{data["userId"]}/{data["gachaCollectionId"]}/1')
         if active_auction.status_code == 200:
-            return make_response(jsonify({"message": f"User {userId} already has an active auction for that"}), 400);
+            return make_response(jsonify({"message": f"User {data['userId']} already has an active auction for that"}), 400);
     
         response = requests.post(config.dbmanagers.auction + '/auction', json=data)
         new_auction = response.json().get('auctionId');

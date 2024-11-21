@@ -57,30 +57,35 @@ def get_auction(auction_id):
         return make_response(jsonify({"message": str(e)}, 500))
     
 
+# PUT /api/admin/auction/{auction_id}: Modify a specific auction.
 @app.route('/auction/<int:auction_id>', methods=['PUT'])
 def update_auction(auction_id):
-    print(f"PATCH auction", auction_id)
+    print(f"PUT auction", auction_id)
     try:
-        try:
-            data = request.get_json()
-        except Exception as e:
-            print(f"ERROR -> ", e)
+        # Parse JSON data from the request
+        data = request.get_json()
+        if not data:
             return make_response(jsonify({"message": "Invalid auction data"}), 400)
         
-        if (not check_auction(data)):
-            return make_response(jsonify({"message": "Invalid auction data"}), 400)
+        # Validate auction data
+        if not check_auction(data):  # Ensure check_auction is correct
+            return make_response(jsonify({"message": "Invalid auction timestamps"}), 400)
 
-        response = requests.put(config.dbmanagers.auction + f'/auction/{auction_id}', json=data.to_dict(), headers={
-            "Content-Type": "application/json",
-        })
-        response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
+        # Send PUT request to update the auction
+        response = requests.put(
+            f"{config.dbmanagers.auction}/auction/{auction_id}",
+            json=data,
+        )
+        response.raise_for_status()  # Raise HTTPError for 4xx/5xx responses
+        
+        # Return success response
+        return make_response(jsonify({"message": "Auction updated successfully"}), 200)
+    except requests.exceptions.RequestException as e:
+        print(f"External request failed: {e}")
+        return make_response(jsonify({"message": "Failed to update auction", "error": str(e)}), 500)
 
-        #response.json()
-        return make_response(jsonify({"message" : "Correctly updated"}), 200) ## Substitute with DBManager request
-    except Exception as e:
-        return make_response(jsonify({"message": str(e)}, 500))
     
-
+# GET /api/admin/auction/history: Admin view of all market history (old auctions).
 @app.route('/auction/history', methods=['GET'])
 def history():
     print(f"GET Auctions History")
@@ -102,23 +107,9 @@ def user_history(user_id):
     print(f"GET History of user " + user_id)
     try:
         data = request.get_json()
-        auction = data
 
-        user_collection_res = requests.get(config.dbmanagers.gacha + f'/gachacollection/{user_id}')
+        auction = requests.get(config.dbmanagers.auction + f'/auction/user/{user_id}/2')
 
-        auction_req = requests.get(config.dbmanagers.auction + '/auction')
-
-        user_collection = user_collection_res.json()
-        auctions = auction_req.json()
-
-        if user_collection is None:
-            user_collection = {}
-
-        if auctions is None:
-            auctions = {}
-
-        history = {}
-
-        return make_response(jsonify({"history":jsonify(history), "usercoll":user_collection, "auctions": auctions}), 200) ## Substitute with DBManager request
+        return make_response(jsonify(auction.json()), 200) ## Substitute with DBManager request
     except Exception as e:
         return make_response(jsonify({"message": str(e)}, 500))
