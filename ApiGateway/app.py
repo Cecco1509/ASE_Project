@@ -139,10 +139,10 @@ def getPlayerInformation(user_id):
 def updatePlayerInformation(user_id):
     payload=request.get_json()
     response=requests.put(f'{config.services.users_user_microservice}/api/player/update/{user_id}',json=payload)
-    return response
+    return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
 def delete_player(user_id):
     delete_response = requests.delete(f'{config.services.users_user_microservice}/api/player/delete/{user_id}')
-    return delete_response
+    return make_response(jsonify(delete_response.json()),delete_response.status_code)
     

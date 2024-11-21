@@ -26,8 +26,8 @@ def getPlayerInformation(user_id):
 
 @app.route('/api/player/update/<int:user_id>', methods=['PUT'])
 def updatePlayerInformation(user_id):
-    payload = request.json['profilePicture']
-    if payload:
+    if 'profilePicture' in request.json():
+        payload = request.json['profilePicture']
         response = requests.get(f'{config.dbmanagers.user}/user/{user_id}')
         if response:
             status_data=response['status']
@@ -40,7 +40,9 @@ def updatePlayerInformation(user_id):
             update_response = requests.put(f'{config.dbmanagers.user}/user/{user_id}', json=update_data)
             return update_response
     else:
-        return make_response(jsonify({"error": "No profile picture provided"}), 400)
+       return make_response(jsonify({"error": "No profile picture provided"}), 500)
+
+
 
 
 @app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
