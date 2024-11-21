@@ -30,7 +30,7 @@ def end_auction(auctionId):
     ## delete the gacha from the user who auctioned it
     ## give the money to the user who auctioned it
     auction = requests.get(config.dbmanagers.auction + f'/auction/{auctionId}').json()
-    if auction is None or auction['status'] == 2: # if the auction is already been closed returns
+    if auction is None or auction['status'] > 1: # if the auction is already been closed returns
         return;
 
     auction['status'] = 2
@@ -58,15 +58,39 @@ def end_auction(auctionId):
         'timestamp': datetime.now()
     }
     
+    #
     resp = requests.post(config.dbmanagers.transaction + f'/auctiontransaction', json=jsonify(transaction))
     if resp.status_code != 200: return
     
+
+    ## return money to the ones that have lost
     for bid in bids:
         if bid['id'] != winningBid['id']:
-            requests.put()
+            resp = requests.put(config.services + f'/api/player/currency/increase/{bid['userId']}', json=jsonify({"amount": bid['bidAmount']}))
+            if resp.status_code!= 200: print(f"Something went wrong INCREASE : {bid['userId']}")
 
+    # give money to the winning bidder
+    requests.put(config.services.paymentsuser + f'/api/player/currency/increase/{auction['userId']}', json=jsonify({"amount": winningBid['bidAmount']}))
+
+    ##GET GACHA
+
+    gacha = requests.get(config.services.gachauser + f'/api/player/gacha/player-collection/item/<int:collectionId>/{auction['gachaCollectionId']}')
+    ## Give gacha to user
+    requests.post(
+        f'{config.dbmanagers.gacha}/gachacollection', 
+        json={
+            "gachaId":auction['id'],
+            "userId":winningBid['buyerId'],
+            "source":f"{auction['id']}"
+        }
+    )
+
+    ## remove gacha from seller user
+    requests.delete(config.dbmanagers.gacha + f'/gachacollection/{auction['gachaCollectionId']}')
+
+    requests.put(config.dbmanagers.transaction + f'/auctiontransaction', json=jsonify(transaction))
     
-    print(f"RUNNING -> {auctionId}")
+    print(f"FINISHED -> {auctionId}")
 
 
 
