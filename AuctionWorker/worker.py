@@ -8,8 +8,8 @@ builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 
 worker = Celery('auction_worker',
-                    broker='amap://admin:mypass@rabbit:5672', 
-                    backend=' rpc://')
+                    broker='amqp://admin:mypass@rabbit:5672', 
+                    backend='rpc://')
 
 @worker.task
 def end_auction(auctionId):
