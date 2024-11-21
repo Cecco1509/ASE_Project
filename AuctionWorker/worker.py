@@ -14,7 +14,16 @@ worker = Celery('auction_worker',
 @worker.task
 def end_auction(auctionId):
     # Fetch auction details
-    auction = requests.get(f"{config.dbmanagers.auction}/auction/{auctionId}").json()
+    auction = requests.get(f"{config.dbmanagers.auction}/auction/{auctionId}")
+
+    if auction.status_code == 404: return
+
+    try:
+        auction = auction.json()
+    except Exception as e:
+        print("Failed decode auction")
+        return
+    
     if not auction or auction['status'] > 1:  # Auction already closed
         return
 
