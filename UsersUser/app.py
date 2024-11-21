@@ -22,7 +22,7 @@ def getPlayerInformation(user_id):
 
 @app.route('/api/player/update/<int:user_id>', methods=['PUT'])
 def updatePlayerInformation(user_id):
-    if 'profilePicture' in request.json():
+    if 'profilePicture' in request.get_json():
         payload = request.json['profilePicture']
         response = requests.get(f'{config.dbmanagers.user}/user/{user_id}')
         if response.status_code==200:
