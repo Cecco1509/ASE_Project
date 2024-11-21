@@ -1,4 +1,5 @@
 from celery import Celery, shared_task
+from flask import jsonify
 import requests
 from python_json_config import ConfigBuilder
 

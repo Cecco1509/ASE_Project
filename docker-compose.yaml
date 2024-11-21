@@ -167,24 +167,32 @@ services:
       context: ./GatchasAdmin
       dockerfile: Dockerfile
     container_name: gachasadmin
+    volumes:
+      - ./config.json:/app/config.json
 
   gachasuser:
     build:
       context: ./GatchasUser
       dockerfile: Dockerfile
     container_name: gachasuser
+    volumes:
+      - ./config.json:/app/config.json
 
   paymentsadmin:
     build:
       context: ./PaymentsAdmin
       dockerfile: Dockerfile
     container_name: paymentsadmin
+    volumes:
+      - ./config.json:/app/config.json
 
   paymentsuser:
     build:
       context: ./PaymentsUser
       dockerfile: Dockerfile
     container_name: paymentsuser
+  volumes:
+    - ./config.json:/app/config.json
 
   # roll:
   #   build:
@@ -197,24 +205,32 @@ services:
       context: ./TransactionsAdmin
       dockerfile: Dockerfile
     container_name: transactionsadmin
+    volumes:
+      - ./config.json:/app/config.json
 
   transactionsuser:
     build:
       context: ./TransactionsUser
       dockerfile: Dockerfile
     container_name: transactionsuser
+    volumes:
+      - ./config.json:/app/config.json
 
   usersadmin:
     build:
       context: ./UsersAdmin
       dockerfile: Dockerfile
     container_name: usersadmin
+    volumes:
+      - ./config.json:/app/config.json
 
   usersuser:
     build:
       context: ./UsersUser
       dockerfile: Dockerfile
     container_name: usersuser
+    volumes:
+      - ./config.json:/app/config.json
 
   rabbit:
     hostname: rabbit
@@ -231,3 +247,5 @@ services:
     user: nobody
     depends_on:
       - rabbit
+    volumes:
+      - ./config.json:/app/config.json
