@@ -15,7 +15,7 @@ def register_user():
     return request.post(f"{config.services.authuser}/api/player/register", json=request.get_json())
 
 @app.route('/api/player/login', methods=['POST'])
-def login(userId):
+def login():
     return request.post(f"{config.services.authuser}/api/player/login", json=request.get_josn())
 
 @app.route('api/player/logout/<int:userId>', method=['POST'])
