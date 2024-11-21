@@ -29,6 +29,13 @@ def get_auctionbids_for_user(userId):
         return make_response(jsonify([bid.to_dict() for bid in bids]), 200)
     return make_response(jsonify({"message":"Auction bids not found"}), 404)
 
+@app.route('/auctionbid/user/<int:userId>/<int:auctionId>', methods=['GET'])
+def get_auctionbids_for_user(userId, auctionId):
+    bids = db.session.execute(db.select(AuctionBid).where(AuctionBid.userId==userId, AuctionBid.auctionId==auctionId)).scalars()
+    if bids:
+        return make_response(jsonify([bid.to_dict() for bid in bids]), 200)
+    return make_response(jsonify({"message":"Auction bids not found"}), 404)
+
 @app.route('/auctionbid', methods=['POST'])
 def create_auctionbid():
     json_data = request.get_json()

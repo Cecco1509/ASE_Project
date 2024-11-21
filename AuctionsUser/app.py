@@ -45,7 +45,8 @@ def create_auction(userId):
             not 'userId'  in data or
             not 'auctionStart' in data or
             not 'auctionEnd' in data or
-            not 'minimumBid' in data) :
+            not 'minimumBid' in data or
+            not 'status' in data) :
 
             return make_response(jsonify({"message": "Invalid data"}), 400);
     
@@ -70,12 +71,35 @@ def create_auction(userId):
         return make_response(jsonify({"message": str(err)}), 500)
     
 #POST /api/player/auction/{auction_id}/bid: Place a bid on an active auction.
-@app.route('/auction/<auction_id>/bid', methods=['POST'])
+@app.route('/auction/<auction_id>/bid', methods=['POST']) ## {userID, amount}
 def bid_on_auction(auction_id):
     try:
         data = request.get_json()
         response = requests.post(config.dbmanagers.auction + f'/auction/{auction_id}/bid', json=data.bid)
         ### Remove previous bid
+        
+        user_bids = requests.get(config.dbmanagers.auction + f'/auctionbid/user/{data["userId"]}/{auction_id}')
+        auction_bids = requests.get(config.dbmanagers.auction + f'/auctionbid/{auction_id}')
+        userBidId = None
+        userBidAmount = 0
+        if (user_bids.status_code == 200):
+            for bid in user_bids.json():
+                userBidId = bid['bidId']
+
+        auctionBidAmount = 0
+        if (auction_bids.status_code == 200):
+            for bid in auction_bids.json():
+                if bid['bidAmount'] > auctionBidAmount:
+                    auctionBidAmount = bid['bidAmount']
+
+        if auctionBidAmount > data["bidAmount"]: return make_response(jsonify({"message": "Bid Amount inferior of previous one"}), 201)
+
+        requests.post(config.dbmanagers.auction + f'/auctionbid', json=jsonify({'userId': data["userId"], 'bidAmount': data["bidAmount"], 'auctionId':auction_id, 'timestamp':datetime.now()}),)
+
+        resp = requests.put(
+                f"{config.services.paymentsuser}/api/player/currency/decrese/{bid['userId']}",
+                json={"amount": bid['bidAmount']}
+            )
         ### Decrease money amount
         response.raise_for_status()
         return make_response(jsonify({"message": "Bid done"}), 201)

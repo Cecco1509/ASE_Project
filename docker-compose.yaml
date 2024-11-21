@@ -78,7 +78,7 @@ services:
     depends_on:
       - auctiondatabase
     ports:
-      - 5003:5000
+      - 5004:5000
     volumes:
       - ./config.json:/app/config.json
 
