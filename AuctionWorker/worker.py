@@ -4,6 +4,7 @@ from flask import jsonify
 import requests
 from python_json_config import ConfigBuilder
 
+builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 
 worker = Celery('auction_worker',
@@ -19,7 +20,7 @@ def end_auction(auctionId):
     ## give the money to the user who auctioned it
     auction = requests.get(config.dbmanagers.auction + f'/auction/{auctionId}').json()
     if auction is None or auction['status'] > 1: # if the auction is already been closed returns
-        return;
+        return
 
     auction['status'] = 2
     requests.put(config.dbmanagers.auction + f'/auction/{auctionId}', json=jsonify(auction))
