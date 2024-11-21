@@ -13,13 +13,13 @@ from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
 
-sys.path.append("/app/")
-from celery_app import end_auction
-
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ?
 
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
+
+sys.path.append("/app/")
+from celery_app import end_auction
 
 # celery_app = Celery(app.name,
 #                     broker='amap://admin:mypass@rabbit:5672', 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from celery import Celery, shared_task
 from flask import jsonify
 import requests
@@ -53,7 +54,7 @@ def end_auction(auctionId):
     ## return money to the ones that have lost
     for bid in bids:
         if bid['id'] != winningBid['id']:
-            resp = requests.put(config.services + f'/api/player/currency/increase/{bid['userId']}', json=jsonify({"amount": bid['bidAmount']}))
+            resp = requests.put(config.services.paymentsuser + f'/api/player/currency/increase/{bid['userId']}', json=jsonify({"amount": bid['bidAmount']}))
             if resp.status_code!= 200: print(f"Something went wrong INCREASE : {bid['userId']}")
 
     # give money to the winning bidder
