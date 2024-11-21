@@ -14,22 +14,18 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
 def getPlayerInformation(user_id):
-    try:
-        response = requests.get(f'{config.dbmanagers.user}/user/{user_id}')
-        
-        if response.status_code == 200:
-            return make_response(jsonify(response.json()), 200)
-        else:
-            return make_response(jsonify({"error": "Player not found"}), response.status_code)
-    except requests.RequestException as e:
-        return make_response(jsonify({"error": "Failed to connect to database API", "details": str(e)}), 500)
+    response = requests.get(f'{config.dbmanagers.user}/user/{user_id}')
+    if response.status_code == 200:
+        return make_response(jsonify(response.json()), 200)
+    else:
+        return make_response(jsonify({"error": "Player not found"}), response.status_code)
 
 @app.route('/api/player/update/<int:user_id>', methods=['PUT'])
 def updatePlayerInformation(user_id):
     if 'profilePicture' in request.json():
         payload = request.json['profilePicture']
         response = requests.get(f'{config.dbmanagers.user}/user/{user_id}')
-        if response:
+        if response.status_code==200:
             status_data=response['status']
             ingameCurrency_data=response['ingameCurrency']
             update_data={
@@ -39,8 +35,8 @@ def updatePlayerInformation(user_id):
             }
             update_response = requests.put(f'{config.dbmanagers.user}/user/{user_id}', json=update_data)
             return update_response
-    else:
-       return make_response(jsonify({"error": "No profile picture provided"}), 500)
+        return make_response(jsonify({"error":"Unsuccessful data retrieval from the database manager/User ID non existent"}),response.status_code)
+    return make_response(jsonify({"error": "No profile picture provided"}), 400)
 
 
 

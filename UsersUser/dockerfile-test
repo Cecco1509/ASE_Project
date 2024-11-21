@@ -1,0 +1,14 @@
+FROM python:3.12-slim
+
+ADD . /UsersUser
+WORKDIR /UsersUser
+
+COPY /config.json /app/
+
+RUN pip3 install -r ./UsersUser/requirements.txt
+
+ENV FLASK_APP=./UsersUser/app_test.py
+
+EXPOSE 5000:5000
+
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
