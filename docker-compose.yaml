@@ -125,6 +125,7 @@ services:
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
+    ports: -3360:3360
     container_name: authdatabase
 
   gachadatabase:
@@ -132,6 +133,7 @@ services:
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
+    ports: -3361:3360
     container_name: gachadatabase
 
   userdatabase:
@@ -139,6 +141,7 @@ services:
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
+    ports: -3362:3360
     container_name: userdatabase
 
   paymentdatabase:
@@ -146,6 +149,7 @@ services:
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
+    ports: -3363:3360
     container_name: paymentdatabase
 
   auctiondatabase:
@@ -153,6 +157,7 @@ services:
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
+    ports: -3364:3360
     container_name: auctiondatabase
 
   transactiondatabase:
@@ -160,6 +165,7 @@ services:
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
+    ports: -3365:3360
     container_name: transactiondatabase
 
   gachasadmin:
