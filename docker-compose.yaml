@@ -77,6 +77,8 @@ services:
     container_name: auctiondbmanager
     depends_on:
       - auctiondatabase
+    ports:
+      - 5003:5000
     volumes:
       - ./config.json:/app/config.json
 
@@ -87,6 +89,8 @@ services:
     container_name: gachadbmanager
     depends_on:
       - gachadatabase
+    ports:
+      - 5003:5000
     volumes:
       - ./config.json:/app/config.json
 
@@ -115,6 +119,8 @@ services:
       context: ./UserDBManager
       dockerfile: Dockerfile
     container_name: userdbmanager
+    ports:
+      - 5001:5000
     depends_on:
       - userdatabase
     volumes:
@@ -125,8 +131,6 @@ services:
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
-    ports:
-     - 3360:3360
     container_name: authdatabase
 
   gachadatabase:
@@ -135,7 +139,6 @@ services:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
     ports:
-     - 3361:3360
     container_name: gachadatabase
 
   userdatabase:
@@ -144,7 +147,6 @@ services:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
     ports:
-     - 3362:3360
     container_name: userdatabase
 
   paymentdatabase:
@@ -153,7 +155,6 @@ services:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
     ports:
-     - 3363:3360
     container_name: paymentdatabase
 
   auctiondatabase:
@@ -161,8 +162,7 @@ services:
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
-    ports: 
-      - 3364:3360
+    ports:
     container_name: auctiondatabase
 
   transactiondatabase:
@@ -170,8 +170,8 @@ services:
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
-    ports: 
-      - 3365:3360
+    ports:
+      - 5002:5000
     container_name: transactiondatabase
 
   gachasadmin:
