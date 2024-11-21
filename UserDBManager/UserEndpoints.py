@@ -40,6 +40,20 @@ def update_user(userId):
         return make_response(jsonify({"messgae":"User sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid user data"}), 400)
 
+
+@app.route('/user/<int:userId>', methods=['PATCH'])
+def update_user(userId):
+    json_data = request.get_json()
+    if json_data:
+        user = db.get_or_404(User, userId)
+        user.ingameCurrency=json_data['ingameCurrency']
+        user.profilePicture=json_data['profilePicture']
+        user.status=json_data['status']
+        user.verified = True
+        db.session.commit()
+        return make_response(jsonify({"messgae":"User sucessfully updated."}), 200)
+    return make_response(jsonify({"message":"Invalid user data"}), 400)
+
 @app.route('/user/<int:userId>', methods=['DELETE'])
 def delete_user(userId):
     user = db.get_or_404(User, userId)

@@ -10,6 +10,13 @@ def get_all_auction_bids():
         return make_response(jsonify([bid.to_dict() for bid in bids]), 200)
     return make_response(jsonify({"message":"Auction bids not found"}), 404)
 
+@app.route('/auctionbid/auction/<int:auctionId>', methods=['GET'])
+def get_auctionbids_for_auction(auctionId):
+    bids = db.session.execute(db.select(AuctionBid).where(AuctionBid.auctionId==auctionId)).scalars()
+    if bids:
+        return make_response(jsonify([bid.to_dict() for bid in bids]), 200)
+    return make_response(jsonify({"message":"Auction bids not found"}), 404)
+
 @app.route('/auctionbid/<int:bidId>', methods=['GET'])
 def get_single_auctiontbid(bidId):
     bid = db.get_or_404(AuctionBid, bidId)

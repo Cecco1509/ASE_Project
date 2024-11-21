@@ -212,3 +212,19 @@ services:
   #     context: ./UsersUser
   #     dockerfile: Dockerfile
   #   container_name: usersuser
+
+  rabbit:
+    hostname: rabbit
+    image: "rabbitmg: 3-management"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  auction_worker:
+    build: " /AuctionWorker"
+    user: nobody
+    depends_on:
+      - rabbit

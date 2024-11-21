@@ -15,6 +15,7 @@ class Auction(db.Model):
     __tablename__ = 'auction'
     id: Mapped[int] = mapped_column(primary_key=True)
     gachaCollectionId: Mapped[int]
+    userId: Mapped[int]
     auctionStart: Mapped[datetime]
     auctionEnd: Mapped[datetime]
     minimumBid: Mapped[float]
@@ -24,6 +25,7 @@ class Auction(db.Model):
         return {
             'id': self.id,
             'gachaCollectionId': self.gachaCollectionId,
+            'userId': self.userId,
             'auctionStart': self.auctionStart,
             'auctionEnd': self.auctionEnd,
             'minimumBid': self.minimumBid,
