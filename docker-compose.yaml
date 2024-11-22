@@ -11,7 +11,12 @@ services:
       - auctionsuser
       - authadmin
       - authuser
-      - dbmanager
+      - authdbmanager
+      - auctiondbmanager
+      - userdbmanager
+      - gachadbmanager
+      - transactiondbmanager
+      - paymentdbmanager
       - gachasadmin
       - gachasuser
       - paymentsadmin
@@ -22,7 +27,9 @@ services:
       - usersadmin
       - usersuser
     ports:
-      - "8080:5000"
+      - "8080:8080"
+    volumes:
+      - ./config.json:/app/config.json
 
   auctionsadmin:
     build:
@@ -48,22 +55,65 @@ services:
       dockerfile: Dockerfile
     container_name: authuser
 
-  dbmanager:
+  authdbmanager:
     build:
-      context: ./DBManager
+      context: ./AuthDBManager
       dockerfile: Dockerfile
-    container_name: dbmanager
+    container_name: authdbmanager
+    depends_on:
+      - authdatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+  auctiondbmanager:
+    build:
+      context: ./AuctionDBManager
+      dockerfile: Dockerfile
+    container_name: auctiondbmanager
     depends_on:
       - auctiondatabase
-      - authdatabase
-      - gachadatabase
-      - paymentdatabase
-      - transactiondatabase
-      - userdatabase
-    ports:
-      - "5000:5000"
     volumes:
-      - ./DBManager:/DBManager
+      - ./config.json:/app/config.json
+
+  gachadbmanager:
+    build:
+      context: ./GachaDBManager
+      dockerfile: Dockerfile
+    container_name: gachadbmanager
+    depends_on:
+      - gachadatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+  paymentdbmanager:
+    build:
+      context: ./PaymentDBManager
+      dockerfile: Dockerfile
+    container_name: paymentdbmanager
+    depends_on:
+      - paymentdatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+  transactiondbmanager:
+    build:
+      context: ./TransactionDBManager
+      dockerfile: Dockerfile
+    container_name: transactiondbmanager
+    depends_on:
+      - transactiondatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+  userdbmanager:
+    build:
+      context: ./UserDBManager
+      dockerfile: Dockerfile
+    container_name: userdbmanager
+    depends_on:
+      - userdatabase
+    volumes:
+      - ./config.json:/app/config.json
 
   authdatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -112,12 +162,16 @@ services:
       context: ./GatchasAdmin
       dockerfile: Dockerfile
     container_name: gachasadmin
+    volumes:
+      - ./config.json:/app/config.json
 
   gachasuser:
     build:
       context: ./GatchasUser
       dockerfile: Dockerfile
     container_name: gachasuser
+    volumes:
+      - ./config.json:/app/config.json
 
   paymentsadmin:
     build:
@@ -162,5 +216,3 @@ services:
       context: ./UsersUser
       dockerfile: Dockerfile
     container_name: usersuser
-
-
