@@ -85,7 +85,7 @@ To stop the application and remove containers, run:
     
 ### Running Unit Tests
 
- - Run the mock microservices: Each microservice has a test code and a test docker file that allows it to run the requests on mock data instead of real data from the database. For example, to run the admin gacha microservice in test mode, you have to run the following commands:
+ - Run the mock microservices: Each microservice has a test code and a test docker file that allows it to run the requests on mock data instead of real data from the database. For example, to run the admin gacha microservice in test mode, you have to run the following commands in the root folder "ASE_Project":
 
 ```
 docker build -t gachadmin_test -f ./GatchasAdmin/dockerfile_test .
