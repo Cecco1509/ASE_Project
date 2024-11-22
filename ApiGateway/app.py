@@ -91,6 +91,14 @@ def get_gacha_collection_details(collectionId):
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
+# Get player's gacha item details
+@app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
+@handle_errors
+def get_gacha_details(userId, gachaId):
+    response = requests.get(GACHAS_USER_URL + f'/api/player/gacha/player-collection/{userId}/gacha/{gachaId}')
+    # TODO response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
 """System Collection Endpoints"""
 
 # Get full system gacha collection.

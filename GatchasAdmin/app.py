@@ -12,16 +12,23 @@ config = builder.parse_config('/app/config.json')
 DB_MANAGER_GACHA_URL = config.dbmanagers.gacha
 
 """Fetch all gacha items."""
+mock_get_all_gacha = None
+
 @app.route('/api/admin/gacha', methods=['GET'])
 @handle_errors
 def get_all_gacha():
     """Fetch all gacha items."""
-    response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha')
-    response.raise_for_status()
-    gacha_items = response.json()
-    return make_response(jsonify(gacha_items), response.status_code)
+    if mock_get_all_gacha:
+        mock_get_all_gacha()
+    else:
+        response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha')
+        response.raise_for_status()
+        gacha_items = response.json()
+        return make_response(jsonify(gacha_items), response.status_code)
 
 """Fetch a single gacha item by ID."""
+mock_get_single_gacha = None
+
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
 def get_single_gacha(gachaId):
@@ -31,6 +38,8 @@ def get_single_gacha(gachaId):
     return make_response(jsonify(response.json()), response.status_code)
 
 """Create a new gacha item."""
+mock_create_gacha = None
+
 @app.route('/api/admin/gacha', methods=['POST'])
 @handle_errors
 def create_gacha():
@@ -68,13 +77,15 @@ def is_valid_gacha_data(data):
         if not isinstance(data[field], expected_type):
             return False, f"Invalid type for field '{field}': Expected {expected_type.__name__}"
 
-    # Additional validation: rarityPercent should be between 0 and 1
-    if not (0 <= data["rarityPercent"] <= 1):
+    # Additional validation: rarityPercent should be between 0 and 100
+    if not (0 <= data["rarityPercent"] <= 100):
         return False, "Rarity percent must be a value between 0 and 1."
 
     return True, "Data is valid"
 
 """Update a gacha item."""
+mock_update_gacha = None
+
 # TODO: use patch instead of put, so we can only update the fields that are provided
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['PUT'])
 @handle_errors
@@ -96,6 +107,8 @@ def update_gacha(gachaId):
     return make_response(jsonify(response.json()), 200)
 
 """Delete a gacha item.""" 
+mock_delete_gacha = None
+
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['DELETE'])
 @handle_errors
 def delete_gacha(gachaId):
@@ -105,6 +118,8 @@ def delete_gacha(gachaId):
     return make_response(jsonify(response.json()), response.status_code)
 
 """Get all gacha collections."""
+mock_get_all_gachacollections = None
+
 @app.route('/api/admin/gachacollection', methods=['GET'])
 @handle_errors
 def get_all_gachacollections():

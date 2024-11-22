@@ -1,3 +1,4 @@
+
 # ASE Project: Gacha Collection Backend
 
 ## Table of Contents
@@ -55,25 +56,28 @@ The primary users of this backend are:
 
 ### Installation and Execution
 
-1.  **Clone the Repository**:
+ -  **Clone the Repository**:
 
-    git clone https://github.com/your-repo/ASE-Project.git
-    cd ASE-Project
+```
+git clone https://github.com/your-repo/ASE-Project.git
+cd ASE-Project
+```
         
-2.  **Build and Run the Docker Containers**:
+ -  **Build and Run the Docker Containers**:
     
    Use Docker Compose to build and run the microservices in containers.
     
     docker-compose up --build
     
-3.  **Accessing the API**:
+ -  **Accessing the API**:
     
-The main API gateway should be accessible at `http://localhost:8080`.
+The main API gateway should be accessible at `http://localhost:5000`.
 For example, to access the AdminGacha service:
+```        
+GET http://localhost:5000/api/admin/gacha
+```
         
-`GET http://localhost:8080/api/admin/gacha` 
-        
-4.  **Stopping the Application**:
+ -  **Stopping the Application**:
     
 To stop the application and remove containers, run:
 
@@ -81,8 +85,16 @@ To stop the application and remove containers, run:
     
 ### Running Unit Tests
 
--   **Postman Collection**: Use the included Postman collections in the "doc" folder to run unit tests for each microservice and each endpoint.
+ - Run the mock microservices: Each microservice has a test code and a test docker file that allows it to run the requests on mock data instead of real data from the database. For example, to run the admin gacha microservice in test mode, you have to run the following commands in the root folder "ASE_Project":
+
+```
+docker build -t gachadmin_test -f ./GatchasAdmin/dockerfile_test .
+docker run -p 5000:5000 gachadmin_test
+```
+
+ -   **Postman Collection**: Use the included Postman collections in the "doc" folder to run unit tests for each microservice and each endpoint.
 
 ### API Documentation
 
 The API is documented using OpenAPI, with an `openapi.yaml` file located in the "doc" folder. You can view the documentation with tools like **Swagger UI**.
+
