@@ -186,6 +186,8 @@ services:
       context: ./PaymentsUser
       dockerfile: Dockerfile
     container_name: paymentsuser
+    volumes:
+      - ./config.json:/app/config.json
 
   roll:
     build:
