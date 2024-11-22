@@ -139,7 +139,7 @@ paths:
           description: "User not found"
   /api/player/gacha/player-gacha/item/{gacha_id}:
     get:
-      summary: "Get specific gacha item details for a player"
+      summary: "Get specific gacha collection item for a player"
       tags: ["PlayerGacha"]
       parameters:
         - in: path
@@ -157,6 +157,32 @@ paths:
                 $ref: '#/components/schemas/GachaCollectionItem'
         '404':
           description: "Gacha collection item not found"
+  /api/player/gacha/player-collection/{user_id}/gacha/{gacha_id}:
+    get:
+      summary: "Get specific gacha item details for a player"
+      tags: ["PlayerGacha"]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item"
+      responses:
+        '200':
+          description: "Details of the specific gacha item for a player"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GachaItem'
+        '404':
+          description: "Gacha item not found"
   /api/player/gacha/system-collection:
     get:
       summary: "Get full system gacha collection"
