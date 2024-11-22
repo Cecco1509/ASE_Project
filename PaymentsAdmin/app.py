@@ -6,7 +6,7 @@ from werkzeug.exceptions import NotFound
 from python_json_config import ConfigBuilder
 
 builder = ConfigBuilder()
-config = builder.parse_config('../config.json')
+config = builder.parse_config('/app/config.json')
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
