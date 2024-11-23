@@ -23,7 +23,7 @@ jobs:
 
     - name: Build gacha player image
       run: |
-        docker build -f ./GachasUser/dockerfile_test -t gachausertest .
+        docker build -f ./GatchasUser/dockerfile_test -t gachausertest .
     - name: Run gacha player image
       run: |
         docker run --rm --name gachausert -d -p 5000:5000 gachausertest
@@ -37,7 +37,7 @@ jobs:
 
     - name: Build gacha admin image
       run: |
-        docker build -f ./GachasAdmin/dockerfile_test -t gachaadmintest .
+        docker build -f ./GatchasAdmin/dockerfile_test -t gachaadmintest .
     - name: Run gacha admin image
       run: |
         docker run --rm --name gachaadmint -d -p 5000:5000 gachaadmintest
