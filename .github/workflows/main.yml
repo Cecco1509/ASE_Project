@@ -17,7 +17,11 @@ jobs:
       uses: actions/setup-node@v4
       with: 
         node-version: '16'
-        
+
+    - name: Install Newman
+      run: |
+        npm install -g newman
+    
     - name: Set up Docker buildx
       uses: docker/setup-buildx-action@v3
 
