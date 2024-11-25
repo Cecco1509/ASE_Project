@@ -32,6 +32,25 @@ def get_gacha_collection_details(collectionId):
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
+# Get player's gacha item details
+@app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
+@handle_errors
+def get_gacha_details(userId, gachaId):
+    user_gacha_collection_response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}')
+    user_gacha_collection_response.raise_for_status()
+    user_gacha_collection = user_gacha_collection_response.json()
+
+    # check if the gacha item is in the player's collection
+    if not any(item['gachaId'] == gachaId for item in user_gacha_collection):
+        return make_response(jsonify({"message":"Gacha item not found in player's collection"}), 404)
+    
+    # the gacha item is in the player's collection, get the details
+    gacha_item_response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha/{gachaId}')
+    gacha_item_response.raise_for_status()
+    gacha_item = gacha_item_response.json()
+
+    return make_response(gacha_item, 200)
+
 """System Collection Endpoints"""
 
 # Get full system gacha collection.

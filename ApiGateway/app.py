@@ -6,6 +6,7 @@ from werkzeug.exceptions import NotFound
 from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
 
+
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
 builder = ConfigBuilder()
@@ -199,6 +200,14 @@ def get_gacha_collection_details(collectionId):
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
+# Get player's gacha item details
+@app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
+@handle_errors
+def get_gacha_details(userId, gachaId):
+    response = requests.get(GACHAS_USER_URL + f'/api/player/gacha/player-collection/{userId}/gacha/{gachaId}')
+    # TODO response.raise_for_status()
+    return make_response(response.json(), response.status_code)
+
 """System Collection Endpoints"""
 
 # Get full system gacha collection.
@@ -269,6 +278,16 @@ def increase_currency(user_id):
         response = requests.put(config.services.payments_player_microservice+ f'/api/player/increase/update_balance', json=data)
 
         return response
+
+   
+
+@app.route('/api/admin/currency/<int:user_id>', methods=['GET'])
+def get_transaction_history(user_id):
+    
+        response = requests.get(config.services.paymentsadmin+f'/api/admin/currency/{user_id}')
+        return response
+
+       
 
 def create_app():
     return app

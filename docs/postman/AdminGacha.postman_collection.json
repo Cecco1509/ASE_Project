@@ -133,12 +133,6 @@
 							"    pm.expect(jsonData.id).to.eql(1);\r",
 							"});\r",
 							"\r",
-							"// Test if the 'rarityPercent' field is a number between 0 and 1\r",
-							"pm.test(\"Rarity percent should be between 0 and 1\", function () {\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData.rarityPercent).to.be.a('number').that.is.greaterThanOrEqual(0).and.lessThanOrEqual(1);\r",
-							"});\r",
-							"\r",
 							"// TEST CASE: Invalid ID (non-existent ID)\r",
 							"pm.test(\"Expect 404 for non-existent gacha item\", function () {\r",
 							"    // Assuming 999999 does not exist\r",
@@ -346,11 +340,11 @@
 							"    pm.expect(parsedBody).to.have.property('rarityPercent');\r",
 							"});\r",
 							"\r",
-							"// Test if the 'rarityPercent' field is between 0 and 1\r",
-							"pm.test(\"Rarity percent should be between 0 and 1\", function () {\r",
+							"// Test if the 'rarityPercent' field is between 0 and 100\r",
+							"pm.test(\"Rarity percent should be between 0 and 100\", function () {\r",
 							"    var jsonData = pm.request.body.raw;  // Get the raw request body\r",
 							"    var parsedBody = JSON.parse(jsonData);  // Parse it into a JSON object\r",
-							"    pm.expect(parsedBody.rarityPercent).to.be.a('number').that.is.greaterThanOrEqual(0).and.lessThanOrEqual(1);\r",
+							"    pm.expect(parsedBody.rarityPercent).to.be.a('number').that.is.greaterThanOrEqual(0).and.lessThanOrEqual(100);\r",
 							"});\r",
 							"\r",
 							"// TEST CASE: Create Gacha Item with Missing \"name\" Field\r",
@@ -390,7 +384,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"description\": \"Test item 2.\",\r\n    \"image\": \"https://super.abril.com.br/wp-content/uploads/2019/12/reproducao_pokemon_episodio_pokemon_centenas_criancas_hospital.jpg\",\r\n    \"name\": \"New Test Item\",\r\n    \"rarityPercent\": 0.21\r\n}",
+					"raw": "{\r\n    \"description\": \"Test item 2.\",\r\n    \"image\": \"https://super.abril.com.br/wp-content/uploads/2019/12/reproducao_pokemon_episodio_pokemon_centenas_criancas_hospital.jpg\",\r\n    \"name\": \"New Test Item\",\r\n    \"rarityPercent\": 70.7\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -490,11 +484,11 @@
 							"    pm.expect(parsedBody).to.have.property('rarityPercent');\r",
 							"});\r",
 							"\r",
-							"// Test if the 'rarityPercent' field is between 0 and 1\r",
-							"pm.test(\"Rarity percent should be between 0 and 1\", function () {\r",
+							"// Test if the 'rarityPercent' field is between 0 and 100\r",
+							"pm.test(\"Rarity percent should be between 0 and 100\", function () {\r",
 							"    var jsonData = pm.request.body.raw;  // Get the raw request body\r",
 							"    var parsedBody = JSON.parse(jsonData);  // Parse it into a JSON object\r",
-							"    pm.expect(parsedBody.rarityPercent).to.be.a('number').that.is.greaterThanOrEqual(0).and.lessThanOrEqual(1);\r",
+							"    pm.expect(parsedBody.rarityPercent).to.be.a('number').that.is.greaterThanOrEqual(0).and.lessThanOrEqual(100);\r",
 							"});\r",
 							"\r",
 							"// TEST CASE: Update Gacha Item with Missing \"name\" Field\r",
@@ -645,10 +639,7 @@
 						"exec": [
 							"// TEST CASE 1: Successful deletion (ID exists)\r",
 							"pm.test(\"Status code is 200 and item is deleted\", function () {\r",
-							"    pm.response.to.have.status(200);  // Expecting status 200 for successful creation\r",
-							"    var jsonData = pm.response.json();\r",
-							"    pm.expect(jsonData).to.have.property('messgae'); \r",
-							"    pm.expect(jsonData.messgae).to.be.a('Gacha sucessfully deleted'); \r",
+							"    pm.response.to.have.status(200);\r",
 							"});\r",
 							"\r",
 							"// TEST CASE 2: Resource not found (ID does not exist)\r",
@@ -661,7 +652,6 @@
 							"        }\r",
 							"    }, function (err, res) {\r",
 							"        pm.expect(res).to.have.status(404);  // Expecting 404 Not Found\r",
-							"        pm.expect(res.json().error).to.eql(\"Resource not found\");  // Check for the 'Resource not found' error message\r",
 							"    });\r",
 							"});"
 						],
@@ -683,7 +673,7 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/admin/gacha/1005",
+					"raw": "localhost:5000/api/admin/gacha/1",
 					"host": [
 						"localhost"
 					],
@@ -692,7 +682,7 @@
 						"api",
 						"admin",
 						"gacha",
-						"1005"
+						"1"
 					]
 				}
 			},

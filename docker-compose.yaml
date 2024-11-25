@@ -194,7 +194,7 @@ services:
       context: ./PaymentsAdmin
       dockerfile: Dockerfile
     container_name: paymentsadmin
-    volumes:
+    volumes: 
       - ./config.json:/app/config.json
 
   paymentsuser:

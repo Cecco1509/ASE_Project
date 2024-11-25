@@ -1,0 +1,400 @@
+{
+	"info": {
+		"_postman_id": "a3c96856-b3b1-4b95-a2d9-f75696d15f73",
+		"name": "PaymentsUser_tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39660017"
+	},
+	"item": [
+		{
+			"name": "Successful get transaction history",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "User not found",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Successful create of purchase",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful create of purchase\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ \r",
+							"        'message': 'Purchase successful',\r",
+							"        'transaction': 1});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"ingameAmount\":200,\"status\": \"ACTIVE\",\"profilePicture\": \"picture1\",\"userId\":1}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/api/player/currency/purchase",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"purchase"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User not found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User not found\", function(){\r",
+							"pm.response.to.have.status(404);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ 'error': 'User not found'});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"ingameAmount\":200,\"status\": \"ACTIVE\",\"profilePicture\": \"picture1\",\"userId\":2}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/api/player/currency/purchase",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"purchase"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid in game currency",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Invalid in game currency\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({'error': 'in game currency must be greater than zero'});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/api/player/currency/purchase",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"purchase"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Successful decrease of balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful decrease of balance\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\r",
+							"    'message': 'Balance decreased successfully', \r",
+							"    'transaction': 1 });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"amount\":100}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/api/player/currency/decrease/1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"decrease",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid amount_decrease",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Invalid amount\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ 'error': 'amount must be greater than zero' });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/api/player/currency/decrease/1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"decrease",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User not found_decrease",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User not found\", function(){\r",
+							"pm.response.to.have.status(404);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ 'error': 'User not found' });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/api/player/currency/decrease/1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"decrease",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Successful increase of balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful increase of balance\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\r",
+							"    'message': 'Currency increased successfully', \r",
+							"    'transaction': 1 });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"amount\":100}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/api/player/currency/increase/1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"increase",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid amount_increase",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/api/player/currency/increase/1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"increase",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User not found_increase",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User not found\", function(){\r",
+							"pm.response.to.have.status(404);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ 'error': 'User not found' });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"amount\":100}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/api/player/currency/increase/2",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"increase",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
