@@ -38,7 +38,7 @@ def updatePlayerInformation(user_id):
             }
             update_response = updatePlayer()
             return make_response(jsonify(update_response),update_response['status'])
-        return make_response(jsonify({"error":"Unsuccessful data retrieval from the database manager/User ID non existent"}),response['status'])
+        return make_response(jsonify({"error":"User not found"}),response['status'])
     return make_response(jsonify({"error": "No profile picture provided"}), 400)
 
 
@@ -89,7 +89,7 @@ def update_player(user_id):
             }
             update_response = updatePlayer()
             return make_response(jsonify(update_response),update_response['status'])
-        return make_response(jsonify({"error":"Unsuccessful data retrieval from the database manager/User ID non existent"}),response['status'])
+        return make_response(jsonify({"error":"User not found"}),response['status'])
     return make_response(jsonify({"error": "No profile picture provided"}), 400)
 
 
