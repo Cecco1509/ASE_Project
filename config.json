@@ -54,8 +54,7 @@
         "payment":"http://paymentdbmanager:5000"
     },
     "services":{
-        "gachasadmin":"http://gachasadmin:5000",
-        "gachasuser":"http://gachasuser:5000",
+        "gacha":"http://gachamicroservice:5000",
         "usersmicroservice":"http://usersmicroservice:5000",
         "payments_admin_microservice": "http://paymentsadmin:5000", 
         "payments_player_microservice": "http://paymentsuser:5000"

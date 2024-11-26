@@ -156,11 +156,11 @@ services:
       - ACCEPT_EULA=Y
     container_name: transactiondatabase
 
-  gachasadmin:
+  gachamicroservice:
     build:
-      context: ./GatchasAdmin
+      context: ./GachaMicroservice
       dockerfile: Dockerfile
-    container_name: gachasadmin
+    container_name: gachamicroservice
     volumes:
       - ./config.json:/app/config.json
 
