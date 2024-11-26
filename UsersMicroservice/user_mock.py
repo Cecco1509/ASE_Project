@@ -42,8 +42,16 @@ def getPlayers():
     users = [user1, user2, user3]
     return {"data":users,"status":200}
 
+
 def updatePlayer():
     return {"status":200,"data":"message"}
+
+def deletePlayer(user_id):
+    if user_id==1:
+        return {"status":200,"data":"User successfully deleted"}
+    else:
+        return {"status":404,"data":"Player not found"}
+
 
 def banPlayer(user_id):
     if user_id==1:

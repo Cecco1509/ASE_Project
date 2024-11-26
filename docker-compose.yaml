@@ -24,8 +24,7 @@ services:
       - roll
       - transactionsadmin
       - transactionsuser
-      - usersadmin
-      - usersuser
+      - usersmicroservice
     ports:
       - "5000:5000"
     volumes:
@@ -207,19 +206,11 @@ services:
       dockerfile: Dockerfile
     container_name: transactionsuser
 
-  usersadmin:
+  usersmicroservice:
     build:
-      context: ./UsersAdmin
+      context: ./UsersMicroservice
       dockerfile: Dockerfile
-    container_name: usersadmin
-    volumes:
-      - ./config.json:/app/config.json  # Mounts config.json into the container
-   
-  usersuser:
-    build:
-      context: ./UsersUser
-      dockerfile: Dockerfile
-    container_name: usersuser
+    container_name: usersmicroservice
     volumes:
       - ./config.json:/app/config.json  # Mounts config.json into the container
    

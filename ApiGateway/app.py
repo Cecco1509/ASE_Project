@@ -185,7 +185,7 @@ def get_admin_transaction_history(user_id):
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
 def getPlayerInformation(user_id):
     try:
-        response = requests.get(f'{config.services.users_user_microservice}/api/player/profile/{user_id}')
+        response = requests.get(f'{config.services.usersmicroservice}/api/player/profile/{user_id}')
         
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
@@ -197,12 +197,12 @@ def getPlayerInformation(user_id):
 @app.route('/api/player/update/<int:user_id>', methods=['PUT'])
 def updatePlayerInformation(user_id):
     payload=request.get_json()
-    response=requests.put(f'{config.services.users_user_microservice}/api/player/update/{user_id}',json=payload)
+    response=requests.put(f'{config.services.usersmicroservice}/api/player/update/{user_id}',json=payload)
     return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
 def delete_player(user_id):
-    delete_response = requests.delete(f'{config.services.users_user_microservice}/api/player/delete/{user_id}')
+    delete_response = requests.delete(f'{config.services.usersmicroservice}/api/player/delete/{user_id}')
     return make_response(jsonify(delete_response.json()),delete_response.status_code)
     
 
@@ -211,7 +211,7 @@ def delete_player(user_id):
 @app.route('/api/admin/users', methods=['GET'])
 def get_players():
     try:
-        response = requests.get(f'{config.services.users_admin_microservice}/api/admin/users')
+        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users')
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
         else:
@@ -223,7 +223,7 @@ def get_players():
 @app.route('/api/admin/users/<int:user_id>', methods=['GET'])
 def get_player(user_id):
     try:
-        response = requests.get(f'{config.services.users_admin_microservice}/api/admin/users/{user_id}')
+        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users/{user_id}')
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
         else:
@@ -237,13 +237,13 @@ def get_player(user_id):
 @app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
 def update_player(user_id):
     payload=request.get_json()
-    response=requests.put(f'{config.services.users_admin_microservice}/api/admin/users/{user_id}',json=payload)
+    response=requests.put(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',json=payload)
     return make_response(jsonify(response.json()),response.status_code)
 
 
 @app.route('/api/admin/users/ban/<int:user_id>', methods=['POST'])
 def ban_player(user_id):
     payload=request.get_json()
-    response=requests.post(f'{config.services.users_admin_microservice}/api/admin/users/ban/{user_id}',json=payload)
+    response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=payload)
     return make_response(jsonify(response.json()),response.status_code)
     
