@@ -3,6 +3,8 @@ from handle_errors import handle_errors
 from datetime import datetime
 import random
 
+# TODO: when i merged the 2 microservices, the player test endpoints work normally, but the admin endpoints are not working, not sure why, even tho its the same file and everything looks good, and i only did copy paste without modifying
+
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
 ROLL_PRICE = 100
