@@ -212,7 +212,9 @@ services:
       context: ./UsersAdmin
       dockerfile: Dockerfile
     container_name: usersadmin
-
+    volumes:
+      - ./config.json:/app/config.json  # Mounts config.json into the container
+   
   usersuser:
     build:
       context: ./UsersUser

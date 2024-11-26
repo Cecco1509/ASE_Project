@@ -56,6 +56,7 @@
     "services":{
         "gachasadmin":"http://gachasadmin:5000",
         "gachasuser":"http://gachasuser:5000",
+        "users_admin_microservice":"http://usersadmin:5000"     ,
         "users_user_microservice":"http://usersuser:5000"
 ,
         "payments_admin_microservice": "http://paymentsadmin:5000", 

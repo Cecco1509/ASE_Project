@@ -3,12 +3,26 @@ from app import db
 from models import *
 from flask import Flask, request, make_response, jsonify
 
+
+
+
+
+
 @app.route('/user', methods=['GET'])
 def get_all_users():
     users = db.session.execute(db.select(User)).scalars()
     if users:
         return make_response(jsonify([user.to_dict() for user in users]), 200)
     return make_response(jsonify({"message":"Users not found"}), 404)
+
+
+
+
+
+
+
+
+
 
 @app.route('/user/<int:userId>', methods=['GET'])
 def get_single_user(userId):
