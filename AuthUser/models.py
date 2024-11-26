@@ -10,6 +10,8 @@ class Account(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] 
     password: Mapped[str]
+    salt: Mapped[str]
+    role: Mapped[str]
     def to_dict(self):
         return {
             'id': self.id,
@@ -22,6 +24,7 @@ class Admin(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] 
     password: Mapped[str]
+    salt: Mapped[str]
     def to_dict(self):
         return {
             'id': self.id,
