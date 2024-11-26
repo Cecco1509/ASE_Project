@@ -17,8 +17,7 @@ services:
       - gachadbmanager
       - transactiondbmanager
       - paymentdbmanager
-      - gachasadmin
-      - gachasuser
+      - gachamicroservice
       - paymentsadmin
       - paymentsuser
       - roll
@@ -161,14 +160,6 @@ services:
       context: ./GachaMicroservice
       dockerfile: Dockerfile
     container_name: gachamicroservice
-    volumes:
-      - ./config.json:/app/config.json
-
-  gachasuser:
-    build:
-      context: ./GatchasUser
-      dockerfile: Dockerfile
-    container_name: gachasuser
     volumes:
       - ./config.json:/app/config.json
 
