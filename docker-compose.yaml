@@ -11,7 +11,7 @@ services:
       # - authuser
       # - authdbmanager
       #- auctiondbmanager
-      #- userdbmanager
+      - userdbmanager
       - gachadbmanager
       #- transactiondbmanager
       #- paymentdbmanager
@@ -25,7 +25,7 @@ services:
       #- usersadmin
       #- usersuser
     ports:
-      - "5000:5000"
+      - "8080:5000"
     volumes:
       - ./config.json:/app/config.json
 
@@ -115,17 +115,17 @@ services:
   #   volumes:
   #     - ./config.json:/app/config.json
 
-  # userdbmanager:
-  #   build:
-  #     context: ./UserDBManager
-  #     dockerfile: Dockerfile
-  #   container_name: userdbmanager
-  #   ports:
-  #     - 5001:5000
-  #   depends_on:
-  #     - userdatabase
-  #   volumes:
-  #     - ./config.json:/app/config.json
+  userdbmanager:
+    build:
+      context: ./UserDBManager
+      dockerfile: Dockerfile
+    container_name: userdbmanager
+    ports:
+      - 5001:5000
+    depends_on:
+      - userdatabase
+    volumes:
+      - ./config.json:/app/config.json
 
   # authdatabase:
   #   image: mcr.microsoft.com/mssql/server:2017-latest
@@ -147,7 +147,8 @@ services:
 
 volumes:
   mssql_data:
-    driver: local  # Named volume to store SQL Server data
+    driver: local # Named volume to store SQL Server data
+
 
   # userdatabase:
   #   image: mcr.microsoft.com/mssql/server:2017-latest
@@ -202,7 +203,7 @@ volumes:
   #     context: ./PaymentsAdmin
   #     dockerfile: Dockerfile
   #   container_name: paymentsadmin
-  #   volumes: 
+  #   volumes:
   #     - ./config.json:/app/config.json
 
   # paymentsuser:
