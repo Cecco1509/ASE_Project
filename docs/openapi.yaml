@@ -4,12 +4,12 @@ info:
   version: "1.0.0"
   description: "API documentation for ASE Project"
 servers:
-  - url: "http://localhost:8080"
+  - url: "http://localhost:5050"
 paths:
   /api/admin/gacha:
     get:
       summary: "Get all gacha items"
-      tags: ["AdminGacha"]
+      tags: ["GachaMicroservice"]
       responses:
         '200':
           description: "List of all gacha items"
@@ -23,7 +23,7 @@ paths:
           description: "Resource not found"
     post:
       summary: "Add new gacha item"
-      tags: ["AdminGacha"]
+      tags: ["GachaMicroservice"]
       requestBody:
         required: true
         content:
@@ -46,7 +46,7 @@ paths:
   /api/admin/gacha/{gacha_id}:
     get:
       summary: "Get specific gacha item"
-      tags: ["AdminGacha"]
+      tags: ["GachaMicroservice"]
       parameters:
         - in: path
           name: gacha_id
@@ -65,7 +65,7 @@ paths:
           description: "Resource not found"
     delete:
       summary: "Delete a gacha item"
-      tags: ["AdminGacha"]
+      tags: ["GachaMicroservice"]
       parameters:
         - in: path
           name: gacha_id
@@ -88,7 +88,7 @@ paths:
           description: "Resource not found"
     put:
       summary: "Update gacha item details"
-      tags: ["AdminGacha"]
+      tags: ["GachaMicroservice"]
       parameters:
         - in: path
           name: gacha_id
@@ -118,7 +118,7 @@ paths:
   /api/player/gacha/player-collection/{user_id}:
     get:
       summary: "Get player's gacha collection"
-      tags: ["PlayerGacha"]
+      tags: ["GachaMicroservice"]
       parameters:
         - in: path
           name: user_id
@@ -140,7 +140,7 @@ paths:
   /api/player/gacha/player-gacha/item/{gacha_id}:
     get:
       summary: "Get specific gacha collection item for a player"
-      tags: ["PlayerGacha"]
+      tags: ["GachaMicroservice"]
       parameters:
         - in: path
           name: gacha_id
@@ -160,7 +160,7 @@ paths:
   /api/player/gacha/player-collection/{user_id}/gacha/{gacha_id}:
     get:
       summary: "Get specific gacha item details for a player"
-      tags: ["PlayerGacha"]
+      tags: ["GachaMicroservice"]
       parameters:
         - in: path
           name: user_id
@@ -186,7 +186,7 @@ paths:
   /api/player/gacha/system-collection:
     get:
       summary: "Get full system gacha collection"
-      tags: ["PlayerGacha"]
+      tags: ["GachaMicroservice"]
       responses:
         '200':
           description: "Full system gacha collection"
@@ -199,7 +199,7 @@ paths:
   /api/player/gacha/system-gacha/{gacha_id}:
     get:
       summary: "Get details of a specific system gacha item"
-      tags: ["PlayerGacha"]
+      tags: ["GachaMicroservice"]
       parameters:
         - in: path
           name: gacha_id
@@ -219,7 +219,7 @@ paths:
   /api/player/gacha/roll:
     post:
       summary: "Roll a new gacha item"
-      tags: ["PlayerGacha"]
+      tags: ["GachaMicroservice"]
       requestBody:
         required: true
         content:

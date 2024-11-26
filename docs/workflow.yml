@@ -21,33 +21,19 @@ jobs:
     - name: Set up Docker buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Build gacha player image
+    - name: Build gacha microservice test image
       run: |
-        docker build -f ./GachasUser/dockerfile_test -t gachausertest .
-    - name: Run gacha player image
+        docker build -f ./GachaMicroservice/dockerfile_test -t gachams_test .
+    - name: Run gacha microservice test image
       run: |
-        docker run --rm --name gachausert -d -p 5000:5000 gachausertest
-    - name: Run gacha player unit tests
-      run: |
-        cd docs/postman
-        newman run UserGacha.postman_collection.json
-    - name: Stop gacha player image
-      run: |
-        docker stop gachausert
-
-    - name: Build gacha admin image
-      run: |
-        docker build -f ./GachasAdmin/dockerfile_test -t gachaadmintest .
-    - name: Run gacha admin image
-      run: |
-        docker run --rm --name gachaadmint -d -p 5000:5000 gachaadmintest
-    - name: Run gacha admin unit tests
+        docker run --rm --name gachamstest -d -p 5000:5000 gachams_test
+    - name: Run gacha microservice unit tests
       run: |
         cd docs/postman
-        newman run AdminGacha.postman_collection.json
-    - name: Stop gacha admin image
+        newman run GachaMicroservice.postman_collection.json
+    - name: Stop gacha microservice test image
       run: |
-        docker stop gachaadmint
+        docker stop gachamstest
         
     - name: Build currency payment user image
       run: |
