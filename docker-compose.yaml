@@ -17,8 +17,7 @@ services:
       - gachadbmanager
       # - transactiondbmanager
       # - paymentdbmanager
-      - gachasadmin
-      - gachasuser
+      - gachamicroservice
       # - paymentsadmin
       # - paymentsuser
       # - roll
@@ -174,31 +173,20 @@ services:
   #     - ACCEPT_EULA=Y
   #   container_name: transactiondatabase
 
-  gachasadmin:
+  gachamicroservice:
     build:
-      context: ./GatchasAdmin
+      context: ./GachaMicroservice
       dockerfile: Dockerfile
-    container_name: gachasadmin
+    container_name: gachamicroservice
     volumes:
       - ./config.json:/app/config.json
-      - .:/GatchasAdmin
+      - .:/GachaMicroservice
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
-      - FLASK_APP=./GatchasAdmin/app.py
-
-  gachasuser:
-    build:
-      context: ./GatchasUser
-      dockerfile: Dockerfile
-    container_name: gachasuser
-    volumes:
-      - ./config.json:/app/config.json
-      - .:/GatchasUser
-    environment:
-      - FLASK_ENV=development
-      - FLASK_DEBUG=1
-      - FLASK_APP=./GatchasUser/app.py
+      - FLASK_APP=./GachaMicroservice/app.py
+    depends_on:
+      - gachadbmanager
 
   # paymentsadmin:
   #   build:
