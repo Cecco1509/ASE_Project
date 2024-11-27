@@ -1,4 +1,0 @@
-Flask
-requests
-datetime
-python-json-config
