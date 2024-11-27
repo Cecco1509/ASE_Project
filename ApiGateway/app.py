@@ -138,7 +138,7 @@ def create_app():
 def get_transaction_history(user_id):
     
         # Send a GET request to the database manager service to fetch transaction history
-        response = requests.get(config.services.payments_player_microservice+f'/api/player/currency/{user_id}')
+        response = requests.get(config.services.paymentsmicroservice+f'/api/player/currency/{user_id}')
         return response
 
 
@@ -147,7 +147,7 @@ def purchase_in_game_currency():
         # Prepare payload
         data = request.get_json()
         # Send request to microservice
-        response = requests.post(f"{config.services.payments_player_microservice}/api/player/currency/", json=data)
+        response = requests.post(f"{config.services.paymentsmicroservice}/api/player/currency/", json=data)
         # Forward the microservice's response to the user
         return response
 
@@ -157,7 +157,7 @@ def decrease_in_game_currency(user_id):
         # Extract the amount to be deducted from the request body
         data = request.get_json()
         
-        response = requests.put(config.services.payments_player_microservice+ f'/api/player/decrease/update_balance', json=data)
+        response = requests.put(config.services.paymentsmicroservice+ f'/api/player/decrease/update_balance', json=data)
         
         return response
 
@@ -167,7 +167,7 @@ def increase_currency(user_id):
     
         data = request.get_json()
         
-        response = requests.put(config.services.payments_player_microservice+ f'/api/player/increase/update_balance', json=data)
+        response = requests.put(config.services.paymentsmicroservice+ f'/api/player/increase/update_balance', json=data)
 
         return response
 
@@ -176,7 +176,7 @@ def increase_currency(user_id):
 @app.route('/api/admin/currency/<int:user_id>', methods=['GET'])
 def get_transaction_history(user_id):
     
-        response = requests.get(config.services.paymentsadmin+f'/api/admin/currency/{user_id}')
+        response = requests.get(config.services.paymentsmicroservice+f'/api/admin/currency/{user_id}')
         return response
 
        

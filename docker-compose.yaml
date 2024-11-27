@@ -173,20 +173,12 @@ services:
     volumes:
       - ./config.json:/app/config.json
 
-  paymentsadmin:
+  paymentsmicroservice:
     build:
-      context: ./PaymentsAdmin
+      context: ./PaymentsMicroservice
       dockerfile: Dockerfile
-    container_name: paymentsadmin
+    container_name: paymentsmicroservice
     volumes: 
-      - ./config.json:/app/config.json
-
-  paymentsuser:
-    build:
-      context: ./PaymentsUser
-      dockerfile: Dockerfile
-    container_name: paymentsuser
-    volumes:
       - ./config.json:/app/config.json
 
   roll:
