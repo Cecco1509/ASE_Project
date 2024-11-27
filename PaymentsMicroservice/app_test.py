@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound 
 from datetime import datetime
 from python_json_config import ConfigBuilder
-from paymentsdb_mock import *
+from payments_mock import *
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
