@@ -211,7 +211,7 @@ def increase_currency(userId):
         return make_response(jsonify({'error': str(e)}), 500)
 
 @app.route('/api/admin/currency/<int:userId>', methods=['GET'])
-def get_transaction_history(userId):
+def get_transaction_history_admin(userId):
     try:
         # Prepare the request URL for fetching transaction history
         response = get_history(userId)
