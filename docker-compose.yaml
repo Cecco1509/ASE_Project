@@ -5,12 +5,12 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway
     depends_on:
-    #- auctionsadmin
-    #- auctionsuser
-    #- authadmin
-    # - authuser
-    # - authdbmanager
-    #- auctiondbmanager
+      #- auctionsadmin
+      #- auctionsuser
+      #- authadmin
+      # - authuser
+      # - authdbmanager
+      #- auctiondbmanager
       - userdbmanager
       - gachadbmanager
     #- transactiondbmanager

@@ -54,14 +54,10 @@
     "payment": "http://paymentdbmanager:5000"
   },
   "services": {
-    "auctionsadmin": "http://auctionsadmin:5000",
-    "auctionsuser": "http://auctionsuser:5000",
-    "gachasadmin": "http://gachasadmin:5000",
-    "gachasuser": "http://gachasuser:5000",
-    "paymentsadmin": "http://paymentsadmin:5000",
-    "paymentsuser": "http://paymentsuser:5000",
-    "transactionsadmin": "http://transactionsadmin:5000",
-    "transactionsuser": "http://transactionsuser:5000"
+    "gacha": "http://gachamicroservice:5000",
+    "usersmicroservice": "http://usersmicroservice:5000",
+    "payments_admin_microservice": "http://paymentsadmin:5000",
+    "payments_player_microservice": "http://paymentsuser:5000"
   },
   "system_settings": {
     "gacha_roll_price": 100
