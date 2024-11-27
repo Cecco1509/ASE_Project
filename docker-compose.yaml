@@ -135,7 +135,7 @@ services:
   #   container_name: authdatabase
 
   gachadatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
+    image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
@@ -146,131 +146,131 @@ services:
     #  - mssql_data:/var/opt/mssql
 
   userdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
+    image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
     ports:
       - "1434:1433"
     container_name: userdatabase
+    volumes:
+      - ./sqlserver-data:/var/opt/mssql
     #volumes:
     #  - mssql_data:/var/opt/mssql
+# volumes:
+#   mssql_data:
+#     driver: local # Named volume to store SQL Server data
 
-volumes:
-  mssql_data:
-    driver: local # Named volume to store SQL Server data
+# paymentdatabase:
+#   image: mcr.microsoft.com/mssql/server:2017-latest
+#   environment:
+#     - SA_PASSWORD=Password1.
+#     - ACCEPT_EULA=Y
 
+#   container_name: paymentdatabase
 
-  # paymentdatabase:
-  #   image: mcr.microsoft.com/mssql/server:2017-latest
-  #   environment:
-  #     - SA_PASSWORD=Password1.
-  #     - ACCEPT_EULA=Y
+# auctiondatabase:
+#   image: mcr.microsoft.com/mssql/server:2017-latest
+#   environment:
+#     - SA_PASSWORD=Password1.
+#     - ACCEPT_EULA=Y
+#   container_name: auctiondatabase
 
-  #   container_name: paymentdatabase
+# transactiondatabase:
+#   image: mcr.microsoft.com/mssql/server:2017-latest
+#   environment:
+#     - SA_PASSWORD=Password1.
+#     - ACCEPT_EULA=Y
+#   ports:
+#     - 5002:5000
+#   container_name: transactiondatabase
 
-  # auctiondatabase:
-  #   image: mcr.microsoft.com/mssql/server:2017-latest
-  #   environment:
-  #     - SA_PASSWORD=Password1.
-  #     - ACCEPT_EULA=Y
-  #   container_name: auctiondatabase
+# gachasadmin:
+#   build:
+#     context: ./GatchasAdmin
+#     dockerfile: Dockerfile
+#   container_name: gachasadmin
+#   volumes:
+#     - ./config.json:/app/config.json
 
-  # transactiondatabase:
-  #   image: mcr.microsoft.com/mssql/server:2017-latest
-  #   environment:
-  #     - SA_PASSWORD=Password1.
-  #     - ACCEPT_EULA=Y
-  #   ports:
-  #     - 5002:5000
-  #   container_name: transactiondatabase
+# gachasuser:
+#   build:
+#     context: ./GatchasUser
+#     dockerfile: Dockerfile
+#   container_name: gachasuser
+#   volumes:
+#     - ./config.json:/app/config.json
 
-  # gachasadmin:
-  #   build:
-  #     context: ./GatchasAdmin
-  #     dockerfile: Dockerfile
-  #   container_name: gachasadmin
-  #   volumes:
-  #     - ./config.json:/app/config.json
+# paymentsadmin:
+#   build:
+#     context: ./PaymentsAdmin
+#     dockerfile: Dockerfile
+#   container_name: paymentsadmin
+#   volumes:
+#     - ./config.json:/app/config.json
 
-  # gachasuser:
-  #   build:
-  #     context: ./GatchasUser
-  #     dockerfile: Dockerfile
-  #   container_name: gachasuser
-  #   volumes:
-  #     - ./config.json:/app/config.json
+# paymentsuser:
+#   build:
+#     context: ./PaymentsUser
+#     dockerfile: Dockerfile
+#   container_name: paymentsuser
+#   volumes:
+#     - ./config.json:/app/config.json
 
-  # paymentsadmin:
-  #   build:
-  #     context: ./PaymentsAdmin
-  #     dockerfile: Dockerfile
-  #   container_name: paymentsadmin
-  #   volumes:
-  #     - ./config.json:/app/config.json
+# roll:
+#   build:
+#     context: ./Roll
+#     dockerfile: Dockerfile
+#   container_name: roll
 
-  # paymentsuser:
-  #   build:
-  #     context: ./PaymentsUser
-  #     dockerfile: Dockerfile
-  #   container_name: paymentsuser
-  #   volumes:
-  #     - ./config.json:/app/config.json
+# transactionsadmin:
+#   build:
+#     context: ./TransactionsAdmin
+#     dockerfile: Dockerfile
+#   container_name: transactionsadmin
+#   volumes:
+#     - ./config.json:/app/config.json
 
-  # roll:
-  #   build:
-  #     context: ./Roll
-  #     dockerfile: Dockerfile
-  #   container_name: roll
+# transactionsuser:
+#   build:
+#     context: ./TransactionsUser
+#     dockerfile: Dockerfile
+#   container_name: transactionsuser
+#   volumes:
+#     - ./config.json:/app/config.json
 
-  # transactionsadmin:
-  #   build:
-  #     context: ./TransactionsAdmin
-  #     dockerfile: Dockerfile
-  #   container_name: transactionsadmin
-  #   volumes:
-  #     - ./config.json:/app/config.json
+# usersadmin:
+#   build:
+#     context: ./UsersAdmin
+#     dockerfile: Dockerfile
+#   container_name: usersadmin
+#   volumes:
+#     - ./config.json:/app/config.json
 
-  # transactionsuser:
-  #   build:
-  #     context: ./TransactionsUser
-  #     dockerfile: Dockerfile
-  #   container_name: transactionsuser
-  #   volumes:
-  #     - ./config.json:/app/config.json
+# usersuser:
+#   build:
+#     context: ./UsersUser
+#     dockerfile: Dockerfile
+#   container_name: usersuser
+#   volumes:
+#     - ./config.json:/app/config.json
 
-  # usersadmin:
-  #   build:
-  #     context: ./UsersAdmin
-  #     dockerfile: Dockerfile
-  #   container_name: usersadmin
-  #   volumes:
-  #     - ./config.json:/app/config.json
+# rabbit:
+#   hostname: rabbit
+#   image: "rabbitmq:3-management"
+#   environment:
+#     - RABBITMQ_DEFAULT_USER=admin
+#     - RABBITMQ_DEFAULT_PASS=mypass
+#   ports:
+#     - "15672:15672"
+#     - "5672:5672"
 
-  # usersuser:
-  #   build:
-  #     context: ./UsersUser
-  #     dockerfile: Dockerfile
-  #   container_name: usersuser
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  # rabbit:
-  #   hostname: rabbit
-  #   image: "rabbitmq:3-management"
-  #   environment:
-  #     - RABBITMQ_DEFAULT_USER=admin
-  #     - RABBITMQ_DEFAULT_PASS=mypass
-  #   ports:
-  #     - "15672:15672"
-  #     - "5672:5672"
-
-  # auction_worker:
-  #   build:
-  #     context: ./AuctionWorker
-  #     dockerfile: Dockerfile
-  #   user: nobody
-  #   depends_on:
-  #     - rabbit
-  #   volumes:
-  #     - ./config.json:/app/config.json
+# auction_worker:
+#   build:
+#     context: ./AuctionWorker
+#     dockerfile: Dockerfile
+#   user: nobody
+#   depends_on:
+#     - rabbit
+#   volumes:
+#     - ./config.json:/app/config.json
