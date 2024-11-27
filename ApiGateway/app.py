@@ -11,7 +11,7 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
-AUCTION_ADMIN_URL = config.services.auctionsadmin
+AUCTIONS_MICROSERVICE = config.services.auctionsservice
 AUCTION_USER_URL = config.services.auctionsuser
 GACHA_MICROSERVICE = config.services.gacha
 

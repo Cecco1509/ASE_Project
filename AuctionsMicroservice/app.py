@@ -18,7 +18,7 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 
-sys.path.append("/app/")
+sys.path.append("/app/")  
 from celery_app import end_auction
 
 # celery_app = Celery(app.name,
