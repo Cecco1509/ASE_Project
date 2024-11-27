@@ -4,26 +4,26 @@ services:
       context: ./ApiGateway
       dockerfile: Dockerfile
     container_name: apigateway
-    depends_on:
-      #- auctionsadmin
-      #- auctionsuser
-      #- authadmin
-      # - authuser
-      # - authdbmanager
-      #- auctiondbmanager
-      - userdbmanager
-      - gachadbmanager
-      #- transactiondbmanager
-      #- paymentdbmanager
-      #- gachasadmin
-      #- gachasuser
-      #- paymentsadmin
-      #- paymentsuser
-      # - roll
-      #- transactionsadmin
-      #- transactionsuser
-      #- usersadmin
-      #- usersuser
+    #depends_on:
+    #- auctionsadmin
+    #- auctionsuser
+    #- authadmin
+    # - authuser
+    # - authdbmanager
+    #- auctiondbmanager
+    #- userdbmanager
+    #- gachadbmanager
+    #- transactiondbmanager
+    #- paymentdbmanager
+    #- gachasadmin
+    #- gachasuser
+    #- paymentsadmin
+    #- paymentsuser
+    # - roll
+    #- transactionsadmin
+    #- transactionsuser
+    #- usersadmin
+    #- usersuser
     ports:
       - "8080:5000"
     volumes:
@@ -83,17 +83,17 @@ services:
   #   volumes:
   #     - ./config.json:/app/config.json
 
-  gachadbmanager:
-    build:
-      context: ./GachaDBManager
-      dockerfile: Dockerfile
-    container_name: gachadbmanager
-    depends_on:
-      - gachadatabase
-    ports:
-      - 5003:5000
-    volumes:
-      - ./config.json:/app/config.json
+  # gachadbmanager:
+  #   build:
+  #     context: ./GachaDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: gachadbmanager
+  #   depends_on:
+  #     - gachadatabase
+  #   ports:
+  #     - 5003:5000
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
   # paymentdbmanager:
   #   build:
@@ -115,17 +115,17 @@ services:
   #   volumes:
   #     - ./config.json:/app/config.json
 
-  userdbmanager:
-    build:
-      context: ./UserDBManager
-      dockerfile: Dockerfile
-    container_name: userdbmanager
-    ports:
-      - 5001:5000
-    depends_on:
-      - userdatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # userdbmanager:
+  #   build:
+  #     context: ./UserDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: userdbmanager
+  #   ports:
+  #     - 5001:5000
+  #   depends_on:
+  #     - userdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
   # authdatabase:
   #   image: mcr.microsoft.com/mssql/server:2017-latest
@@ -142,21 +142,24 @@ services:
     container_name: gachadatabase
     ports:
       - "1433:1433"
-    volumes:
-      - mssql_data:/var/opt/mssql
+    #volumes:
+    #  - mssql_data:/var/opt/mssql
+
+  userdatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    ports:
+      - "1434:1433"
+    container_name: userdatabase
+    #volumes:
+    #  - mssql_data:/var/opt/mssql
 
 volumes:
   mssql_data:
     driver: local # Named volume to store SQL Server data
 
-
-  # userdatabase:
-  #   image: mcr.microsoft.com/mssql/server:2017-latest
-  #   environment:
-  #     - SA_PASSWORD=Password1.
-  #     - ACCEPT_EULA=Y
-
-  #   container_name: userdatabase
 
   # paymentdatabase:
   #   image: mcr.microsoft.com/mssql/server:2017-latest
