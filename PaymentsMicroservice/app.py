@@ -208,7 +208,7 @@ def increase_currency(userId):
         response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload)
 
 @app.route('/api/admin/currency/<int:user_id>', methods=['GET'])
-def get_transaction_history(user_id):
+def get_transaction_history_admin(user_id):
     try:
         # Prepare the request URL for fetching transaction history
         transaction_history_url = config.dbmanagers.payment+f'/currencytransaction/{user_id}'

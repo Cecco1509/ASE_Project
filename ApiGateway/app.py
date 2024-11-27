@@ -174,7 +174,7 @@ def increase_currency(user_id):
    
 
 @app.route('/api/admin/currency/<int:user_id>', methods=['GET'])
-def get_transaction_history(user_id):
+def get_transaction_history_admin(user_id):
     
         response = requests.get(config.services.paymentsmicroservice+f'/api/admin/currency/{user_id}')
         return response
