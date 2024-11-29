@@ -157,9 +157,9 @@ def verify_player_token(user_info=None):
     except Exception as e:
         return jsonify({"error" : str(e)}), 500
  
-@app.route('/helloAdmin/<int:id>', methods=['GET'])
+@app.route('/helloAdmin', methods=['GET'])
 @token_required("admin")
-def verify_admin_token(id, user_info=None):
+def verify_admin_token(user_info=None):
     try:
         return jsonify({"msg" : f"token verified successfully for admin {user_info['username']} and id {id}"}), 200
     except Exception as e:
