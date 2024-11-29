@@ -142,7 +142,10 @@ services:
     container_name: usersmicroservice
     volumes:
       - ./config.json:/app/config.json  # Mounts config.json into the container
-   
+    secrets:
+      - users_cert
+      - users_cert_key
+
   auctiondbmanager:
       build:
         context: ./AuctionDBManager
@@ -194,5 +197,9 @@ services:
       - ./config.json:/app/config.json
 
 secrets:
-   token_secret:
+  token_secret:
         file: token_secret.env
+  users_cert:
+    file: ./secrets/users_cert.pem
+  users_cert_key:
+    file: ./secrets/users_key.pem 

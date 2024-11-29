@@ -196,7 +196,7 @@ def getPlayerInformation(user_id):
 @app.route('/api/player/update/<int:user_id>', methods=['PUT'])
 def updatePlayerInformation(user_id):
     payload=request.get_json()
-    response=requests.put(f'{config.services.usersmicroservice}/api/player/update/{user_id}',json=payload)
+    response=requests.put(f'{config.services.usersmicroservice}/api/player/update/{user_id}',json=payload,verify=False)
     return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
@@ -236,14 +236,14 @@ def get_player(user_id):
 @app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
 def update_player(user_id):
     payload=request.get_json()
-    response=requests.put(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',json=payload)
+    response=requests.put(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',json=payload,verify=False)
     return make_response(jsonify(response.json()),response.status_code)
 
 
 @app.route('/api/admin/users/ban/<int:user_id>', methods=['POST'])
 def ban_player(user_id):
     payload=request.get_json()
-    response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=payload)
+    response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=payload,verify=False)
     return make_response(jsonify(response.json()),response.status_code)
     
 @app.route('/api/player/register', methods=['POST'])
