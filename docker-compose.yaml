@@ -50,7 +50,9 @@ services:
       - ./config.json:/app/config.json
     secrets:
       - token_secret
-  
+      - auth_cert
+      - auth_cert_key
+
   authdatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
     environment:
@@ -198,8 +200,12 @@ services:
 
 secrets:
   token_secret:
-        file: token_secret.env
+    file: ./secrets/token_secret.env
   users_cert:
     file: ./secrets/users_cert.pem
   users_cert_key:
     file: ./secrets/users_key.pem 
+  auth_cert:
+    file: ./secrets/auth_cert.pem
+  auth_cert_key:
+    file: ./secrets/auth_key.pem  
