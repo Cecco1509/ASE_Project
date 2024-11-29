@@ -237,14 +237,14 @@ def get_player(user_id):
 def update_player(user_id):
     payload=request.get_json()
     response=requests.put(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',json=payload,verify=False)
-    return make_response(jsonify(response.json()),response.status_code)
+    return make_response(response.json(),response.status_code)
 
 
 @app.route('/api/admin/users/ban/<int:user_id>', methods=['POST'])
 def ban_player(user_id):
     payload=request.get_json()
     response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=payload,verify=False)
-    return make_response(jsonify(response.json()),response.status_code)
+    return make_response(response.json(),response.status_code)
     
 @app.route('/api/player/register', methods=['POST'])
 def register_user():
