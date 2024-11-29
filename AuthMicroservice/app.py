@@ -153,17 +153,17 @@ def logout(user_info):
 @token_required("player")
 def verify_player_token(user_info=None):
     try:
-        return jsonify({"msg" : f"token verified successfully for user {user_info['username']}"}), 200
+        return make_response(jsonify({"msg" : f"token verified successfully for user {user_info['username']}"}), 200)
     except Exception as e:
-        return jsonify({"error" : str(e)}), 500
+        return make_response(jsonify({"error" : str(e)}), 500)
  
 @app.route('/helloAdmin', methods=['GET'])
 @token_required("admin")
 def verify_admin_token(user_info=None):
     try:
-        return jsonify({"msg" : f"token verified successfully for admin {user_info['username']} and id {id}"}), 200
+        return make_response(jsonify({"msg" : f"token verified successfully for admin {user_info['username']}"}), 200)
     except Exception as e:
-        return jsonify({"error" : str(e)}), 500
+        return make_response(jsonify({"error" : str(e)}), 500)
 
 @app.route('/api/admin/register', methods=['POST'])
 def register_admin():
