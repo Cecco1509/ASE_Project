@@ -26,7 +26,10 @@ services:
       - "5000:5000"
     volumes:
       - ./config.json:/app/config.json  # Mounts config.json into the container
-   
+    secrets:
+      - api_gateway_cert
+      - api_gateway_cert_key
+ 
   auctionsadmin:
     build:
       context: ./AuctionsAdmin
@@ -209,3 +212,7 @@ secrets:
     file: ./secrets/auth_cert.pem
   auth_cert_key:
     file: ./secrets/auth_key.pem  
+  api_gateway_cert:
+    file: ./secrets/api_gateway_cert.pem
+  api_gateway_cert_key:
+    file: ./secrets/api_gateway_key.pem  
