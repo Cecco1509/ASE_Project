@@ -75,9 +75,10 @@ def update_player(user_id):
     if 'profilePicture' in request.get_json():
         payload = request.json['profilePicture']
         response = requests.get(f'{config.dbmanagers.user}/user/{user_id}')
+        response_data=response.json()
         if response.status_code==200:
-            status_data=response['status']
-            ingameCurrency_data=response['ingameCurrency']
+            status_data=response_data['status']
+            ingameCurrency_data=response_data['ingameCurrency']
             update_data={
                 'status':status_data,
                 'ingameCurrency':ingameCurrency_data,
