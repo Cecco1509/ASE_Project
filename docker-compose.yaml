@@ -9,9 +9,7 @@ services:
     depends_on:
       - auctionsadmin
       - auctionsuser
-      - authadmin
-      - authuser
-      - authdbmanager
+      - authmicroservice
       - auctiondbmanager
       - userdbmanager
       - gachadbmanager
@@ -41,69 +39,24 @@ services:
       dockerfile: Dockerfile
     container_name: auctionsuser
 
-  authadmin:
+  authmicroservice:
     build:
-      context: ./AuthAdmin
+      context: ./AuthMicroservice
       dockerfile: Dockerfile
-    container_name: authadmin
-
-  authuser:
-    build:
-      context: ./AuthUser
-      dockerfile: Dockerfile
-    container_name: authuser
-    volumes:
-      - ./config.json:/app/config.json
-
-  auctiondbmanager:
-    build:
-      context: ./AuctionDBManager
-      dockerfile: Dockerfile
-    container_name: auctiondbmanager
+    container_name: authmicroservice
     depends_on:
-      - auctiondatabase
+      - authdatabase
     volumes:
       - ./config.json:/app/config.json
-
-  gachadbmanager:
-    build:
-      context: ./GachaDBManager
-      dockerfile: Dockerfile
-    container_name: gachadbmanager
-    depends_on:
-      - gachadatabase
-    volumes:
-      - ./config.json:/app/config.json
-
-  paymentdbmanager:
-    build:
-      context: ./PaymentDBManager
-      dockerfile: Dockerfile
-    container_name: paymentdbmanager
-    depends_on:
-      - paymentdatabase
-    volumes:
-      - ./config.json:/app/config.json
-
-  transactiondbmanager:
-    build:
-      context: ./TransactionDBManager
-      dockerfile: Dockerfile
-    container_name: transactiondbmanager
-    depends_on:
-      - transactiondatabase
-    volumes:
-      - ./config.json:/app/config.json
-
-  userdbmanager:
-    build:
-      context: ./UserDBManager
-      dockerfile: Dockerfile
-    container_name: userdbmanager
-    depends_on:
-      - userdatabase
-    volumes:
-      - ./config.json:/app/config.json
+    secrets:
+      - token_secret
+  
+  authdatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    container_name: authdatabase
 
   gachadatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -190,4 +143,56 @@ services:
     volumes:
       - ./config.json:/app/config.json  # Mounts config.json into the container
    
+  auctiondbmanager:
+      build:
+        context: ./AuctionDBManager
+        dockerfile: Dockerfile
+      container_name: auctiondbmanager
+      depends_on:
+        - auctiondatabase
+      volumes:
+        - ./config.json:/app/config.json
 
+  gachadbmanager:
+    build:
+      context: ./GachaDBManager
+      dockerfile: Dockerfile
+    container_name: gachadbmanager
+    depends_on:
+      - gachadatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+  paymentdbmanager:
+    build:
+      context: ./PaymentDBManager
+      dockerfile: Dockerfile
+    container_name: paymentdbmanager
+    depends_on:
+      - paymentdatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+  transactiondbmanager:
+    build:
+      context: ./TransactionDBManager
+      dockerfile: Dockerfile
+    container_name: transactiondbmanager
+    depends_on:
+      - transactiondatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+  userdbmanager:
+    build:
+      context: ./UserDBManager
+      dockerfile: Dockerfile
+    container_name: userdbmanager
+    depends_on:
+      - userdatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+secrets:
+   token_secret:
+        file: token_secret.env

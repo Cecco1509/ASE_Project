@@ -1,7 +1,0 @@
-Flask
-requests
-datetime
-python_json_config
-pyjwt
-flask-sqlalchemy
-pyodbc

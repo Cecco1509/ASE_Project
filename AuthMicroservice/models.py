@@ -11,12 +11,12 @@ class Account(db.Model):
     username: Mapped[str] 
     password: Mapped[str]
     salt: Mapped[str]
-    role: Mapped[str]
     def to_dict(self):
         return {
             'id': self.id,
             'username': self.username,
-            'password': self.password
+            'password': self.password,
+            'salt':self.salt
         }
 
 class Admin(db.Model):
@@ -29,5 +29,6 @@ class Admin(db.Model):
         return {
             'id': self.id,
             'username': self.username,
-            'password': self.password
+            'password': self.password,
+            'salt':self.salt
         }
