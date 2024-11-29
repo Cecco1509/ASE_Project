@@ -7,40 +7,45 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway
     depends_on:
-      - auctionsadmin
-      - auctionsuser
+      # - auctionsadmin
+      # - auctionsuser
       - authmicroservice
-      - auctiondbmanager
+      # - auctiondbmanager
       - userdbmanager
       - gachadbmanager
-      - transactiondbmanager
-      - paymentdbmanager
+      # - transactiondbmanager
+      # - paymentdbmanager
       - gachamicroservice
-      - paymentsadmin
-      - paymentsuser
-      - roll
-      - transactionsadmin
-      - transactionsuser
-      - usersmicroservice
+      # - paymentsadmin
+      # - paymentsuser
+      # - roll
+      # - transactionsadmin
+      # - transactionsuser
+      # - usersmicroservice
     ports:
       - "5000:5000"
     volumes:
-      - ./config.json:/app/config.json  # Mounts config.json into the container
+      - ./config.json:/app/config.json
+      - .:/ApiGateway
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./ApiGateway/app.py
     secrets:
       - api_gateway_cert
       - api_gateway_cert_key
  
-  auctionsadmin:
-    build:
-      context: ./AuctionsAdmin
-      dockerfile: Dockerfile
-    container_name: auctionsadmin
+  # auctionsadmin:
+  #   build:
+  #     context: ./AuctionsAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: auctionsadmin
 
-  auctionsuser:
-    build:
-      context: ./AuctionsUser
-      dockerfile: Dockerfile
-    container_name: auctionsuser
+  # auctionsuser:
+  #   build:
+  #     context: ./AuctionsUser
+  #     dockerfile: Dockerfile
+  #   container_name: auctionsuser
 
   authmicroservice:
     build:
@@ -77,26 +82,26 @@ services:
       - ACCEPT_EULA=Y
     container_name: userdatabase
 
-  paymentdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: paymentdatabase
+  # paymentdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: paymentdatabase
 
-  auctiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: auctiondatabase
+  # auctiondatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: auctiondatabase
   
-  transactiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: transactiondatabase
+  # transactiondatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
+  #   container_name: transactiondatabase
 
   gachamicroservice:
     build:
@@ -105,61 +110,68 @@ services:
     container_name: gachamicroservice
     volumes:
       - ./config.json:/app/config.json
+      - .:/GachaMicroservice
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./GachaMicroservice/app.py
+    depends_on:
+      - gachadbmanager
 
-  paymentsadmin:
-    build:
-      context: ./PaymentsAdmin
-      dockerfile: Dockerfile
-    container_name: paymentsadmin
-    volumes: 
-      - ./config.json:/app/config.json
+  # paymentsadmin:
+  #   build:
+  #     context: ./PaymentsAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: paymentsadmin
+  #   volumes: 
+  #     - ./config.json:/app/config.json
 
-  paymentsuser:
-    build:
-      context: ./PaymentsUser
-      dockerfile: Dockerfile
-    container_name: paymentsuser
-    volumes:
-      - ./config.json:/app/config.json
+  # paymentsuser:
+  #   build:
+  #     context: ./PaymentsUser
+  #     dockerfile: Dockerfile
+  #   container_name: paymentsuser
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  roll:
-    build:
-      context: ./Roll
-      dockerfile: Dockerfile
-    container_name: roll
+  # roll:
+  #   build:
+  #     context: ./Roll
+  #     dockerfile: Dockerfile
+  #   container_name: roll
 
-  transactionsadmin:
-    build:
-      context: ./TransactionsAdmin
-      dockerfile: Dockerfile
-    container_name: transactionsadmin
+  # transactionsadmin:
+  #   build:
+  #     context: ./TransactionsAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: transactionsadmin
 
-  transactionsuser:
-    build:
-      context: ./TransactionsUser
-      dockerfile: Dockerfile
-    container_name: transactionsuser
+  # transactionsuser:
+  #   build:
+  #     context: ./TransactionsUser
+  #     dockerfile: Dockerfile
+  #   container_name: transactionsuser
 
-  usersmicroservice:
-    build:
-      context: ./UsersMicroservice
-      dockerfile: Dockerfile
-    container_name: usersmicroservice
-    volumes:
-      - ./config.json:/app/config.json  # Mounts config.json into the container
-    secrets:
-      - users_cert
-      - users_cert_key
+  # usersmicroservice:
+  #   build:
+  #     context: ./UsersMicroservice
+  #     dockerfile: Dockerfile
+  #   container_name: usersmicroservice
+  #   volumes:
+  #     - ./config.json:/app/config.json  # Mounts config.json into the container
+  #   secrets:
+  #     - users_cert
+  #     - users_cert_key
 
-  auctiondbmanager:
-      build:
-        context: ./AuctionDBManager
-        dockerfile: Dockerfile
-      container_name: auctiondbmanager
-      depends_on:
-        - auctiondatabase
-      volumes:
-        - ./config.json:/app/config.json
+  # auctiondbmanager:
+  #     build:
+  #       context: ./AuctionDBManager
+  #       dockerfile: Dockerfile
+  #     container_name: auctiondbmanager
+  #     depends_on:
+  #       - auctiondatabase
+  #     volumes:
+  #       - ./config.json:/app/config.json
 
   gachadbmanager:
     build:
@@ -170,26 +182,31 @@ services:
       - gachadatabase
     volumes:
       - ./config.json:/app/config.json
+      - .:/GachaDBManager
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./GachaDBManager/app.py
 
-  paymentdbmanager:
-    build:
-      context: ./PaymentDBManager
-      dockerfile: Dockerfile
-    container_name: paymentdbmanager
-    depends_on:
-      - paymentdatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # paymentdbmanager:
+  #   build:
+  #     context: ./PaymentDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: paymentdbmanager
+  #   depends_on:
+  #     - paymentdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-  transactiondbmanager:
-    build:
-      context: ./TransactionDBManager
-      dockerfile: Dockerfile
-    container_name: transactiondbmanager
-    depends_on:
-      - transactiondatabase
-    volumes:
-      - ./config.json:/app/config.json
+  # transactiondbmanager:
+  #   build:
+  #     context: ./TransactionDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: transactiondbmanager
+  #   depends_on:
+  #     - transactiondatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
   userdbmanager:
     build:
@@ -200,6 +217,11 @@ services:
       - userdatabase
     volumes:
       - ./config.json:/app/config.json
+      - .:/UserDBManager
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./UserDBManager/app.py
 
 secrets:
   token_secret:
