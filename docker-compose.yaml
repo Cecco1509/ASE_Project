@@ -7,37 +7,13 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway
     depends_on:
-      - auctionsadmin
-      - auctionsuser
       - authmicroservice
-      - auctiondbmanager
       - userdbmanager
-      - gachadbmanager
-      - transactiondbmanager
-      - paymentdbmanager
-      - gachamicroservice
-      - paymentsadmin
-      - paymentsuser
-      - roll
-      - transactionsadmin
-      - transactionsuser
-      - usersmicroservice
     ports:
       - "5000:5000"
     volumes:
       - ./config.json:/app/config.json  # Mounts config.json into the container
-   
-  auctionsadmin:
-    build:
-      context: ./AuctionsAdmin
-      dockerfile: Dockerfile
-    container_name: auctionsadmin
 
-  auctionsuser:
-    build:
-      context: ./AuctionsUser
-      dockerfile: Dockerfile
-    container_name: auctionsuser
 
   authmicroservice:
     build:
@@ -50,6 +26,8 @@ services:
       - ./config.json:/app/config.json
     secrets:
       - token_secret
+      - auth_cert
+      - auth_cert_key
   
   authdatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -58,12 +36,6 @@ services:
       - ACCEPT_EULA=Y
     container_name: authdatabase
 
-  gachadatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: gachadatabase
 
   userdatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -71,117 +43,6 @@ services:
       - SA_PASSWORD=Password1.
       - ACCEPT_EULA=Y
     container_name: userdatabase
-
-  paymentdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: paymentdatabase
-
-  auctiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: auctiondatabase
-  
-  transactiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    container_name: transactiondatabase
-
-  gachamicroservice:
-    build:
-      context: ./GachaMicroservice
-      dockerfile: Dockerfile
-    container_name: gachamicroservice
-    volumes:
-      - ./config.json:/app/config.json
-
-  paymentsadmin:
-    build:
-      context: ./PaymentsAdmin
-      dockerfile: Dockerfile
-    container_name: paymentsadmin
-    volumes: 
-      - ./config.json:/app/config.json
-
-  paymentsuser:
-    build:
-      context: ./PaymentsUser
-      dockerfile: Dockerfile
-    container_name: paymentsuser
-    volumes:
-      - ./config.json:/app/config.json
-
-  roll:
-    build:
-      context: ./Roll
-      dockerfile: Dockerfile
-    container_name: roll
-
-  transactionsadmin:
-    build:
-      context: ./TransactionsAdmin
-      dockerfile: Dockerfile
-    container_name: transactionsadmin
-
-  transactionsuser:
-    build:
-      context: ./TransactionsUser
-      dockerfile: Dockerfile
-    container_name: transactionsuser
-
-  usersmicroservice:
-    build:
-      context: ./UsersMicroservice
-      dockerfile: Dockerfile
-    container_name: usersmicroservice
-    volumes:
-      - ./config.json:/app/config.json  # Mounts config.json into the container
-   
-  auctiondbmanager:
-      build:
-        context: ./AuctionDBManager
-        dockerfile: Dockerfile
-      container_name: auctiondbmanager
-      depends_on:
-        - auctiondatabase
-      volumes:
-        - ./config.json:/app/config.json
-
-  gachadbmanager:
-    build:
-      context: ./GachaDBManager
-      dockerfile: Dockerfile
-    container_name: gachadbmanager
-    depends_on:
-      - gachadatabase
-    volumes:
-      - ./config.json:/app/config.json
-
-  paymentdbmanager:
-    build:
-      context: ./PaymentDBManager
-      dockerfile: Dockerfile
-    container_name: paymentdbmanager
-    depends_on:
-      - paymentdatabase
-    volumes:
-      - ./config.json:/app/config.json
-
-  transactiondbmanager:
-    build:
-      context: ./TransactionDBManager
-      dockerfile: Dockerfile
-    container_name: transactiondbmanager
-    depends_on:
-      - transactiondatabase
-    volumes:
-      - ./config.json:/app/config.json
 
   userdbmanager:
     build:
@@ -194,5 +55,9 @@ services:
       - ./config.json:/app/config.json
 
 secrets:
-   token_secret:
-        file: token_secret.env
+  token_secret:
+    file: ./secrets/token_secret.env
+  auth_cert:
+    file: ./secrets/auth_cert.pem
+  auth_cert_key:
+    file: ./secrets/auth_key.pem  

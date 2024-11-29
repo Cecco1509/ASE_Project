@@ -248,30 +248,30 @@ def ban_player(user_id):
     
 @app.route('/api/player/register', methods=['POST'])
 def register_user():
-    response = requests.post(f"{config.services.authmicroservice}/api/player/register", json=request.get_json())
+    response = requests.post(f"{config.services.authmicroservice}/api/player/register", json=request.get_json(), verify=False)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/player/login', methods=['POST'])
 def user_login():
-    response = requests.post(f"{config.services.authmicroservice}/api/player/login", json=request.get_json())
+    response = requests.post(f"{config.services.authmicroservice}/api/player/login", json=request.get_json(), verify=False)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/player/logout', methods=['POST'])
 def user_logout():
-    response = requests.post(f"{config.services.authmicroservice}/api/player/logout", headers=request.headers)
+    response = requests.post(f"{config.services.authmicroservice}/api/player/logout", headers=request.headers, verify=False)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/admin/register', methods=['POST'])
 def register_admin():
-    response = requests.post(f"{config.services.authmicroservice}/api/admin/register", json=request.get_json())
+    response = requests.post(f"{config.services.authmicroservice}/api/admin/register", json=request.get_json(), verify=False)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/admin/login', methods=['POST'])
 def admin_login():
-    response = requests.post(f"{config.services.authmicroservice}/api/admin/login", json=request.get_json())
+    response = requests.post(f"{config.services.authmicroservice}/api/admin/login", json=request.get_json(), verify=False)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/admin/logout', methods=['POST'])
 def admin_logout():
-    response = requests.post(f"{config.services.authmicroservice}/api/admin/logout", headers=request.headers)
+    response = requests.post(f"{config.services.authmicroservice}/api/admin/logout", headers=request.headers, verify =False)
     return make_response(jsonify(response.json()), response.status_code)
