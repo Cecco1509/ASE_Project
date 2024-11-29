@@ -11,25 +11,24 @@ services:
       - auctionsuser
       - authadmin
       - authuser
-      #- auctiondbmanager
-      #- userdbmanager
-      #- gachadbmanager
-      #- transactiondbmanager
-      #- paymentdbmanager
-      - gachasadmin
-      - gachasuser
+      - authdbmanager
+      - auctiondbmanager
+      - userdbmanager
+      - gachadbmanager
+      - transactiondbmanager
+      - paymentdbmanager
+      - gachamicroservice
       - paymentsadmin
       - paymentsuser
       - roll
       - transactionsadmin
       - transactionsuser
-      - usersadmin
-      - usersuser
+      - usersmicroservice
     ports:
-      - "8080:5000"
+      - "5000:5000"
     volumes:
-      - ./config.json:/app/config.json
-
+      - ./config.json:/app/config.json  # Mounts config.json into the container
+   
   auctionsadmin:
     build:
       context: ./AuctionsAdmin
@@ -141,29 +140,29 @@ services:
       - ACCEPT_EULA=Y
     container_name: transactiondatabase
 
-  gachasadmin:
+  gachamicroservice:
     build:
-      context: ./GatchasAdmin
+      context: ./GachaMicroservice
       dockerfile: Dockerfile
-    container_name: gachasadmin
-
-  gachasuser:
-    build:
-      context: ./GatchasUser
-      dockerfile: Dockerfile
-    container_name: gachasuser
+    container_name: gachamicroservice
+    volumes:
+      - ./config.json:/app/config.json
 
   paymentsadmin:
     build:
       context: ./PaymentsAdmin
       dockerfile: Dockerfile
     container_name: paymentsadmin
+    volumes: 
+      - ./config.json:/app/config.json
 
   paymentsuser:
     build:
       context: ./PaymentsUser
       dockerfile: Dockerfile
     container_name: paymentsuser
+    volumes:
+      - ./config.json:/app/config.json
 
   roll:
     build:
@@ -183,14 +182,12 @@ services:
       dockerfile: Dockerfile
     container_name: transactionsuser
 
-  usersadmin:
+  usersmicroservice:
     build:
-      context: ./UsersAdmin
+      context: ./UsersMicroservice
       dockerfile: Dockerfile
-    container_name: usersadmin
+    container_name: usersmicroservice
+    volumes:
+      - ./config.json:/app/config.json  # Mounts config.json into the container
+   
 
-  usersuser:
-    build:
-      context: ./UsersUser
-      dockerfile: Dockerfile
-    container_name: usersuser

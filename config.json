@@ -54,6 +54,13 @@
         "payment":"http://paymentdbmanager:5000"
     },
     "services":{
+        "gacha":"http://gachamicroservice:5000",
+        "usersmicroservice":"http://usersmicroservice:5000",
+        "payments_admin_microservice": "http://paymentsadmin:5000", 
+        "payments_player_microservice": "http://paymentsuser:5000",
         "authuser":"http://authuser:5000"
+    },
+    "system_settings":{
+        "gacha_roll_price":100
     }
 }

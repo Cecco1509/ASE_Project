@@ -1,0 +1,309 @@
+openapi: 3.0.3
+info:
+  title: "ASE Project API"
+  version: "1.0.0"
+  description: "API documentation for ASE Project"
+servers:
+  - url: "http://localhost:5050"
+paths:
+  /api/admin/gacha:
+    get:
+      summary: "Get all gacha items"
+      tags: ["GachaMicroservice"]
+      responses:
+        '200':
+          description: "List of all gacha items"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GachaItem'
+        '404':
+          description: "Resource not found"
+    post:
+      summary: "Add new gacha item"
+      tags: ["GachaMicroservice"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GachaItemInput'
+      responses:
+        '200':
+          description: "Gacha item created successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gachaId:
+                    type: integer
+                    description: "ID of the newly created gacha item"
+        '400':
+          description: "Invalid input data"
+  /api/admin/gacha/{gacha_id}:
+    get:
+      summary: "Get specific gacha item"
+      tags: ["GachaMicroservice"]
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item to retrieve"
+      responses:
+        '200':
+          description: "Details of the gacha item"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GachaItem'
+        '404':
+          description: "Resource not found"
+    delete:
+      summary: "Delete a gacha item"
+      tags: ["GachaMicroservice"]
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item to delete"
+      responses:
+        '200':
+          description: "Gacha item deleted successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Gacha item successfully deleted."
+        '404':
+          description: "Resource not found"
+    put:
+      summary: "Update gacha item details"
+      tags: ["GachaMicroservice"]
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item to update"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GachaItemInput'
+      responses:
+        '200':
+          description: "Gacha item updated successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Gacha item successfully updated."
+        '400':
+          description: "Invalid input data"
+  /api/player/gacha/player-collection/{user_id}:
+    get:
+      summary: "Get player's gacha collection"
+      tags: ["GachaMicroservice"]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the player"
+      responses:
+        '200':
+          description: "Player's gacha collection"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GachaCollectionItem'
+        '404':
+          description: "User not found"
+  /api/player/gacha/player-gacha/item/{gacha_id}:
+    get:
+      summary: "Get specific gacha collection item for a player"
+      tags: ["GachaMicroservice"]
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha collection item"
+      responses:
+        '200':
+          description: "Details of the specific gacha collection item for a player"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GachaCollectionItem'
+        '404':
+          description: "Gacha collection item not found"
+  /api/player/gacha/player-collection/{user_id}/gacha/{gacha_id}:
+    get:
+      summary: "Get specific gacha item details for a player"
+      tags: ["GachaMicroservice"]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item"
+      responses:
+        '200':
+          description: "Details of the specific gacha item for a player"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GachaItem'
+        '404':
+          description: "Gacha item not found"
+  /api/player/gacha/system-collection:
+    get:
+      summary: "Get full system gacha collection"
+      tags: ["GachaMicroservice"]
+      responses:
+        '200':
+          description: "Full system gacha collection"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GachaItem'
+  /api/player/gacha/system-gacha/{gacha_id}:
+    get:
+      summary: "Get details of a specific system gacha item"
+      tags: ["GachaMicroservice"]
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item"
+      responses:
+        '200':
+          description: "Details of the specified system gacha item"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GachaItem'
+        '404':
+          description: "Gacha item not found"
+  /api/player/gacha/roll:
+    post:
+      summary: "Roll a new gacha item"
+      tags: ["GachaMicroservice"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  description: "ID of the user rolling the gacha"
+      responses:
+        '200':
+          description: "Roll successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collectionId:
+                    type: integer
+                    description: "ID of the added item in user's collection"
+        '404':
+          description: "User not found "
+        '400':
+          description: "Rolling failed, for example the user's in-game balance is not suffisant"
+
+components:
+  schemas:
+    GachaItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "ID of the gacha item"
+        name:
+          type: string
+          description: "Name of the gacha item"
+        description:
+          type: string
+          description: "Description of the gacha item"
+        image:
+          type: string
+          description: "URL to the gacha item's image"
+        rarityPercent:
+          type: number
+          format: float
+          description: "Rarity percentage of the gacha item"
+    GachaItemInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Name of the gacha item"
+        description:
+          type: string
+          description: "Description of the gacha item"
+        image:
+          type: string
+          description: "URL to the gacha item's image"
+        rarityPercent:
+          type: number
+          format: float
+          description: "Rarity percentage of the gacha item"
+      required:
+        - name
+        - description
+        - image
+        - rarityPercent
+    GachaCollectionItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Name of the gacha item"
+        gachaId:
+          type: string
+          description: "Description of the gacha item"
+        userId:
+          type: string
+          description: "URL to the gacha item's image"
+        source:
+          type: number
+          format: float
+          description: "Rarity percentage of the gacha item"
+        timestamp:
+          type: string
+          description: "Creation timestamp"
