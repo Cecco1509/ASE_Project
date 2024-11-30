@@ -211,7 +211,7 @@ def increase_currency(userId):
 def get_transaction_history_admin(user_id):
     try:
         # Prepare the request URL for fetching transaction history
-        transaction_history_url = config.dbmanagers.payment+f'/currencytransaction/{user_id}'
+        transaction_history_url = config.dbmanagers.payment + f'/currencytransaction/{user_id}'
         
 
         # Make a GET request to the database manager service to fetch the transaction history
@@ -226,7 +226,6 @@ def get_transaction_history_admin(user_id):
         else:
             # Handle errors from the database manager service
             return make_response(jsonify({'error': 'Failed to retrieve transaction history'}), 500)
-
     except Exception as e:
         return make_response(jsonify({'error': str(e)}), 500)
 
