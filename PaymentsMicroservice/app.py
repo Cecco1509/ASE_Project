@@ -206,6 +206,8 @@ def increase_currency(userId):
 
         # Make a POST request to the database manager's /transactions endpoint
         response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload)
+    except Exception as e:
+        return make_response(jsonify({'error': str(e)}), 500)
 
 @app.route('/api/admin/currency/<int:user_id>', methods=['GET'])
 def get_transaction_history_admin(user_id):
