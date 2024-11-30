@@ -19,8 +19,7 @@ services:
       - paymentdbmanager
       - gachasadmin
       - gachasuser
-      - paymentsadmin
-      - paymentsuser
+      - paymentsmicroservice
       - roll
       - transactionsadmin
       - transactionsuser
