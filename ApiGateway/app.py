@@ -17,86 +17,60 @@ GACHA_MICROSERVICE = config.services.gacha
 @app.route('/api/admin/gacha', methods=['GET'])
 @handle_errors
 def admin_gacha():
-    """Fetch all gacha items."""
-    response = requests.get(GACHA_MICROSERVICE + '/api/admin/gacha', verify=False)
-    response.raise_for_status()
-    gacha_items = response.json()
-    return make_response(jsonify(gacha_items), response.status_code)
+    response = requests.get(GACHA_MICROSERVICE + '/api/admin/gacha', headers=request.headers, verify=False)
+    return make_response(response.json(), response.status_code)
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
 def get_single_gacha(gachaId):
-    """Fetch a single gacha item by ID."""
-    response = requests.get(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', verify=False)
-    response.raise_for_status()
-    return make_response(jsonify(response.json()), response.status_code)
+    response = requests.get(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', headers=request.headers, verify=False)
+    return make_response(response.json(), response.status_code)
     
 @app.route('/api/admin/gacha', methods=['POST'])
 @handle_errors
 def create_gacha():
-    """Create a new gacha item."""
-    json_data = request.get_json()
-
-    if not json_data:
-        return make_response(jsonify({"message":"No JSON data provided"}), 400)
-
-    response = requests.post(GACHA_MICROSERVICE + '/api/admin/gacha', json=json_data, verify=False)
-    #response.raise_for_status()
-    # i commented this line so the 400 error message will be returned the same, otherwise, the error message will be ovverriden
-    return make_response(jsonify(response.json()), response.status_code)
+    response = requests.post(GACHA_MICROSERVICE + '/api/admin/gacha', headers=request.headers, json=request.get_json(), verify=False)
+    return make_response(response.json(), response.status_code)
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['PUT'])
 @handle_errors
 def update_gacha(gachaId):
-    """Update a gacha item."""
-    json_data = request.get_json()
-
-    if not json_data:
-        return make_response(jsonify({"message":"No JSON data provided"}), 400)
-
-    response = requests.put(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', json=json_data, verify=False)
-    return make_response(jsonify(response.json()), response.status_code)
+    response = requests.put(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', headers=request.headers, json=request.get_json(), verify=False)
+    return make_response(response.json(), response.status_code)
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['DELETE'])
 @handle_errors
 def delete_gacha(gachaId):
-    """Delete a gacha item."""
-    response = requests.delete(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', verify=False)
-    response.raise_for_status()
-    return make_response(jsonify(response.json()), response.status_code)
+    response = requests.delete(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', headers=request.headers, verify=False)
+    return make_response(response.json(), response.status_code)
 
 """Fetch all gacha collections."""
 @app.route('/api/admin/gachacollection', methods=['GET'])
 @handle_errors
 def admin_gachacollection():
-    response = requests.get(GACHA_MICROSERVICE + '/api/admin/gachacollection', verify=False)
-    response.raise_for_status()
-    gacha_collections = response.json()
-    return make_response(jsonify(gacha_collections), response.status_code)
+    response = requests.get(GACHA_MICROSERVICE + '/api/admin/gachacollection', headers=request.headers, verify=False)
+    return make_response(response.json(), response.status_code)
 
 """GatchasUser ENDPOINTS"""
 
 @app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
 @handle_errors
 def get_gacha_collection(userId):
-    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/{userId}', verify=False)
-    response.raise_for_status()
+    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/{userId}', headers=request.headers, verify=False)
     return make_response(response.json(), response.status_code)
 
 # Get player's gacha collection item
 @app.route('/api/player/gacha/player-collection/item/<int:collectionId>', methods=['GET'])
 @handle_errors
 def get_gacha_collection_details(collectionId):
-    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/item/{collectionId}', verify=False)
-    response.raise_for_status()
+    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/item/{collectionId}', headers=request.headers, verify=False)
     return make_response(response.json(), response.status_code)
 
 # Get player's gacha item details
 @app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
 def get_gacha_details(userId, gachaId):
-    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/{userId}/gacha/{gachaId}', verify=False)
-    # TODO response.raise_for_status()
+    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/{userId}/gacha/{gachaId}', headers=request.headers, verify=False)
     return make_response(response.json(), response.status_code)
 
 """System Collection Endpoints"""
@@ -105,27 +79,22 @@ def get_gacha_details(userId, gachaId):
 @app.route('/api/player/gacha/system-collection', methods=['GET'])
 @handle_errors
 def get_system_gacha_collection():
-    response = requests.get(GACHA_MICROSERVICE + '/api/player/gacha/system-collection', verify=False)
-    response.raise_for_status()
+    response = requests.get(GACHA_MICROSERVICE + '/api/player/gacha/system-collection', headers=request.headers, verify=False)
     return make_response(response.json(), response.status_code)
 
 # Get details of a specific system gacha item.
 @app.route('/api/player/gacha/system-collection/<int:gachaId>', methods=['GET'])
 @handle_errors
 def get_system_gacha_details(gachaId):
-    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/system-collection/{gachaId}', verify=False)
-    response.raise_for_status()
+    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/system-collection/{gachaId}', headers=request.headers, verify=False)
     return make_response(response.json(), response.status_code)
 
 """Gacha Roll Endpoints"""
 @app.route('/api/player/gacha/roll', methods=['POST'])
 @handle_errors
 def roll_gacha():
-    response = requests.post(GACHA_MICROSERVICE + f'/api/player/gacha/roll', json=request.get_json(), verify=False)
-    response.raise_for_status()
+    response = requests.post(GACHA_MICROSERVICE + f'/api/player/gacha/roll', headers=request.headers, json=request.get_json(), verify=False)
     return make_response(response.json(), response.status_code)
-
-# TODO: create separate files and import them here
 
 def create_app():
     return app
