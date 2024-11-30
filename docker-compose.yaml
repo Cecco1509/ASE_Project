@@ -117,6 +117,9 @@ services:
       - FLASK_APP=./GachaMicroservice/app.py
     depends_on:
       - gachadbmanager
+    secrets:
+      - gacha_ms_cert
+      - gacha_ms_cert_key
 
   # paymentsadmin:
   #   build:
@@ -237,4 +240,8 @@ secrets:
   api_gateway_cert:
     file: ./secrets/api_gateway_cert.pem
   api_gateway_cert_key:
-    file: ./secrets/api_gateway_key.pem  
+    file: ./secrets/api_gateway_key.pem
+  gacha_ms_cert:
+    file: ./secrets/gacha_ms_cert.pem
+  gacha_ms_cert_key:
+    file: ./secrets/gacha_ms_key.pem
