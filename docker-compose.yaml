@@ -209,3 +209,9 @@ services:
       context: ./UsersUser
       dockerfile: Dockerfile
     container_name: usersuser
+
+secrets:
+  payments_cert:
+    file: ./secrets/payments_cert.pem
+  payments_cert_key:
+    file: ./secrets/payments_key.pem 
