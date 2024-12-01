@@ -168,6 +168,7 @@ def get_gacha_details(userId, gachaId, auth_response=None):
 @validate_player_token
 def get_system_gacha_collection(auth_response=None):
     response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha')
+    response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
 # Get details of a specific system gacha item.
