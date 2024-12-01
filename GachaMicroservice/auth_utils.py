@@ -25,3 +25,18 @@ def validate_player_token(f):
         return f(*args, **kwargs)
     
     return decorated_function
+
+def validate_admin_token(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Call the auth service to validate the admin's token
+        auth_response = requests.get(AUTH_MICROSERVICE_URL + '/helloAdmin', headers=request.headers, verify=False)
+        
+        # If the authentication fails, return Unauthorized response
+        if auth_response.status_code != 200:
+            return make_response(jsonify({"message": "Unauthorized"}), 401)
+        
+        # Proceed to the actual view function (no need to pass auth_response)
+        return f(*args, **kwargs)
+    
+    return decorated_function

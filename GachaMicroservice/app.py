@@ -2,7 +2,7 @@ import requests
 from flask import Flask, request, make_response, jsonify
 from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
-from auth_utils import validate_player_token
+from auth_utils import validate_player_token, validate_admin_token
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
@@ -18,6 +18,7 @@ ROLL_PRICE = config.system_settings.gacha_roll_price
 
 @app.route('/api/admin/gacha', methods=['GET'])
 @handle_errors
+@validate_admin_token
 def get_all_gacha():
     """Fetch all gacha items."""
     response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha')
@@ -28,6 +29,7 @@ def get_all_gacha():
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
+@validate_admin_token
 def get_single_gacha(gachaId):
     """Fetch a single gacha item by ID."""
     response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}')
@@ -36,6 +38,7 @@ def get_single_gacha(gachaId):
 
 @app.route('/api/admin/gacha', methods=['POST'])
 @handle_errors
+@validate_admin_token
 def create_gacha():
     """Create a new gacha item."""
     json_data = request.get_json()
@@ -80,6 +83,7 @@ def is_valid_gacha_data(data):
 # TODO: use patch instead of put, so we can only update the fields that are provided
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['PUT'])
 @handle_errors
+@validate_admin_token
 def update_gacha(gachaId):
     """Update a gacha item."""
     json_data = request.get_json()
@@ -99,6 +103,7 @@ def update_gacha(gachaId):
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['DELETE'])
 @handle_errors
+@validate_admin_token
 def delete_gacha(gachaId):
     """Delete a gacha item."""
     response = requests.delete(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}')
@@ -107,6 +112,7 @@ def delete_gacha(gachaId):
 
 @app.route('/api/admin/gachacollection', methods=['GET'])
 @handle_errors
+@validate_admin_token
 def get_all_gachacollections():
     """Fetch all gacha collections."""
     response = requests.get(DB_MANAGER_GACHA_URL + f'/gachacollection')
