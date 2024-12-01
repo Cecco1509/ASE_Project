@@ -179,6 +179,9 @@ services:
     container_name: paymentsmicroservice
     volumes: 
       - ./config.json:/app/config.json
+    secrets:
+      - payments_cert
+      - payments _cert_key
 
   roll:
     build:
