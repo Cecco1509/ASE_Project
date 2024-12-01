@@ -185,7 +185,7 @@ def register_admin():
         return make_response(jsonify({"message":"Admin registration failed."}), 400)
     return make_response(jsonify({"message":"Invalid data."}), 400)
 
-@app.route('/api/player/login', methods=['POST'])
+@app.route('/api/admin/login', methods=['POST'])
 def admin_login():
     json_data = request.get_json()
     if json_data and 'username' in json_data and 'password' in json_data:
