@@ -4,7 +4,7 @@ from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
 from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
-from datetime import datetime
+from functools import wraps
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
@@ -12,7 +12,28 @@ builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 DB_MANAGER_GACHA_URL = config.dbmanagers.gacha
 DB_MANAGER_USER_URL = config.dbmanagers.user
+AUTH_MICROSERVICE_URL = config.services.authmicroservice
 ROLL_PRICE = config.system_settings.gacha_roll_price
+
+# The decorator to validate the token
+def validate_player_token(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Call the auth service to validate the token
+        auth_response = requests.get(AUTH_MICROSERVICE_URL + '/helloPlayer', headers=request.headers, verify=False)
+        
+        # If the authentication fails, return Unauthorized response
+        if auth_response.status_code != 200:
+            return make_response(jsonify({"message": "Unauthorized"}), 401)
+        
+        # Optionally, you can pass the auth_response to the view function if needed
+        # For example, you could add it to kwargs
+        kwargs['auth_response'] = auth_response
+        
+        # Proceed to the actual view function
+        return f(*args, **kwargs)
+    
+    return decorated_function
 
 """ ----------------- ADMIN ENDPOINTS ----------------- """
 
@@ -121,7 +142,10 @@ def get_all_gachacollections():
 # Get player's gacha collection.
 @app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
 @handle_errors
-def get_gacha_collection(userId):
+@validate_player_token
+def get_gacha_collection(userId, auth_response=None):
+    print("Auth response:", auth_response.json(), flush=True)
+
     response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}')
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
@@ -137,7 +161,8 @@ def get_gacha_collection_details(collectionId):
 # Get player's gacha item details
 @app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
-def get_gacha_details(userId, gachaId):
+@validate_player_token
+def get_gacha_details(userId, gachaId, auth_response=None):
     user_gacha_collection_response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}')
     user_gacha_collection_response.raise_for_status()
     user_gacha_collection = user_gacha_collection_response.json()
@@ -158,7 +183,8 @@ def get_gacha_details(userId, gachaId):
 # Get full system gacha collection.
 @app.route('/api/player/gacha/system-collection', methods=['GET'])
 @handle_errors
-def get_system_gacha_collection():
+@validate_player_token
+def get_system_gacha_collection(auth_response=None):
     response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha')
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
@@ -166,7 +192,8 @@ def get_system_gacha_collection():
 # Get details of a specific system gacha item.
 @app.route('/api/player/gacha/system-collection/<int:gachaId>', methods=['GET'])
 @handle_errors
-def get_system_gacha_details(gachaId):
+@validate_player_token
+def get_system_gacha_details(gachaId, auth_response=None):
     response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha/{gachaId}')
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
@@ -176,7 +203,8 @@ def get_system_gacha_details(gachaId):
 # Roll a gacha
 @app.route('/api/player/gacha/roll', methods=['POST'])
 @handle_errors
-def roll_gacha():
+@validate_player_token
+def roll_gacha(auth_response=None):
     print("Rolling gacha", flush=True)
     json_data = request.get_json()
     print(json_data, flush=True)
