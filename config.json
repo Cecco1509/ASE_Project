@@ -1,7 +1,7 @@
 {
     "databases":{
-       "timeout" :1, 
-       "retries":5,
+       "timeout" :10, 
+       "retries":10,
         "auth":{
             "server":"authdatabase",
             "port":"1433",
@@ -47,16 +47,16 @@
     },
     "dbmanagers":{
         "user":"http://userdbmanager:5000",
-        "auth":"http://authdbmanager:5000",
         "auction":"http://auctiondbmanager:5000",
         "gacha":"http://gachadbmanager:5000",
         "transaction":"http://transactiondbmanager:5000",
         "payment":"http://paymentdbmanager:5000"
     },
     "services":{
-        "gachasadmin":"http://gachasadmin:5000",
-        "gachasuser":"http://gachasuser:5000",
-        "paymentsmicroservice": "http://paymentsmicroservice:5000"
+        "gacha":"http://gachamicroservice:5000",
+        "usersmicroservice":"https://usersmicroservice:5000",
+        "paymentsmicroservice": "http://paymentsmicroservice:5000",
+        "authmicroservice":"https://authmicroservice:5000"
         
     },
     "system_settings":{

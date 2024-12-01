@@ -1,0 +1,12 @@
+FROM python:3.12-slim
+
+WORKDIR /GachaMicroservice
+ADD * /GachaMicroservice
+
+COPY config.json /app/
+
+RUN pip3 install -r requirements.txt
+
+EXPOSE 5000
+
+CMD ["flask", "--app", "app_test", "run", "--host=0.0.0.0", "--port=5000"]

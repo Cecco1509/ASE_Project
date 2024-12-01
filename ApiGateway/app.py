@@ -11,15 +11,14 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
-GACHAS_ADMIN_URL = config.services.gachasadmin
-GACHAS_USER_URL = config.services.gachasuser
+GACHA_MICROSERVICE = config.services.gacha
 
 """GatchasAdmin ENDPOINTS"""
 @app.route('/api/admin/gacha', methods=['GET'])
 @handle_errors
 def admin_gacha():
     """Fetch all gacha items."""
-    response = requests.get(GACHAS_ADMIN_URL + '/api/admin/gacha')
+    response = requests.get(GACHA_MICROSERVICE + '/api/admin/gacha')
     response.raise_for_status()
     gacha_items = response.json()
     return make_response(jsonify(gacha_items), response.status_code)
@@ -28,7 +27,7 @@ def admin_gacha():
 @handle_errors
 def get_single_gacha(gachaId):
     """Fetch a single gacha item by ID."""
-    response = requests.get(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gachaId}')
+    response = requests.get(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}')
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
     
@@ -41,7 +40,7 @@ def create_gacha():
     if not json_data:
         return make_response(jsonify({"message":"No JSON data provided"}), 400)
 
-    response = requests.post(GACHAS_ADMIN_URL + '/api/admin/gacha', json=json_data)
+    response = requests.post(GACHA_MICROSERVICE + '/api/admin/gacha', json=json_data)
     #response.raise_for_status()
     # i commented this line so the 400 error message will be returned the same, otherwise, the error message will be ovverriden
     return make_response(jsonify(response.json()), response.status_code)
@@ -55,14 +54,14 @@ def update_gacha(gachaId):
     if not json_data:
         return make_response(jsonify({"message":"No JSON data provided"}), 400)
 
-    response = requests.put(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gachaId}', json=json_data)
+    response = requests.put(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', json=json_data)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['DELETE'])
 @handle_errors
 def delete_gacha(gachaId):
     """Delete a gacha item."""
-    response = requests.delete(GACHAS_ADMIN_URL + f'/api/admin/gacha/{gachaId}')
+    response = requests.delete(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}')
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
 
@@ -70,7 +69,7 @@ def delete_gacha(gachaId):
 @app.route('/api/admin/gachacollection', methods=['GET'])
 @handle_errors
 def admin_gachacollection():
-    response = requests.get(GACHAS_ADMIN_URL + '/api/admin/gachacollection')
+    response = requests.get(GACHA_MICROSERVICE + '/api/admin/gachacollection')
     response.raise_for_status()
     gacha_collections = response.json()
     return make_response(jsonify(gacha_collections), response.status_code)
@@ -80,7 +79,7 @@ def admin_gachacollection():
 @app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
 @handle_errors
 def get_gacha_collection(userId):
-    response = requests.get(GACHAS_USER_URL + f'/api/player/gacha/player-collection/{userId}')
+    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/{userId}')
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -88,7 +87,7 @@ def get_gacha_collection(userId):
 @app.route('/api/player/gacha/player-collection/item/<int:collectionId>', methods=['GET'])
 @handle_errors
 def get_gacha_collection_details(collectionId):
-    response = requests.get(GACHAS_USER_URL + f'/api/player/gacha/player-collection/item/{collectionId}')
+    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/item/{collectionId}')
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -96,7 +95,7 @@ def get_gacha_collection_details(collectionId):
 @app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
 def get_gacha_details(userId, gachaId):
-    response = requests.get(GACHAS_USER_URL + f'/api/player/gacha/player-collection/{userId}/gacha/{gachaId}')
+    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/{userId}/gacha/{gachaId}')
     # TODO response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -106,7 +105,7 @@ def get_gacha_details(userId, gachaId):
 @app.route('/api/player/gacha/system-collection', methods=['GET'])
 @handle_errors
 def get_system_gacha_collection():
-    response = requests.get(GACHAS_USER_URL + '/api/player/gacha/system-collection')
+    response = requests.get(GACHA_MICROSERVICE + '/api/player/gacha/system-collection')
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -114,7 +113,7 @@ def get_system_gacha_collection():
 @app.route('/api/player/gacha/system-collection/<int:gachaId>', methods=['GET'])
 @handle_errors
 def get_system_gacha_details(gachaId):
-    response = requests.get(GACHAS_USER_URL + f'/api/player/gacha/system-collection/{gachaId}')
+    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/system-collection/{gachaId}')
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -122,7 +121,7 @@ def get_system_gacha_details(gachaId):
 @app.route('/api/player/gacha/roll', methods=['POST'])
 @handle_errors
 def roll_gacha():
-    response = requests.post(GACHAS_USER_URL + f'/api/player/gacha/roll', json=request.get_json())
+    response = requests.post(GACHA_MICROSERVICE + f'/api/player/gacha/roll', json=request.get_json())
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -180,3 +179,99 @@ def get_transaction_history_admin(user_id):
         return response
 
        
+
+
+@app.route('/api/player/profile/<int:user_id>', methods=['GET'])
+def getPlayerInformation(user_id):
+    try:
+        response = requests.get(f'{config.services.usersmicroservice}/api/player/profile/{user_id}',verify=False)
+        
+        if response.status_code == 200:
+            return make_response(jsonify(response.json()), 200)
+        else:
+            return make_response(jsonify({"error": "Player not found"}), response.status_code)
+    except requests.RequestException as e:
+        return make_response(jsonify({"error": "Failed to connect to database API", "details": str(e)}), 500)
+
+@app.route('/api/player/update/<int:user_id>', methods=['PUT'])
+def updatePlayerInformation(user_id):
+    payload=request.get_json()
+    response=requests.put(f'{config.services.usersmicroservice}/api/player/update/{user_id}',json=payload,verify=False)
+    return make_response(jsonify(response.json()),response.status_code)
+
+@app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
+def delete_player(user_id):
+    delete_response = requests.delete(f'{config.services.usersmicroservice}/api/player/delete/{user_id}',verify=False)
+    return make_response(jsonify(delete_response.json()),delete_response.status_code)
+    
+
+
+
+@app.route('/api/admin/users', methods=['GET'])
+def get_players():
+    try:
+        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users',verify=False)
+        if response.status_code == 200:
+            return make_response(jsonify(response.json()), 200)
+        else:
+            return make_response(jsonify({"error": "Players not found"}), response.status_code)
+    except requests.RequestException as e:
+        return make_response(jsonify({"error": "Failed to connect to database API", "details": str(e)}), 500)
+
+
+@app.route('/api/admin/users/<int:user_id>', methods=['GET'])
+def get_player(user_id):
+    try:
+        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',verify=False)
+        if response.status_code == 200:
+            return make_response(jsonify(response.json()), 200)
+        else:
+            return make_response(jsonify({"error": "Player not found"}), response.status_code)
+    except requests.RequestException as e:
+        return make_response(jsonify({"error": "Failed to connect to database API", "details": str(e)}), 500)
+
+
+
+
+@app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
+def update_player(user_id):
+    payload=request.get_json()
+    response=requests.put(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',json=payload,verify=False)
+    return make_response(response.json(),response.status_code)
+
+
+@app.route('/api/admin/users/ban/<int:user_id>', methods=['POST'])
+def ban_player(user_id):
+    payload=request.get_json()
+    response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=payload,verify=False)
+    return make_response(response.json(),response.status_code)
+    
+@app.route('/api/player/register', methods=['POST'])
+def register_user():
+    response = requests.post(f"{config.services.authmicroservice}/api/player/register", json=request.get_json(), verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/player/login', methods=['POST'])
+def user_login():
+    response = requests.post(f"{config.services.authmicroservice}/api/player/login", json=request.get_json(), verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/player/logout', methods=['POST'])
+def user_logout():
+    response = requests.post(f"{config.services.authmicroservice}/api/player/logout", headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/register', methods=['POST'])
+def register_admin():
+    response = requests.post(f"{config.services.authmicroservice}/api/admin/register", json=request.get_json(), verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/login', methods=['POST'])
+def admin_login():
+    response = requests.post(f"{config.services.authmicroservice}/api/admin/login", json=request.get_json(), verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/logout', methods=['POST'])
+def admin_logout():
+    response = requests.post(f"{config.services.authmicroservice}/api/admin/logout", headers=request.headers, verify =False)
+    return make_response(jsonify(response.json()), response.status_code)

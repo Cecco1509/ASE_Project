@@ -1,0 +1,110 @@
+name: ASE_project CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with: 
+        node-version: '16'
+
+    - name: Install Newman
+      run: |
+        npm install -g newman
+    
+    - name: Set up Docker buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build gacha player image
+      run: |
+        docker build -f ./GatchasUser/dockerfile_test -t gachausertest .
+    - name: Run gacha player image
+      run: |
+        docker run --rm --name gachausert -d -p 5000:5000 gachausertest
+    - name: Run gacha player unit tests
+      run: |
+        cd docs/postman
+        newman run UserGacha.postman_collection.json
+    - name: Stop gacha player image
+      run: |
+        docker stop gachausert
+
+    - name: Build gacha admin image
+      run: |
+        docker build -f ./GatchasAdmin/dockerfile_test -t gachaadmintest .
+    - name: Run gacha admin image
+      run: |
+        docker run --rm --name gachaadmint -d -p 5000:5000 gachaadmintest
+    - name: Run gacha admin unit tests
+      run: |
+        cd docs/postman
+        newman run AdminGacha.postman_collection.json
+    - name: Stop gacha admin image
+      run: |
+        docker stop gachaadmint
+        
+    - name: Build currency payment user image
+      run: |
+        docker build -f ./PaymentUser/dockerfile_test -t paymentusertest .
+    - name: Run currency payment user image
+      run: |
+        docker run --rm --name paymentusert -d -p 5000:5000 paymentusertest
+    - name: Run currency payment user unit tests
+      run: |
+        cd docs/postman
+        newman run PaymentsUser_tests.postman_collection.json
+    - name: Stop currency payment user image
+      run: |
+        docker stop paymentsusert
+
+    - name: Build currency payment admin image
+      run: |
+        docker build -f ./PaymentsAdmin/dockerfile_test -t paymentsamintest .
+    - name: Run payments admin image
+      run: |
+        docker run --rm --name paymentsadmint -d -p 5000:5000 paymentsadmintest
+    - name: Run payments admin unit tests
+      run: |
+        cd docs/postman
+        newman run PaymentsAdmin_test.postman_collection.json
+    - name: Stop payments admin image
+      run: |
+        docker stop paymentsadmint
+
+    - name: Build user user image
+      run: |
+        docker build -f ./UsersUser/dockerfile-test -t usersusertest .
+    - name: Run user user image
+      run: |
+        docker run --rm --name usersusert -d -p 5000:5000 usersusertest
+    - name: Run user user unit tests
+      run: |
+        cd docs/postman
+        newman run UsersUser.postman_collection.json
+    - name: Stop user user image
+      run: |
+        docker stop usersusert
+        
+    - name: Build user admin image
+      run: |
+        docker build -f ./UsersAdmin/dockerfile-test -t useradmintest .
+    - name: Run user admin image
+      run: |
+        docker run --rm --name userusert -d -p 5000:5000 useradmintest
+    - name: Run user admin unit tests
+      run: |
+        cd docs/postman
+        newman run UsersAdmin.postman_collection.json
+    - name: Stop user admin image
+      run: |
+        docker stop usersusert

@@ -9,27 +9,26 @@ services:
     depends_on:
       - auctionsadmin
       - auctionsuser
-      - authadmin
-      - authuser
-      - authdbmanager
+      - authmicroservice
       - auctiondbmanager
       - userdbmanager
       - gachadbmanager
       - transactiondbmanager
       - paymentdbmanager
-      - gachasadmin
-      - gachasuser
+      - gachamicroservice
       - paymentsmicroservice
       - roll
       - transactionsadmin
       - transactionsuser
-      - usersadmin
-      - usersuser
+      - usersmicroservice
     ports:
       - "5000:5000"
     volumes:
-      - ./config.json:/app/config.json
-
+      - ./config.json:/app/config.json  # Mounts config.json into the container
+    secrets:
+      - api_gateway_cert
+      - api_gateway_cert_key
+ 
   auctionsadmin:
     build:
       context: ./AuctionsAdmin
@@ -42,77 +41,19 @@ services:
       dockerfile: Dockerfile
     container_name: auctionsuser
 
-  authadmin:
+  authmicroservice:
     build:
-      context: ./AuthAdmin
+      context: ./AuthMicroservice
       dockerfile: Dockerfile
-    container_name: authadmin
-
-  authuser:
-    build:
-      context: ./AuthUser
-      dockerfile: Dockerfile
-    container_name: authuser
-
-  authdbmanager:
-    build:
-      context: ./AuthDBManager
-      dockerfile: Dockerfile
-    container_name: authdbmanager
+    container_name: authmicroservice
     depends_on:
       - authdatabase
     volumes:
       - ./config.json:/app/config.json
-
-  auctiondbmanager:
-    build:
-      context: ./AuctionDBManager
-      dockerfile: Dockerfile
-    container_name: auctiondbmanager
-    depends_on:
-      - auctiondatabase
-    volumes:
-      - ./config.json:/app/config.json
-
-  gachadbmanager:
-    build:
-      context: ./GachaDBManager
-      dockerfile: Dockerfile
-    container_name: gachadbmanager
-    depends_on:
-      - gachadatabase
-    volumes:
-      - ./config.json:/app/config.json
-
-  paymentdbmanager:
-    build:
-      context: ./PaymentDBManager
-      dockerfile: Dockerfile
-    container_name: paymentdbmanager
-    depends_on:
-      - paymentdatabase
-    volumes:
-      - ./config.json:/app/config.json
-
-  transactiondbmanager:
-    build:
-      context: ./TransactionDBManager
-      dockerfile: Dockerfile
-    container_name: transactiondbmanager
-    depends_on:
-      - transactiondatabase
-    volumes:
-      - ./config.json:/app/config.json
-
-  userdbmanager:
-    build:
-      context: ./UserDBManager
-      dockerfile: Dockerfile
-    container_name: userdbmanager
-    depends_on:
-      - userdatabase
-    volumes:
-      - ./config.json:/app/config.json
+    secrets:
+      - token_secret
+      - auth_cert
+      - auth_cert_key
 
   authdatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -156,19 +97,11 @@ services:
       - ACCEPT_EULA=Y
     container_name: transactiondatabase
 
-  gachasadmin:
+  gachamicroservice:
     build:
-      context: ./GatchasAdmin
+      context: ./GachaMicroservice
       dockerfile: Dockerfile
-    container_name: gachasadmin
-    volumes:
-      - ./config.json:/app/config.json
-
-  gachasuser:
-    build:
-      context: ./GatchasUser
-      dockerfile: Dockerfile
-    container_name: gachasuser
+    container_name: gachamicroservice
     volumes:
       - ./config.json:/app/config.json
 
@@ -201,19 +134,82 @@ services:
       dockerfile: Dockerfile
     container_name: transactionsuser
 
-  usersadmin:
+  usersmicroservice:
     build:
-      context: ./UsersAdmin
+      context: ./UsersMicroservice
       dockerfile: Dockerfile
-    container_name: usersadmin
+    container_name: usersmicroservice
+    volumes:
+      - ./config.json:/app/config.json  # Mounts config.json into the container
+    secrets:
+      - users_cert
+      - users_cert_key
 
-  usersuser:
+  auctiondbmanager:
+      build:
+        context: ./AuctionDBManager
+        dockerfile: Dockerfile
+      container_name: auctiondbmanager
+      depends_on:
+        - auctiondatabase
+      volumes:
+        - ./config.json:/app/config.json
+
+  gachadbmanager:
     build:
-      context: ./UsersUser
+      context: ./GachaDBManager
       dockerfile: Dockerfile
-    container_name: usersuser
+    container_name: gachadbmanager
+    depends_on:
+      - gachadatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+  paymentdbmanager:
+    build:
+      context: ./PaymentDBManager
+      dockerfile: Dockerfile
+    container_name: paymentdbmanager
+    depends_on:
+      - paymentdatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+  transactiondbmanager:
+    build:
+      context: ./TransactionDBManager
+      dockerfile: Dockerfile
+    container_name: transactiondbmanager
+    depends_on:
+      - transactiondatabase
+    volumes:
+      - ./config.json:/app/config.json
+
+  userdbmanager:
+    build:
+      context: ./UserDBManager
+      dockerfile: Dockerfile
+    container_name: userdbmanager
+    depends_on:
+      - userdatabase
+    volumes:
+      - ./config.json:/app/config.json
 
 secrets:
+  token_secret:
+    file: ./secrets/token_secret.env
+  users_cert:
+    file: ./secrets/users_cert.pem
+  users_cert_key:
+    file: ./secrets/users_key.pem 
+  auth_cert:
+    file: ./secrets/auth_cert.pem
+  auth_cert_key:
+    file: ./secrets/auth_key.pem  
+  api_gateway_cert:
+    file: ./secrets/api_gateway_cert.pem
+  api_gateway_cert_key:
+    file: ./secrets/api_gateway_key.pem  
   payments_cert:
     file: ./secrets/payments_cert.pem
   payments_cert_key:
