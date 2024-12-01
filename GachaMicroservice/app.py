@@ -1,10 +1,8 @@
 import requests
 from flask import Flask, request, make_response, jsonify
-from requests.exceptions import ConnectionError, HTTPError
-from werkzeug.exceptions import NotFound
 from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
-from functools import wraps
+from auth_utils import validate_player_token
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
@@ -12,28 +10,9 @@ builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 DB_MANAGER_GACHA_URL = config.dbmanagers.gacha
 DB_MANAGER_USER_URL = config.dbmanagers.user
-AUTH_MICROSERVICE_URL = config.services.authmicroservice
 ROLL_PRICE = config.system_settings.gacha_roll_price
 
-# The decorator to validate the token
-def validate_player_token(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        # Call the auth service to validate the token
-        auth_response = requests.get(AUTH_MICROSERVICE_URL + '/helloPlayer', headers=request.headers, verify=False)
-        
-        # If the authentication fails, return Unauthorized response
-        if auth_response.status_code != 200:
-            return make_response(jsonify({"message": "Unauthorized"}), 401)
-        
-        # Optionally, you can pass the auth_response to the view function if needed
-        # For example, you could add it to kwargs
-        kwargs['auth_response'] = auth_response
-        
-        # Proceed to the actual view function
-        return f(*args, **kwargs)
-    
-    return decorated_function
+
 
 """ ----------------- ADMIN ENDPOINTS ----------------- """
 
