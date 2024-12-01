@@ -20,6 +20,7 @@ def create_app():
 @app.route('/api/player/currency/transaction-history/<int:userId>', methods=['GET'])
 def get_transaction_history(userId):
     try:
+        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
         # Send a GET request to the database manager service to fetch transaction history
         response = requests.get(config.dbamangers.payment+ f'/currencytransaction/{userId}')
         
@@ -49,6 +50,7 @@ if __name__ == '__main__':
 @app.route('/api/player/currency/purchase/', methods=['POST'])
 def purchase_in_game_currency():
     try:
+        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
         # Extract data from request body
         data = request.get_json()
         in_game_currency = data.get('ingameAmount')
@@ -106,6 +108,7 @@ def purchase_in_game_currency():
 @app.route('/api/player/currency/decrease/<int:userId>', methods=['PUT'])
 def decrease_in_game_currency(userId):
     try:
+        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
         # Extract the amount to be deducted from the request body
         data = request.get_json()
         amount = data.get('amount')
@@ -172,6 +175,7 @@ def decrease_in_game_currency(userId):
 @app.route('/api/player/currency/increase/<int:userId>', methods=['PUT'])
 def increase_currency(userId):
     try:
+        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
         # Get the amount to increase from the JSON payload
         data = request.get_json()
         
@@ -212,6 +216,7 @@ def increase_currency(userId):
 @app.route('/api/admin/currency/<int:user_id>', methods=['GET'])
 def get_transaction_history_admin(user_id):
     try:
+        auth_response = requests.get(config.services.authmicroservice + '/helloAdmin', headers=request.headers, verify=False)
         # Prepare the request URL for fetching transaction history
         transaction_history_url = config.dbmanagers.payment + f'/currencytransaction/{user_id}'
         
