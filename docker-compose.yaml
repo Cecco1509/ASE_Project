@@ -181,7 +181,7 @@ services:
       - ./config.json:/app/config.json
     secrets:
       - payments_cert
-      - payments _cert_key
+      - payments_cert_key
 
   roll:
     build:
