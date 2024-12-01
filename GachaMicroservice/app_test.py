@@ -2,88 +2,12 @@ from flask import Flask, request, make_response, jsonify
 from handle_errors import handle_errors
 from datetime import datetime
 import random
+from gacha_mock_db import *
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
-ROLL_PRICE = 100
-
-mock_gacha_list = [
-        {
-            'id': 1,
-            'name': 'Gacha 1',
-            'description': 'Description for Gacha 1',
-            'image': 'image1.png',
-            'rarityPercent': 25.9
-        },
-        {
-            'id': 2,
-            'name': 'Gacha 2',
-            'description': 'Description for Gacha 2',
-            'image': 'image2.png',
-            'rarityPercent': 0.7
-        },
-        {
-            'id': 3,
-            'name': 'Gacha 3',
-            'description': 'Description for Gacha 3',
-            'image': 'image3.png',
-            'rarityPercent': 57.3
-        }
-    ]
-
-mock_gacha_collection_list = [
-        {
-            'id': 1,
-            'gachaId': 1,
-            'userId': 1,
-            'timestamp': '2021-07-01T12:00:00',
-            'source': 'ROLL'
-        },
-        {
-            'id': 2,
-            'gachaId': 2,
-            'userId': 1,
-            'timestamp': '2021-07-01T12:01:00',
-            'source': 'AUCTION'
-        },
-        {
-            'id': 3,
-            'gachaId': 3,
-            'userId': 2,
-            'timestamp': '2021-07-01T12:02:00',
-            'source': 'ROLL'
-        }
-    ]
-
-mock_user_list = [
-        {
-            'id': 1,
-            'authId': 101,
-            'ingameCurrency': 1500.0,
-            'profilePicture': 'profile1.png',
-            'registrationDate': '2021-01-01T10:00:00',
-            'status': 'ACTIVE'
-        },
-        {
-            'id': 2,
-            'authId': 102,
-            'ingameCurrency': 3000.0,
-            'profilePicture': 'profile2.png',
-            'registrationDate': '2021-02-01T11:00:00',
-            'status': 'ACTIVE'
-        },
-        {
-            'id': 3,
-            'authId': 103,
-            'ingameCurrency': 500.0,
-            'profilePicture': 'profile3.png',
-            'registrationDate': '2021-03-01T12:00:00',
-            'status': 'ACTIVE'
-        }
-    ]
-
 """ ------------------ ADMIN ENDPOINTS ------------------ """
-"""Fetch all gacha items."""
+
 @app.route('/api/admin/gacha', methods=['GET'])
 @handle_errors
 def get_all_gacha():
@@ -99,7 +23,6 @@ def get_single_gacha(gachaId):
         return make_response(jsonify({"message": f"Gacha item with ID {gachaId} not found"}), 404)
     return make_response(jsonify(mock_gacha_list[gachaId-1]), 200)
 
-"""Create a new gacha item."""
 @app.route('/api/admin/gacha', methods=['POST'])
 @handle_errors
 def create_gacha():
@@ -145,11 +68,10 @@ def is_valid_gacha_data(data):
 
     # Additional validation: rarityPercent should be between 0 and 100
     if not (0 <= data["rarityPercent"] <= 100):
-        return False, "Rarity percent must be a value between 0 and 1."
+        return False, "Rarity percent must be a value between 0 and 100."
 
     return True, "Data is valid"
 
-"""Update a gacha item."""
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['PUT'])
 @handle_errors
 def update_gacha(gachaId):
@@ -172,7 +94,6 @@ def update_gacha(gachaId):
     gacha_item.update(json_data)
     return make_response({"message":"Gacha sucessfully updated."}, 200)
 
-"""Delete a gacha item.""" 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['DELETE'])
 @handle_errors
 def delete_gacha(gachaId):
@@ -189,9 +110,6 @@ def delete_gacha(gachaId):
 
     return make_response({"message":"Gacha sucessfully deleted."}, 200)
 
-"""Get all gacha collections."""
-mock_get_all_gachacollections = None
-
 @app.route('/api/admin/gachacollection', methods=['GET'])
 @handle_errors
 def get_all_gachacollections():
@@ -202,7 +120,6 @@ def get_all_gachacollections():
 
 """Player Collection Endpoints"""
 
-# Get player's gacha collection.
 @app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
 @handle_errors
 def get_gacha_collection(userId):
@@ -210,7 +127,6 @@ def get_gacha_collection(userId):
     user_gacha_collection = [item for item in mock_gacha_collection_list if item['userId'] == userId]
     return make_response(jsonify(user_gacha_collection), 200)
 
-# Get player's gacha collection item
 @app.route('/api/player/gacha/player-collection/item/<int:collectionId>', methods=['GET'])
 @handle_errors
 def get_gacha_collection_details(collectionId):
@@ -220,7 +136,6 @@ def get_gacha_collection_details(collectionId):
         return make_response(jsonify({"message":"Gacha collection item not found"}), 404)
     return make_response(jsonify(gacha_collection_item), 200)
 
-# Get player's gacha item details
 @app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
 def get_gacha_details(userId, gachaId):
