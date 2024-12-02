@@ -6,51 +6,45 @@
             "server":"authdatabase",
             "port":"1433",
             "name":"authdatabase",
-            "username":"sa",
-            "password":"Password1."
+            "username":"sa"
         },
         "user":{
             "server":"userdatabase",
             "port":"1433",
             "name":"userdatabase",
-            "username":"sa",
-            "password":"Password1."
+            "username":"sa"
         },
         "gacha":{
             "server":"gachadatabase",
             "port":"1433",
             "name":"gachadatabase",
-            "username":"sa",
-            "password":"Password1."
+            "username":"sa"
         },
         "payment":{
             "server":"paymentdatabase",
             "port":"1433",
             "name":"paymentdatabase",
-            "username":"sa",
-            "password":"Password1."
+            "username":"sa"
         },
         "auction":{
             "server":"auctiondatabase",
             "port":"1433",
             "name":"auctiondatabase",
-            "username":"sa",
-            "password":"Password1."
+            "username":"sa"
         },
         "transaction":{
             "server":"transactiondatabase",
             "port":"1433",
             "name":"transactiondatabase",
-            "username":"sa",
-            "password":"Password1."
+            "username":"sa"
         }
     },
     "dbmanagers":{
-        "user":"http://userdbmanager:5000",
-        "auction":"http://auctiondbmanager:5000",
-        "gacha":"http://gachadbmanager:5000",
-        "transaction":"http://transactiondbmanager:5000",
-        "payment":"http://paymentdbmanager:5000"
+        "user":"https://userdbmanager:5000",
+        "auction":"https://auctiondbmanager:5000",
+        "gacha":"https://gachadbmanager:5000",
+        "transaction":"https://transactiondbmanager:5000",
+        "payment":"https://paymentdbmanager:5000"
     },
     "services":{
         "gacha":"https://gachamicroservice:5000",
