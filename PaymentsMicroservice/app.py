@@ -25,7 +25,7 @@ def get_transaction_history(userId):
             return make_response(response.json(), response.status_code)
 
         # Send a GET request to the database manager service to fetch transaction history
-        response = requests.get(config.dbamangers.payment+ f'/currencytransaction/{userId}')
+        response = requests.get(config.dbamangers.payment+ f'/currencytransaction/{userId}', verify=False)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -69,7 +69,7 @@ def purchase_in_game_currency():
         if in_game_currency <=0:     
             return make_response(jsonify({'error': 'in game currency must be greater than zero'}), 400)
 
-        user_response=requests.get(config.dbamangers.user+ f'/user/{user_id}')  
+        user_response=requests.get(config.dbamangers.user+ f'/user/{user_id}', verify=False)  
         if user_response.status_code == 404:
             return make_response(jsonify({'error': 'User not found'}), 404) 
 
@@ -86,7 +86,7 @@ def purchase_in_game_currency():
         }
 
         # Send a POST request to the database manager service to process the purchase
-        response = requests.post(config.dbmanagers.payment+f'/currencytransaction', json=payload)
+        response = requests.post(config.dbmanagers.payment+f'/currencytransaction', json=payload, verify=False)
         
         # Check if the request was successful
         if response.status_code == 200:  # Assuming 200 for successful creation
@@ -127,7 +127,7 @@ def decrease_in_game_currency(userId):
             return make_response(jsonify({'error': 'amount must be greater than zero'}), 400)
 
         # Fetch the user's current balance from the database manager
-        balance_response = requests.get(config.dbmanagers.user+ f'/user/{userId}')
+        balance_response = requests.get(config.dbmanagers.user+ f'/user/{userId}', verify=False)
 
         
         if balance_response.status_code == 404:
@@ -154,7 +154,7 @@ def decrease_in_game_currency(userId):
         }
 
         # Send a PUT request to the database manager service to decrease the balance
-        response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload)
+        response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload, verify=False)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -197,7 +197,7 @@ def increase_currency(userId):
         if amount <= 0:
             return make_response(jsonify({'error': 'Amount must be a positive number'}), 400)
 
-        balance_response = requests.get(config.dbmanagers.user+ f'/user/{userId}')
+        balance_response = requests.get(config.dbmanagers.user+ f'/user/{userId}', verify=False)
         
         if balance_response.status_code == 404:
             return make_response(jsonify({'error': 'User not found'}), 404)
@@ -218,7 +218,7 @@ def increase_currency(userId):
         }
 
         # Make a POST request to the database manager's /transactions endpoint
-        response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload)
+        response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload, verify=False)
     except Exception as e:
         return make_response(jsonify({'error': str(e)}), 500)
 
@@ -227,13 +227,10 @@ def get_transaction_history_admin(user_id):
     try:
         auth_response = requests.get(config.services.authmicroservice + '/helloAdmin', headers=request.headers, verify=False)
         if auth_response.status_code != 200:
-            return make_response(response.json(), response.status_code)
-        # Prepare the request URL for fetching transaction history
-        transaction_history_url = config.dbmanagers.payment + f'/currencytransaction/{user_id}'
-        
+            return make_response(response.json(), response.status_code)        
 
         # Make a GET request to the database manager service to fetch the transaction history
-        response = requests.get(transaction_history_url)
+        response = requests.get(config.dbmanagers.payment + f'/currencytransaction/{user_id}', verify=False )
 
         # Check if the request was successful
         if response.status_code == 200:
