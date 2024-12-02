@@ -16,11 +16,11 @@ services:
       # - transactiondbmanager
       # - paymentdbmanager
       - gachamicroservice
-      - paymentsadmin
-      - paymentsuser
-      - roll
-      - transactionsadmin
-      - transactionsuser
+      # - paymentsadmin
+      # - paymentsuser
+      # - roll
+      # - transactionsadmin
+      # - transactionsuser
     ports:
       - "5000:5000"
     volumes:
@@ -136,52 +136,52 @@ services:
     depends_on:
       - gachadbmanager
     secrets:
-      - users_cert
-      - users_cert_key
+      - gacha_ms_cert
+      - gacha_ms_cert_key
 
-  paymentdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
-      - ACCEPT_EULA=Y
-      - MSSQL_TLS_CERT=/run/secrets/payment_db_cert
-      - MSSQL_TLS_KEY=/run/secrets/payment_db_key
-      - MSSQL_TLS_PROTOCOLS=1.2
-      - MSSQL_FORCE_ENCRYPTION=1
-    container_name: paymentdatabase
-    secrets:
-      - db_password
-      - payment_db_cert
-      - payment_db_key
+  # paymentdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+  #     - ACCEPT_EULA=Y
+  #     - MSSQL_TLS_CERT=/run/secrets/payment_db_cert
+  #     - MSSQL_TLS_KEY=/run/secrets/payment_db_key
+  #     - MSSQL_TLS_PROTOCOLS=1.2
+  #     - MSSQL_FORCE_ENCRYPTION=1
+  #   container_name: paymentdatabase
+  #   secrets:
+  #     - db_password
+  #     - payment_db_cert
+  #     - payment_db_key
   
-  transactiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
-      - ACCEPT_EULA=Y
-      - MSSQL_TLS_CERT=/run/secrets/transaction_db_cert
-      - MSSQL_TLS_KEY=/run/secrets/transaction_db_key
-      - MSSQL_TLS_PROTOCOLS=1.2
-      - MSSQL_FORCE_ENCRYPTION=1
-    container_name: transactiondatabase
-    secrets:
-      - db_password
-      - transaction_db_cert
-      - transaction_db_key
+  # transactiondatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+  #     - ACCEPT_EULA=Y
+  #     - MSSQL_TLS_CERT=/run/secrets/transaction_db_cert
+  #     - MSSQL_TLS_KEY=/run/secrets/transaction_db_key
+  #     - MSSQL_TLS_PROTOCOLS=1.2
+  #     - MSSQL_FORCE_ENCRYPTION=1
+  #   container_name: transactiondatabase
+  #   secrets:
+  #     - db_password
+  #     - transaction_db_cert
+  #     - transaction_db_key
    
-  auctiondbmanager:
-    build:
-      context: ./AuctionDBManager
-      dockerfile: Dockerfile
-    container_name: auctiondbmanager
-    depends_on:
-      - auctiondatabase
-    volumes:
-      - ./config.json:/app/config.json
-    secrets:
-      - db_password
-      - auction_db_manager_cert
-      - auction_db_manager_key
+  # auctiondbmanager:
+  #   build:
+  #     context: ./AuctionDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: auctiondbmanager
+  #   depends_on:
+  #     - auctiondatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
+  #   secrets:
+  #     - db_password
+  #     - auction_db_manager_cert
+  #     - auction_db_manager_key
 
   gachadbmanager:
     build:
@@ -197,33 +197,33 @@ services:
       - gacha_db_manager_cert
       - gacha_db_manager_key
 
-  paymentdbmanager:
-    build:
-      context: ./PaymentDBManager
-      dockerfile: Dockerfile
-    container_name: paymentdbmanager
-    depends_on:
-      - paymentdatabase
-    volumes:
-      - ./config.json:/app/config.json
-    secrets:
-      - db_password
-      - payment_db_manager_cert
-      - payment_db_manager_key
+  # paymentdbmanager:
+  #   build:
+  #     context: ./PaymentDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: paymentdbmanager
+  #   depends_on:
+  #     - paymentdatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
+  #   secrets:
+  #     - db_password
+  #     - payment_db_manager_cert
+  #     - payment_db_manager_key
 
-  transactiondbmanager:
-    build:
-      context: ./TransactionDBManager
-      dockerfile: Dockerfile
-    container_name: transactiondbmanager
-    depends_on:
-      - transactiondatabase
-    volumes:
-      - ./config.json:/app/config.json
-    secrets:
-      - db_password
-      - transaction_db_manager_cert
-      - transaction_db_manager_key
+  # transactiondbmanager:
+  #   build:
+  #     context: ./TransactionDBManager
+  #     dockerfile: Dockerfile
+  #   container_name: transactiondbmanager
+  #   depends_on:
+  #     - transactiondatabase
+  #   volumes:
+  #     - ./config.json:/app/config.json
+  #   secrets:
+  #     - db_password
+  #     - transaction_db_manager_cert
+  #     - transaction_db_manager_key
 
   userdbmanager:
     build:
