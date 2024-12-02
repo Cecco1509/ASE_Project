@@ -138,7 +138,7 @@ def get_transaction_history(user_id):
     
         # Send a GET request to the database manager service to fetch transaction history
         response = requests.get(config.services.paymentsmicroservice+f'/api/player/currency/{user_id}', headers=request.headers, verify=False)
-        return response
+         return make_response(jsonify(response.json()),response.status_code)
 
 
 @app.route('/api/player/currency/', methods=['POST'])
@@ -148,7 +148,7 @@ def purchase_in_game_currency():
         # Send request to microservice
         response = requests.post(f"{config.services.paymentsmicroservice}/api/player/currency/", json=data, headers=request.headers, verify=False)
         # Forward the microservice's response to the user
-        return response
+         return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/decrease/<int:user_id>', methods=['PUT'])
 def decrease_in_game_currency(user_id):
@@ -158,7 +158,7 @@ def decrease_in_game_currency(user_id):
         
         response = requests.put(config.services.paymentsmicroservice+ f'/api/player/decrease/update_balance', json=data,  headers=request.headers, verify=False)
         
-        return response
+        return make_response(jsonify(response.json()),response.status_code)
 
 
 @app.route('/api/player/increase/<int:user_id>', methods=['PUT'])
@@ -166,9 +166,9 @@ def increase_currency(user_id):
     
         data = request.get_json()
         
-        response = requests.put(config.services.paymentsmicroservice+ f'/api/player/increase/update_balance', json=data,  headers=request.headers, verify=False)
+        response = requests.put(config.services.paymentsmicroservice+ f'/api/player/increase/update_balance', json=data, headers=request.headers, verify=False)
 
-        return response
+        return make_response(jsonify(response.json()),response.status_code)
 
    
 
@@ -176,7 +176,7 @@ def increase_currency(user_id):
 def get_transaction_history_admin(user_id):
     
         response = requests.get(config.services.paymentsmicroservice+f'/api/admin/currency/{user_id}', headers=request.headers, verify=False)
-        return response
+        return make_response(jsonify(response.json()),response.status_code)
 
        
 
