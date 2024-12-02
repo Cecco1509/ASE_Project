@@ -22,7 +22,7 @@ def get_transaction_history(userId):
     try:
         auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
         if auth_response.status_code != 200:
-            return make_response(response.json(), response.status_code)
+            return make_response(auth_response.json(), auth_response.status_code) 
 
         # Send a GET request to the database manager service to fetch transaction history
         response = requests.get(config.dbamangers.payment+ f'/currencytransaction/{userId}', verify=False)
@@ -55,7 +55,7 @@ def purchase_in_game_currency():
     try:
         auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
         if auth_response.status_code != 200:
-            return make_response(response.json(), response.status_code)
+            return make_response(auth_response.json(), auth_response.status_code)
         # Extract data from request body
         data = request.get_json()
         in_game_currency = data.get('ingameAmount')
@@ -115,7 +115,7 @@ def decrease_in_game_currency(userId):
     try:
         auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
         if auth_response.status_code != 200:
-            return make_response(response.json(), response.status_code)
+            return make_response(auth_response.json(), auth_response.status_code)
         # Extract the amount to be deducted from the request body
         data = request.get_json()
         amount = data.get('amount')
@@ -184,7 +184,7 @@ def increase_currency(userId):
     try:
         auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
         if auth_response.status_code != 200:
-            return make_response(response.json(), response.status_code)
+            return make_response(auth_response.json(), auth_response.status_code)
         # Get the amount to increase from the JSON payload
         data = request.get_json()
         
@@ -227,7 +227,7 @@ def get_transaction_history_admin(user_id):
     try:
         auth_response = requests.get(config.services.authmicroservice + '/helloAdmin', headers=request.headers, verify=False)
         if auth_response.status_code != 200:
-            return make_response(response.json(), response.status_code)        
+            return make_response(auth_response.json(), auth_response.status_code)        
 
         # Make a GET request to the database manager service to fetch the transaction history
         response = requests.get(config.dbmanagers.payment + f'/currencytransaction/{user_id}', verify=False )

@@ -15,6 +15,10 @@ config = builder.parse_config('/app/config.json')
 @app.route('/api/player/currency/transaction-history/<int:userId>', methods=['GET'])
 def get_transaction_history(userId):
     try:
+        auth_response = check_validation(request.headers)
+        if auth_response=False:
+            return "Invalid token"
+
         # Send a GET request to the database manager service to fetch transaction history
         transaction_history= get_history(userId)
         # Check if the request was successful
@@ -42,6 +46,10 @@ if __name__ == '__main__':
 @app.route('/api/player/currency/purchase/', methods=['POST'])
 def purchase_in_game_currency():
     try:
+        auth_response = check_validation(request.headers)
+        if auth_response=False:
+            return "Invalid token"
+
         # Extract data from request body
         data = request.get_json()
         in_game_currency = data.get('ingameAmount')
@@ -99,6 +107,10 @@ def purchase_in_game_currency():
 @app.route('/api/player/currency/decrease/<int:userId>', methods=['PUT'])
 def decrease_in_game_currency(userId):
     try:
+        auth_response = check_validation(request.headers)
+        if auth_response=False:
+            return "Invalid token"
+
         # Extract the amount to be deducted from the request body
         data = request.get_json()
         amount = data.get('amount')
@@ -165,6 +177,10 @@ def decrease_in_game_currency(userId):
 @app.route('/api/player/currency/increase/<int:userId>', methods=['PUT'])
 def increase_currency(userId):
     try:
+        auth_response = check_validation(request.headers)
+        if auth_response=False:
+            return "Invalid token"
+
         # Get the amount to increase from the JSON payload
         data = request.get_json()
         
@@ -213,6 +229,10 @@ def increase_currency(userId):
 @app.route('/api/admin/currency/<int:userId>', methods=['GET'])
 def get_transaction_history_admin(userId):
     try:
+        auth_response = check_validation(request.headers)
+        if auth_response=False:
+            return "Invalid token"
+ 
         # Prepare the request URL for fetching transaction history
         response = get_history(userId)
         
