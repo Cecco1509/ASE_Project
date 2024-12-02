@@ -16,7 +16,7 @@ config = builder.parse_config('/app/config.json')
 def get_transaction_history(userId):
     try:
         auth_response = check_validation(request.headers)
-        if auth_response=False:
+        if auth_response==False:
             return "Invalid token"
 
         # Send a GET request to the database manager service to fetch transaction history
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 def purchase_in_game_currency():
     try:
         auth_response = check_validation(request.headers)
-        if auth_response=False:
+        if auth_response==False:
             return "Invalid token"
 
         # Extract data from request body
@@ -108,7 +108,7 @@ def purchase_in_game_currency():
 def decrease_in_game_currency(userId):
     try:
         auth_response = check_validation(request.headers)
-        if auth_response=False:
+        if auth_response==False:
             return "Invalid token"
 
         # Extract the amount to be deducted from the request body
@@ -178,7 +178,7 @@ def decrease_in_game_currency(userId):
 def increase_currency(userId):
     try:
         auth_response = check_validation(request.headers)
-        if auth_response=False:
+        if auth_response==False:
             return "Invalid token"
 
         # Get the amount to increase from the JSON payload
@@ -230,7 +230,7 @@ def increase_currency(userId):
 def get_transaction_history_admin(userId):
     try:
         auth_response = check_validation(request.headers)
-        if auth_response=False:
+        if auth_response==False:
             return "Invalid token"
  
         # Prepare the request URL for fetching transaction history

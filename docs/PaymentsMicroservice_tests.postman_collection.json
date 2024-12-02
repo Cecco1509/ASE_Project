@@ -8,11 +8,38 @@
 	"item": [
 		{
 			"name": "User not found admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User not found\", function(){\r",
+							"pm.response.to.have.status(404);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ 'error': 'User not found' });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:5000/api/admin/currency/2",
+					"raw": "https://localhost:5000/api/admin/currency/2",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -37,7 +64,12 @@
 							"pm.test(\"Successful get transaction history\", function(){\r",
 							"pm.response.to.have.status(200);\r",
 							"var jsonData = pm.response.json();\r",
-							"pm.expect(jsonData).to.eql({  });\r",
+							"pm.expect(jsonData).to.eql({ \r",
+							"        \"id\": 1,\r",
+							"        \"ingameAmount\": 100,\r",
+							"        \"realAmount\": 50,\r",
+							"        \"timestamp\": \"21/11/2024\",\r",
+							"        \"userId\": 1 });\r",
 							"});"
 						],
 						"type": "text/javascript",
@@ -46,10 +78,21 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:5000/api/admin/currency/1",
+					"raw": "https://localhost:5000/api/admin/currency/1",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -66,17 +109,106 @@
 		},
 		{
 			"name": "Successful get transaction history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful get transaction history\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\r",
+							"        \"id\": 1,\r",
+							"        \"ingameAmount\": 100,\r",
+							"        \"realAmount\": 50,\r",
+							"        \"timestamp\": \"21/11/2024\",\r",
+							"        \"userId\": 1\r",
+							"    \r",
+							" });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/currency/transaction-history/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"transaction-history",
+						"1"
+					]
+				}
 			},
 			"response": []
 		},
 		{
 			"name": "Transaction not found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Transaction not found\", function(){\r",
+							"pm.response.to.have.status(404);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ 'error': 'Transactions not found' });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
-				"header": []
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/currency/transaction-history/2",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"transaction-history",
+						"2"
+					]
+				}
 			},
 			"response": []
 		},
@@ -101,6 +233,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -113,7 +255,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/player/currency/purchase",
+					"raw": "https://localhost:5000/api/player/currency/purchase",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -147,6 +290,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -159,7 +312,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/player/currency/purchase",
+					"raw": "https://localhost:5000/api/player/currency/purchase",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -193,10 +347,30 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "djsdkhfsflasfl",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"ingameAmount\":-100,\"status\": \"ACTIVE\",\"profilePicture\": \"picture1\",\"userId\":2}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "localhost:5000/api/player/currency/purchase",
+					"raw": "https://localhost:5000/api/player/currency/purchase",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -206,55 +380,6 @@
 						"player",
 						"currency",
 						"purchase"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Successful decrease of balance",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Successful decrease of balance\", function(){\r",
-							"pm.response.to.have.status(200);\r",
-							"var jsonData = pm.response.json();\r",
-							"pm.expect(jsonData).to.eql({\r",
-							"    'message': 'Balance decreased successfully', \r",
-							"    'transaction': 1 });\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"amount\":100}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:5000/api/player/currency/decrease/1",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"player",
-						"currency",
-						"decrease",
-						"1"
 					]
 				}
 			},
@@ -279,10 +404,30 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"amount\":-100}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "localhost:5000/api/player/currency/decrease/1",
+					"raw": "https://localhost:5000/api/player/currency/decrease/1",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -317,10 +462,30 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"amount\":100}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "localhost:5000/api/player/currency/decrease/1",
+					"raw": "https://localhost:5000/api/player/currency/decrease/2",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -330,7 +495,7 @@
 						"player",
 						"currency",
 						"decrease",
-						"1"
+						"2"
 					]
 				}
 			},
@@ -357,6 +522,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -369,7 +544,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/player/currency/increase/1",
+					"raw": "https://localhost:5000/api/player/currency/increase/1",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -387,11 +563,47 @@
 		},
 		{
 			"name": "Invalid amount_increase",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Invalid amount\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ 'error': 'Amount must be a positive number' });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"amount\":-100}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "localhost:5000/api/player/currency/increase/1",
+					"raw": "https://localhost:5000/api/player/currency/increase/1",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -426,6 +638,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -438,7 +660,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/player/currency/increase/2",
+					"raw": "https://localhost:5000/api/player/currency/increase/2",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -449,6 +672,66 @@
 						"currency",
 						"increase",
 						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Successful decrease of balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful decrease of balance\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\r",
+							"    'message': 'Balance decreased successfully', \r",
+							"    'transaction': 1 });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "srbteam",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"amount\":100}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/currency/decrease/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency",
+						"decrease",
+						"1"
 					]
 				}
 			},

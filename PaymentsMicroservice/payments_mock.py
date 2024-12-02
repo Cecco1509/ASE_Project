@@ -42,9 +42,10 @@ def increase_balance(payload):
     else:
         return {"status":400, "userId":None}    
 
-def check_validation(request.headers):
-    if 'Authorization' in request.headers
+def check_validation(headers):
+    if 'Authorization' in headers:
         return True
-    else return False
+    else:
+        return False
 
     
