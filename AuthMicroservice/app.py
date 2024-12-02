@@ -20,7 +20,10 @@ app.config['SECRET_KEY']=str(os.getenv("SECRET_KEY"))
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mssql+pyodbc://{config.databases.auth.username}:{config.databases.auth.password}@{config.databases.auth.server}:{config.databases.auth.port}/{config.databases.auth.name}?driver=ODBC+Driver+17+for+SQL+Server'
+with open('/run/secrets/db_password', 'r') as file:
+    password = file.read().strip()
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mssql+pyodbc://{config.databases.auth.username}:{password}@{config.databases.auth.server}:{config.databases.auth.port}/{config.databases.auth.name}?driver=ODBC+Driver+17+for+SQL+Server'
 
 for i in range(config.databases.retries):
     try:
@@ -28,7 +31,8 @@ for i in range(config.databases.retries):
                             f'SERVER={config.databases.auth.server},{config.databases.auth.port};'
                             f'DATABASE=master;'
                             f'UID={config.databases.auth.username};'
-                            f'PWD={config.databases.auth.password}')
+                            f'PWD={password};'
+                            'Encrypt=yes;TrustServerCertificate=yes')
         conn.autocommit = True
         cursor = conn.cursor()
         cursor.execute(f"IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{config.databases.auth.name}') \
@@ -79,7 +83,7 @@ def token_required(role=None):
                 valid_token = valid_tokens.get(data['username'])
                 if not valid_token:
                     return jsonify({'message':'Invalid token!'}),403
-                user = {"username":data['username'], "role":data['roles'], "token":token}
+                user = {"username":data['username'],"userId":data['userId'], "role":data['roles'], "token":token}
 
             except Exception as e:
                 print('Error decoding token: ', str(e))
@@ -112,7 +116,7 @@ def register_user():
             'profilePicture': json_data['profilePicture'],
             'registrationDate': datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
             'status': "ACTIVE"}
-            response = requests.post(f'{config.dbmanagers.user}/user', json=userData)
+            response = requests.post(f'{config.dbmanagers.user}/user', json=userData, verify=False)
             if response.status_code==200:
                 return make_response(jsonify(response.json()), response.status_code)
         return make_response(jsonify({"message":"User registration failed."}), 400)
@@ -131,7 +135,8 @@ def login():
                 "iss":"ASE Project",
                 "exp_time":str(datetime.now(timezone.utc)+timedelta(hours=5)) ,
                 "username":json_data['username'],
-                "roles":role
+                "roles":role,
+                "userId":response['id']
             }
             jwt_encoded = jwt.encode(token_data, app.config['SECRET_KEY'], algorithm="HS256")
             valid_tokens[json_data['username']]=jwt_encoded
@@ -161,7 +166,7 @@ def verify_player_token(user_info=None):
 @token_required("admin")
 def verify_admin_token(user_info=None):
     try:
-        return make_response(jsonify({"msg" : f"token verified successfully for admin {user_info['username']}"}), 200)
+        return make_response(jsonify({"adminId" : user_info['userId']}), 200)
     except Exception as e:
         return make_response(jsonify({"error" : str(e)}), 500)
 
@@ -181,11 +186,11 @@ def register_admin():
         }
         response = create_admin(auth_data)
         if response != None:
-                return make_response(jsonify(response.json()), response.status_code)
+                return make_response(jsonify(response), response.status_code)
         return make_response(jsonify({"message":"Admin registration failed."}), 400)
     return make_response(jsonify({"message":"Invalid data."}), 400)
 
-@app.route('/api/player/login', methods=['POST'])
+@app.route('/api/admin/login', methods=['POST'])
 def admin_login():
     json_data = request.get_json()
     if json_data and 'username' in json_data and 'password' in json_data:
@@ -198,7 +203,8 @@ def admin_login():
                 "iss":"ASE Project",
                 "exp_time":str(datetime.now(timezone.utc)+timedelta(hours=5)) ,
                 "username":json_data['username'],
-                "roles":role
+                "roles":role,
+                "userId":response['id']
             }
             jwt_encoded = jwt.encode(token_data, app.config['SECRET_KEY'], algorithm="HS256")
             valid_tokens[json_data['username']]=jwt_encoded
