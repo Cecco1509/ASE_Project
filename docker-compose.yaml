@@ -144,6 +144,9 @@ services:
     container_name: paymentsmicroservice
     volumes: 
       - ./config.json:/app/config.json
+    secrets:
+      - payments_cert
+      - payments_cert_key
 
   transactionsadmin:
     build:
