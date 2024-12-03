@@ -1,10 +1,10 @@
 import requests, time
-
 from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
 from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
+from utils import *
 
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
@@ -29,13 +29,15 @@ def get_single_gacha(gachaId):
 @app.route('/api/admin/gacha', methods=['POST'])
 @handle_errors
 def create_gacha():
-    response = requests.post(GACHA_MICROSERVICE + '/api/admin/gacha', headers=request.headers, json=request.get_json(), verify=False)
+    sanitized_data = sanitize_data(request.get_json())
+    response = requests.post(GACHA_MICROSERVICE + '/api/admin/gacha', headers=request.headers, json=sanitized_data, verify=False)
     return make_response(response.json(), response.status_code)
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['PUT'])
 @handle_errors
 def update_gacha(gachaId):
-    response = requests.put(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', headers=request.headers, json=request.get_json(), verify=False)
+    sanitized_data = sanitize_data(request.get_json())
+    response = requests.put(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', headers=request.headers, json=sanitized_data, verify=False)
     return make_response(response.json(), response.status_code)
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['DELETE'])
