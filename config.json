@@ -47,7 +47,7 @@
         "payment":"https://paymentdbmanager:5000"
     },
     "services":{
-        "gacha":"http://gachamicroservice:5000",
+        "gacha":"https://gachamicroservice:5000",
         "usersmicroservice":"https://usersmicroservice:5000",
         "paymentsmicroservice": "http://paymentsmicroservice:5000",
         "authmicroservice":"https://authmicroservice:5000"

@@ -142,7 +142,7 @@ def login():
             valid_tokens[json_data['username']]=jwt_encoded
             return make_response({"Access token":jwt_encoded}, 200)
         else:
-            return make_response(jsonify({"message":f"Username or password incorrect. {response['password']}, {salt}"}), 401)
+            return make_response(jsonify({"message":f"Username or password incorrect."}), 401)
     return make_response(jsonify({"message":"Invalid data."}), 400)
 
 @app.route('/api/player/logout', methods=['POST'])
@@ -186,7 +186,7 @@ def register_admin():
         }
         response = create_admin(auth_data)
         if response != None:
-                return make_response(jsonify(response), response.status_code)
+                return make_response(jsonify(response), 200)
         return make_response(jsonify({"message":"Admin registration failed."}), 400)
     return make_response(jsonify({"message":"Invalid data."}), 400)
 

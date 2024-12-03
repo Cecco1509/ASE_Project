@@ -23,7 +23,12 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./config.json:/app/config.json  # Mounts config.json into the container
+      - ./config.json:/app/config.json
+      - .:/ApiGateway
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./ApiGateway/app.py
     secrets:
       - api_gateway_cert
       - api_gateway_cert_key 
@@ -122,6 +127,16 @@ services:
     container_name: gachamicroservice
     volumes:
       - ./config.json:/app/config.json
+      - .:/GachaMicroservice
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./GachaMicroservice/app.py
+    depends_on:
+      - gachadbmanager
+    secrets:
+      - gacha_ms_cert
+      - gacha_ms_cert_key
 
   paymentsmicroservice:
     build:
@@ -130,9 +145,14 @@ services:
     container_name: paymentsmicroservice
     volumes: 
       - ./config.json:/app/config.json
-    secrets:
-      - payments_cert
-      - payments_cert_key
+
+  paymentsuser:
+    build:
+      context: ./PaymentsUser
+      dockerfile: Dockerfile
+    container_name: paymentsuser
+    volumes:
+      - ./config.json:/app/config.json
 
   roll:
     build:
