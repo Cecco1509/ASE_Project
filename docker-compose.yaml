@@ -5,19 +5,18 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway
     depends_on:
-      - auctionsadmin
-      - auctionsuser
       - authmicroservice
+      - auctionmicroservice
       - auctiondbmanager
       - userdbmanager
       - gachadbmanager
       - transactiondbmanager
       - paymentdbmanager
       - gachamicroservice
-      - paymentsadmin
-      - paymentsuser
-      - transactionsadmin
-      - transactionsuser
+      #- paymentsadmin
+      #- paymentsuser
+      #- transactionsadmin
+      #- transactionsuser
     ports:
       - "8080:5000"
     volumes:
@@ -31,17 +30,23 @@ services:
       - api_gateway_cert
       - api_gateway_cert_key
 
-  auctionsadmin:
+  auctionmicroservice:
     build:
-      context: ./AuctionsAdmin
+      context: ./AuctionsMicroservice
       dockerfile: Dockerfile
-    container_name: auctionsadmin
-
-  auctionsuser:
-    build:
-      context: ./AuctionsUser
-      dockerfile: Dockerfile
-    container_name: auctionsuser
+    container_name: auctionmicroservice
+    depends_on:
+      - auctiondbmanager
+    volumes:
+      - ./config.json:/app/config.json
+      - .:/AuctionsMicroservice
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./AuctionsMicroservice/app.py
+    secrets:
+      - auction_ms_cert
+      - auction_ms_key
 
   authmicroservice:
     build:
@@ -59,7 +64,7 @@ services:
       - db_password
 
   authdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
+    image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
@@ -253,7 +258,7 @@ services:
       - users_cert_key
 
   paymentdatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
+    image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
@@ -268,7 +273,7 @@ services:
       - payment_db_key
 
   transactiondatabase:
-    image: mcr.microsoft.com/mssql/server:2017-latest
+    image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
@@ -417,7 +422,10 @@ secrets:
     file: ./secrets/gacha_ms_cert.pem
   gacha_ms_cert_key:
     file: ./secrets/gacha_ms_key.pem
-      - ./Auctioneer:/Auctioneer
+  auction_ms_cert:
+    file: ./secrets/auction_ms_cert.pem
+  auction_ms_key:
+    file: ./secrets/auction_ms_key.pem
 
 volumes:
   uservolume:

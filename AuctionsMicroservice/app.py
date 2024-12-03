@@ -14,6 +14,8 @@ from celery import Celery
 from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
+from auth_utils import *
+from handle_errors import *
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ?
 
@@ -27,6 +29,8 @@ celery_app = Celery('worker',
 ############################################################# USER ##########################################################
 
 @app.route('/player/auction/market', methods=['GET'])
+@handle_errors
+@validate_player_token
 def get_auctions():
     try:
         response = requests.get(config.dbmanagers.auction + '/auction/status/1')
@@ -34,10 +38,11 @@ def get_auctions():
         return make_response(jsonify(market=response.json()), 200)
     except Exception as err:
         return make_response(jsonify({"message": str(err)}, 500))
-    
 
 #POST /api/player/auction/create: Create a new auction listing for a gacha item. (input: gacha id, bid min, auctionStart, auctionEnd etc)
 @app.route('/player/auction/create', methods=['POST'])
+@handle_errors
+@validate_player_token
 def create_auction():
     try:
         data = request.get_json()
@@ -97,6 +102,8 @@ def create_auction():
     
 #POST /api/player/auction/{auction_id}/bid: Place a bid on an active auction.
 @app.route('/player/auction/bid/<auction_id>', methods=['POST']) ## {userID, amount}
+@handle_errors
+@validate_player_token
 def bid_on_auction(auction_id):
     try:
         tz = pytz.timezone('Europe/Rome')
@@ -193,7 +200,7 @@ def bid_on_auction(auction_id):
                     ## Trying to rollback if the currency isn't changed
                     resp2 = requests.patch(
                         f"{config.dbmanagers.user}/user/{data["userId"]}",
-                        json={"ingameCurrency": (float(data['bidAmount'] - last_bid_user_amount))}
+                        json={"ingameCurrency": (float(data['bidAmount']))}
                     )
                     resp1.raise_for_status()
             
@@ -209,7 +216,10 @@ def bid_on_auction(auction_id):
         return make_response(jsonify({"message": str(err)}), 500)
 
     ## TOKENS DA INSERIRE
+
 @app.route('/player/auction/history/<int:userId>', methods=['GET'])
+@handle_errors
+@validate_player_token
 def auction_player_history(userId):
     try:
         data = request.get_json()
@@ -217,7 +227,6 @@ def auction_player_history(userId):
         return make_response(response.json(), 200)
     except Exception as err:
         return make_response(jsonify({"message": str(err)}), 500)
-    
 
 
 def check_auction(auction) -> bool:
@@ -234,6 +243,8 @@ def check_auction(auction) -> bool:
 
 #GET /auctions: Admin view of all auctions.
 @app.route('/admin/auction', methods=['GET'])
+@handle_errors
+@validate_admin_token
 def get_all_auctions():
     print(f"GET all auctions")
     try:
@@ -248,6 +259,8 @@ def get_all_auctions():
     
 #GET /auction/<auctions_id>: Admin view specific auction.
 @app.route('/admin/auction/<int:auction_id>', methods=['GET'])
+@handle_errors
+@validate_admin_token
 def get_auction(auction_id):
     print(f"GET auction", auction_id)
     try:
@@ -262,6 +275,8 @@ def get_auction(auction_id):
 
 # PUT /api/admin/auction/{auction_id}: Modify a specific auction.
 @app.route('/admin/auction/<int:auction_id>', methods=['PUT'])
+@handle_errors
+@validate_admin_token
 def update_auction(auction_id):
     print(f"PUT auction", auction_id)
     try:
@@ -290,6 +305,8 @@ def update_auction(auction_id):
     
 # GET /api/admin/auction/history: Admin view of all market history (old auctions).
 @app.route('/admin/auction/history', methods=['GET'])
+@handle_errors
+@validate_admin_token
 def history():
     print(f"GET Auctions History")
     try:
@@ -306,6 +323,8 @@ def history():
     
 
 @app.route('/admin/auction/history/<user_id>', methods=['GET'])
+@handle_errors
+@validate_admin_token
 def user_history(user_id):
     print(f"GET History of user " + user_id)
     try:
