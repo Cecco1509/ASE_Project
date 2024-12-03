@@ -54,6 +54,19 @@
         
     },
     "system_settings":{
-        "gacha_roll_price":100
+        "convert_price":100},
+    "roll":{
+        "probability": {
+            "Common": 1.0,
+            "Rare": 1.5,
+            "Epic": 2.0,
+            "Legendary": 3.0
+        },
+        "price": {
+            "Common": 100,
+            "Rare": 200,
+            "Epic": 350,
+            "Legendary": 550
+        }
     }
 }
