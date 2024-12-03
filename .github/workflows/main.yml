@@ -34,7 +34,7 @@ jobs:
     - name: Run gacha microservice unit tests
       run: |
         cd docs/postman
-        newman run GachaMicroservice.postman_collection.json
+        newman run GachaMicroservice.postman_collection.json --insecure
     - name: Stop gacha microservice image
       run: |
         docker stop gachams_test_
@@ -48,7 +48,7 @@ jobs:
     - name: Run payments unit tests
       run: |
         cd docs/postman
-        newman run PaymentsMicroservice_tests.postman_collection.json
+        newman run PaymentsMicroservice_tests.postman_collection.json --insecure
     - name: Stop payments image
       run: |
         docker stop paymentst
@@ -62,7 +62,7 @@ jobs:
     - name: Run user unit tests
       run: |
         cd docs/postman
-        newman run UsersMicroservice.postman_collection.json
+        newman run UsersMicroservice.postman_collection.json --insecure
     - name: Stop user image
       run: |
         docker stop userst
