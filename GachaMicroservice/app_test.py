@@ -106,7 +106,7 @@ def delete_gacha(gachaId):
         return make_response(jsonify({"message": f"Gacha item with ID {gachaId} not found"}), 404)
     
     # all data is valid, delete the gacha item from the mock list
-    mock_gacha_list = [gacha for gacha in mock_gacha_list if gacha['id'] != gachaId]
+    # mock_gacha_list = [gacha for gacha in mock_gacha_list if gacha['id'] != gachaId]
 
     return make_response({"message":"Gacha sucessfully deleted."}, 200)
 
