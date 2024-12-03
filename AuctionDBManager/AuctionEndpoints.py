@@ -1,6 +1,6 @@
 from app import app
 from app import db
-from models import Auction
+from models import Auction, AuctionStatus
 from flask import Flask, request, make_response, jsonify
 
 
@@ -60,7 +60,7 @@ def user_auctions(userId, status):
 @app.route('/auction/<int:userId>/<int:collectionId>/<int:status>', methods=['GET'])
 def user_gacha_auction(userId, collectionId, status):
     
-    auctions = db.session.execute(db.select(Auction).where(Auction.status==status, Auction.userId==userId, Auction.gachaCollectionId==collectionId)).scalars()
+    auctions = db.session.execute(db.select(Auction).where(Auction.status==AuctionStatus(status), Auction.userId==userId, Auction.gachaCollectionId==collectionId)).scalars()
     if auctions:
         return make_response(jsonify([auction.to_dict() for auction in auctions]), 200)
     return make_response(jsonify({"message":"Auctions not found"}), 404)

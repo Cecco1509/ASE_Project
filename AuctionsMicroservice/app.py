@@ -1,13 +1,15 @@
 import collections
 from datetime import datetime
 import functools
+from numbers import Number
 import os
 import threading
 import sys
 import requests, time
 from flask import jsonify
-from celery import Celery
 from python_json_config import ConfigBuilder
+import pytz
+from celery import Celery
 
 from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
@@ -18,19 +20,13 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 
-sys.path.append("/app/")  
-from celery_app import end_auction
-
-# celery_app = Celery(app.name,
-#                     broker='amap://admin:mypass@rabbit:5672', 
-#                     backend='rpc://')
-
-# GET /api/player/auction/market: Get all active auctions in the market.
-
+celery_app = Celery('worker',
+                broker='amqp://admin:mypass@rabbit:5672', 
+                backend='rpc://')
 
 ############################################################# USER ##########################################################
 
-@app.route('/auction/market', methods=['GET'])
+@app.route('/player/auction/market', methods=['GET'])
 def get_auctions():
     try:
         response = requests.get(config.dbmanagers.auction + '/auction/status/1')
@@ -40,8 +36,8 @@ def get_auctions():
         return make_response(jsonify({"message": str(err)}, 500))
     
 
-#POST /api/player/auction/create: Create a new auction listing for a gacha item. (input: gacha id, bid min, timestamp, etc)
-@app.route('/auction/create', methods=['POST'])
+#POST /api/player/auction/create: Create a new auction listing for a gacha item. (input: gacha id, bid min, auctionStart, auctionEnd etc)
+@app.route('/player/auction/create', methods=['POST'])
 def create_auction():
     try:
         data = request.get_json()
@@ -54,65 +50,166 @@ def create_auction():
 
             return make_response(jsonify({"message": "Invalid data"}), 400);
     
-        start = datetime.strptime(data['auctionStart'], '%Y-%m-%dT%H:%M:%SZ')
-        end = datetime.strptime(data['auctionEnd'], '%Y-%m-%dT%H:%M:%SZ')
-        now = datetime.now();
+        tz = pytz.timezone('Europe/Rome')
 
-        if (start < now or end < now or start > end):
-            return make_response(jsonify({"message": "Auction start or end time must be in the future"}), 400);
+        try:
+            gacha_res = requests.get(f"{config.dbmanagers.gacha}/gachacollection/item/{data["gachaCollectionId"]}")
+            gacha_res.raise_for_status()
+            if gacha_res.json()['userId'] != data["userId"] :
+                return make_response(jsonify({"message": "Invalid user"}), 400);
+        except Exception as e:
+            return make_response(jsonify({"message": "Gacha Collection does not exits"}), 400);
+
+
+        start = tz.localize(datetime.strptime(data['auctionStart'], '%Y-%m-%dT%H:%M:%SZ'))
+        end = tz.localize(datetime.strptime(data['auctionEnd'], '%Y-%m-%dT%H:%M:%SZ'))
         
-        active_auction = request.get(config.dbmanagers.auction + f'/auction/user/{data["userId"]}/{data["gachaCollectionId"]}/1')
-        if active_auction.status_code == 200:
-            return make_response(jsonify({"message": f"User {data['userId']} already has an active auction for that"}), 400);
-    
-        response = requests.post(config.dbmanagers.auction + '/auction', json=data)
-        new_auction = response.json().get('auctionId');
+        now = datetime.now(tz);
+        end = end.replace(second=0, microsecond=0)
+        start = start.replace(second=0, microsecond=0)
+        now = now.replace(second=0, microsecond=0)
 
-        r = end_auction.apply_sync(args=('auctionId',new_auction), eta=end);
+        if (start < now or end < now or start >= end):
+            print(start, end, now, flush=True)
+            return make_response(jsonify({"message": "Auction start or end time must be in the future"}), 400);
+        else :
+            print(start, end, now, flush=True)
+        # check if user already has an active auction for this gachaCollection
+        
+        active_auction = requests.get(config.dbmanagers.auction + f'/auction/{data["userId"]}/{data["gachaCollectionId"]}/1')
+        try:
+            active = active_auction.json()
+            print("ACTIVE : ", active, flush=True)
+            if(len(active) > 0):
+                return make_response(jsonify({"message": f"User {data['userId']} already has an active auction for tha gachaCollection"}), 400);
+        except Exception as e:
+            print("EXPLODED "+str(e), flush=True)
+            print(active, flush=True)
+    
+        data["timestamp"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        response = requests.post(config.dbmanagers.auction + '/auction', json=data)
+        new_auction = response.json()['auctionId'];
+        print(new_auction)
 
         return make_response(jsonify(auction=response.json()), 201)
     except Exception as err:
         return make_response(jsonify({"message": str(err)}), 500)
     
 #POST /api/player/auction/{auction_id}/bid: Place a bid on an active auction.
-@app.route('/auction/<auction_id>/bid', methods=['POST']) ## {userID, amount}
+@app.route('/player/auction/bid/<auction_id>', methods=['POST']) ## {userID, amount}
 def bid_on_auction(auction_id):
     try:
+        tz = pytz.timezone('Europe/Rome')
         data = request.get_json()
-        response = requests.post(config.dbmanagers.auction + f'/auction/{auction_id}/bid', json=data.bid)
-        ### Remove previous bid
+        response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}')
+        response.raise_for_status()
+        auction = response.json()
+
+        if (auction["status"] != "ACTIVE" ):
+            return make_response(jsonify({"message": "Auction is not active"}), 400);
+    
+        if (tz.localize(datetime.strptime(auction["auctionStart"], "%a, %d %b %Y %H:%M:%S %Z")).replace(second=0, microsecond=0) > datetime.now(tz).replace(second=0, microsecond=0)):
+            return make_response(jsonify({"message": "Auction has not started yet"}), 400);
+
+        if (auction["userId"] == data["userId"]):
+            return make_response(jsonify({"message": "Can't bid on an owned auction"}), 400);
+    
+        if (auction["minimumBid"] > data["bidAmount"]):
+            return make_response(jsonify({"message": "Bid amount is lower than minimum bid"}), 400);
         
-        user_bids = requests.get(config.dbmanagers.auction + f'/auctionbid/user/{data["userId"]}/{auction_id}')
-        auction_bids = requests.get(config.dbmanagers.auction + f'/auctionbid/{auction_id}')
+        auction_bids_resp = requests.get(config.dbmanagers.auction + f'/auctionbid/auction/{auction_id}')
+        auction_bids_resp.raise_for_status()
         userBidId = None
-        userBidAmount = 0
-        if (user_bids.status_code == 200):
-            for bid in user_bids.json():
-                userBidId = bid['bidId']
+        auction_bids = []
+
+        if (auction_bids_resp.status_code == 200):
+            auction_bids = auction_bids_resp.json()
+
+        print("auctionBids", auction_bids, flush=True)
 
         auctionBidAmount = 0
-        if (auction_bids.status_code == 200):
-            for bid in auction_bids.json():
-                if bid['bidAmount'] > auctionBidAmount:
-                    auctionBidAmount = bid['bidAmount']
 
-        if auctionBidAmount > data["bidAmount"]: return make_response(jsonify({"message": "Bid Amount inferior of previous one"}), 201)
+        if len(auction_bids) > 0:
+            auction_bids.sort(key=lambda x: x['timestamp'], reverse=True)
+            auctionBidAmount = auction_bids[0]['bidAmount']
+            userBidId = auction_bids[0]['userId']
+        else:
+            print("NO BIDS FOR AUCTION " + str(auction_id), flush=True)
 
-        requests.post(config.dbmanagers.auction + f'/auctionbid', json=jsonify({'userId': data["userId"], 'bidAmount': data["bidAmount"], 'auctionId':auction_id, 'timestamp':datetime.now()}),)
-
-        resp = requests.put(
-                f"{config.services.paymentsuser}/api/player/currency/decrese/{bid['userId']}",
-                json={"amount": bid['bidAmount']}
-            )
-        ### Decrease money amount
-        response.raise_for_status()
-        return make_response(jsonify({"message": "Bid done"}), 201)
-    except Exception as err:
-        return make_response(jsonify({"message": str(err)}), 500)
+        if (userBidId == data["userId"]):
+            return make_response(jsonify({"message": "Can't bid twice in a row"}), 400)
+        else:
+            print("LAST BID USER ID " + str(userBidId), flush=True)
     
+        if auctionBidAmount > data["bidAmount"]: 
+            return make_response(jsonify({"message": "Bid Amount inferior of previous one"}), 400)
+        else:
+            print("LAST BID AMOUNT " + str(auctionBidAmount), flush=True)
+
+        bid = {
+                'userId': data["userId"],
+                'bidCode': f"{auction_id}:{len(auction_bids)}",
+                'bidAmount': data["bidAmount"],
+                'auctionId':auction_id, 
+                'timestamp':datetime.now(tz).strftime("%Y-%m-%dT%H:%M:%SZ")
+            }
+
+        try:
+            result = requests.post(config.dbmanagers.auction + f'/auctionbid', 
+                        json={
+                            'userId': data["userId"],
+                            'bidCode': f"{auction_id}:{len(auction_bids)}",
+                            'bidAmount': data["bidAmount"],
+                            'auctionId':auction_id, 
+                            'timestamp':datetime.now(tz).strftime("%Y-%m-%dT%H:%M:%SZ")
+                        })
+            
+            result.raise_for_status()
+        except Exception as e:
+            print("EXPLODED "+str(e), flush=True)
+            return make_response(jsonify({"message": str(e)}), 500)
+        
+
+        new_bid_id = result.json()['bidId']
+        bid["id"] = new_bid_id
+        print("BID INSERTED", flush=True)
+        
+        try:
+            ## Subtract money from the current bidder
+            resp = requests.patch(
+                    f"{config.dbmanagers.user}/user/{data["userId"]}",
+                    json={"ingameCurrency": - (float(data['bidAmount']))}
+                )
+                    
+            resp.raise_for_status()
+
+            ## Giving money back to the last bidder
+            if userBidId is not None:
+                resp1 = requests.patch(f"{config.dbmanagers.user}/user/{userBidId}",
+                                    json={"ingameCurrency": float(auctionBidAmount)}
+                                )
+                
+                if resp1.status_code != 200:
+                    ## Trying to rollback if the currency isn't changed
+                    resp2 = requests.patch(
+                        f"{config.dbmanagers.user}/user/{data["userId"]}",
+                        json={"ingameCurrency": (float(data['bidAmount'] - last_bid_user_amount))}
+                    )
+                    resp1.raise_for_status()
+            
+        except Exception as e:
+            ## Trying to rollback if the currency isn't changed
+            response = requests.delete(config.dbmanagers.auction + f'/auctionbid/{new_bid_id}')
+            print("BID REMOVED", flush=True)
+            return make_response(jsonify({"message": "Unexpected error, retry later"}), 500)
+
+        return make_response(jsonify({"bid": bid}), 200)
+    except Exception as err:
+        print(str(err), flush=True)
+        return make_response(jsonify({"message": str(err)}), 500)
 
     ## TOKENS DA INSERIRE
-@app.route('/auction/history/<int:userId>', methods=['GET'])
+@app.route('/player/auction/history/<int:userId>', methods=['GET'])
 def auction_player_history(userId):
     try:
         data = request.get_json()
@@ -136,7 +233,7 @@ def check_auction(auction) -> bool:
 ##################################################### ADMIN ############################################################
 
 #GET /auctions: Admin view of all auctions.
-@app.route('/auction', methods=['GET'])
+@app.route('/admin/auction', methods=['GET'])
 def get_all_auctions():
     print(f"GET all auctions")
     try:
@@ -150,7 +247,7 @@ def get_all_auctions():
 
     
 #GET /auction/<auctions_id>: Admin view specific auction.
-@app.route('/auction/<int:auction_id>', methods=['GET'])
+@app.route('/admin/auction/<int:auction_id>', methods=['GET'])
 def get_auction(auction_id):
     print(f"GET auction", auction_id)
     try:
@@ -164,7 +261,7 @@ def get_auction(auction_id):
     
 
 # PUT /api/admin/auction/{auction_id}: Modify a specific auction.
-@app.route('/auction/<int:auction_id>', methods=['PUT'])
+@app.route('/admin/auction/<int:auction_id>', methods=['PUT'])
 def update_auction(auction_id):
     print(f"PUT auction", auction_id)
     try:
@@ -192,7 +289,7 @@ def update_auction(auction_id):
 
     
 # GET /api/admin/auction/history: Admin view of all market history (old auctions).
-@app.route('/auction/history', methods=['GET'])
+@app.route('/admin/auction/history', methods=['GET'])
 def history():
     print(f"GET Auctions History")
     try:
@@ -208,7 +305,7 @@ def history():
         return make_response(jsonify({"message": str(e)}, 500))
     
 
-@app.route('/auction/history/<user_id>', methods=['GET'])
+@app.route('/admin/auction/history/<user_id>', methods=['GET'])
 def user_history(user_id):
     print(f"GET History of user " + user_id)
     try:
@@ -219,7 +316,6 @@ def user_history(user_id):
         return make_response(jsonify(auction.json()), 200) ## Substitute with DBManager request
     except Exception as e:
         return make_response(jsonify({"message": str(e)}, 500))
-
 
 def create_app():
     return app

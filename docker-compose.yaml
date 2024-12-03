@@ -5,49 +5,41 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway
     depends_on:
-      #- auctionsadmin
-      #- auctionsuser
+      - auctionsmicroservice
       #- authadmin
-      # - authuser
-      # - authdbmanager
-      #- auctiondbmanager
+      #- authuser
+      #- authdbmanager
+      - auctiondbmanager
       - userdbmanager
       - gachadbmanager
-    #- transactiondbmanager
-    #- paymentdbmanager
-    #- gachasadmin
-    #- gachasuser
-    #- paymentsadmin
-    #- paymentsuser
-    # - roll
-    #- transactionsadmin
-    #- transactionsuser
-    #- usersadmin
-    #- usersuser
+      - transactiondbmanager
+      #- paymentdbmanager
+      #- gachasadmin
+      #- gachasuser
+      #- paymentsadmin
+      #- paymentsuser
+      #- roll
+      #- transactionsadmin
+      #- transactionsuser
+      #- usersadmin
+      #- usersuser
     ports:
       - "8080:5000"
     volumes:
       - ./config.json:/app/config.json
 
-  # auctionsadmin:
-  #   build:
-  #     context: ./AuctionsAdmin
-  #     dockerfile: Dockerfile
-  #   container_name: auctionsadmin
-  #   depends_on:
-  #     - auctiondbmanager
-  #     - auction_worker
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  # auctionsuser:
-  #   build:
-  #     context: ./AuctionsUser
-  #     dockerfile: Dockerfile
-  #   container_name: auctionsuser
-  #   volumes:
-  #     - ./config.json:/app/config.json
-  #     - ./AuctionWorker/worker.py:/app/celery_app.py
+  auctionsmicroservice:
+    build:
+      context: ./AuctionsMicroservice
+      dockerfile: dockerfile
+    container_name: auctionsmicroservice
+    # depends_on:
+    #   - auctiondbmanager
+    ports:
+      - "5005:5000"
+    volumes:
+      - ./config.json:/app/config.json
+      - ./AuctionsMicroservice:/AuctionsMicroservice
 
   # authadmin:
   #   build:
@@ -71,17 +63,18 @@ services:
   #   volumes:
   #     - ./config.json:/app/config.json
 
-  # auctiondbmanager:
-  #   build:
-  #     context: ./AuctionDBManager
-  #     dockerfile: Dockerfile
-  #   container_name: auctiondbmanager
-  #   depends_on:
-  #     - auctiondatabase
-  #   ports:
-  #     - 5004:5000
-  #   volumes:
-  #     - ./config.json:/app/config.json
+  auctiondbmanager:
+    build:
+      context: ./AuctionDBManager
+      dockerfile: Dockerfile
+    container_name: auctiondbmanager
+    depends_on:
+      - auctiondatabase
+    ports:
+      - 5004:5000
+    volumes:
+      - ./config.json:/app/config.json
+      - ./AuctionDBManager:/AuctionDBManager
 
   gachadbmanager:
     build:
@@ -105,15 +98,15 @@ services:
   #   volumes:
   #     - ./config.json:/app/config.json
 
-  # transactiondbmanager:
-  #   build:
-  #     context: ./TransactionDBManager
-  #     dockerfile: Dockerfile
-  #   container_name: transactiondbmanager
-  #   depends_on:
-  #     - transactiondatabase
-  #   volumes:
-  #     - ./config.json:/app/config.json
+  transactiondbmanager:
+    build:
+      context: ./TransactionDBManager
+      dockerfile: Dockerfile
+    container_name: transactiondbmanager
+    depends_on:
+      - transactiondatabase
+    volumes:
+      - ./config.json:/app/config.json
 
   userdbmanager:
     build:
@@ -126,6 +119,7 @@ services:
       - userdatabase
     volumes:
       - ./config.json:/app/config.json
+      - ./UserDBManager:/UserDBManager
 
   # authdatabase:
   #   image: mcr.microsoft.com/mssql/server:2017-latest
@@ -142,8 +136,8 @@ services:
     container_name: gachadatabase
     ports:
       - "1433:1433"
-    #volumes:
-    #  - mssql_data:/var/opt/mssql
+    volumes:
+      - gachavolume:/var/opt/mssql
 
   userdatabase:
     image: mcr.microsoft.com/mssql/server:2019-latest
@@ -154,123 +148,151 @@ services:
       - "1434:1433"
     container_name: userdatabase
     volumes:
-      - ./sqlserver-data:/var/opt/mssql
+      - uservolume:/var/opt/mssql
     #volumes:
     #  - mssql_data:/var/opt/mssql
-# volumes:
-#   mssql_data:
-#     driver: local # Named volume to store SQL Server data
+  # volumes:
+  #   mssql_data:
+  #     driver: local # Named volume to store SQL Server data
 
-# paymentdatabase:
-#   image: mcr.microsoft.com/mssql/server:2017-latest
-#   environment:
-#     - SA_PASSWORD=Password1.
-#     - ACCEPT_EULA=Y
+  # paymentdatabase:
+  #   image: mcr.microsoft.com/mssql/server:2017-latest
+  #   environment:
+  #     - SA_PASSWORD=Password1.
+  #     - ACCEPT_EULA=Y
 
-#   container_name: paymentdatabase
+  #   container_name: paymentdatabase
 
-# auctiondatabase:
-#   image: mcr.microsoft.com/mssql/server:2017-latest
-#   environment:
-#     - SA_PASSWORD=Password1.
-#     - ACCEPT_EULA=Y
-#   container_name: auctiondatabase
+  auctiondatabase:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    container_name: auctiondatabase
+    ports:
+      - "1435:1433"
+    volumes:
+      - auctionsvolume:/var/opt/mssql
 
-# transactiondatabase:
-#   image: mcr.microsoft.com/mssql/server:2017-latest
-#   environment:
-#     - SA_PASSWORD=Password1.
-#     - ACCEPT_EULA=Y
-#   ports:
-#     - 5002:5000
-#   container_name: transactiondatabase
+  transactiondatabase:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - SA_PASSWORD=Password1.
+      - ACCEPT_EULA=Y
+    ports:
+      - "1436:1433"
+    container_name: transactiondatabase
+    volumes:
+      - transactionsvolume:/var/opt/mssql
 
-# gachasadmin:
-#   build:
-#     context: ./GatchasAdmin
-#     dockerfile: Dockerfile
-#   container_name: gachasadmin
-#   volumes:
-#     - ./config.json:/app/config.json
+  # gachasadmin:
+  #   build:
+  #     context: ./GatchasAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: gachasadmin
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-# gachasuser:
-#   build:
-#     context: ./GatchasUser
-#     dockerfile: Dockerfile
-#   container_name: gachasuser
-#   volumes:
-#     - ./config.json:/app/config.json
+  # gachasuser:
+  #   build:
+  #     context: ./GatchasUser
+  #     dockerfile: Dockerfile
+  #   container_name: gachasuser
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-# paymentsadmin:
-#   build:
-#     context: ./PaymentsAdmin
-#     dockerfile: Dockerfile
-#   container_name: paymentsadmin
-#   volumes:
-#     - ./config.json:/app/config.json
+  # paymentsadmin:
+  #   build:
+  #     context: ./PaymentsAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: paymentsadmin
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-# paymentsuser:
-#   build:
-#     context: ./PaymentsUser
-#     dockerfile: Dockerfile
-#   container_name: paymentsuser
-#   volumes:
-#     - ./config.json:/app/config.json
+  # paymentsuser:
+  #   build:
+  #     context: ./PaymentsUser
+  #     dockerfile: Dockerfile
+  #   container_name: paymentsuser
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-# roll:
-#   build:
-#     context: ./Roll
-#     dockerfile: Dockerfile
-#   container_name: roll
+  # roll:
+  #   build:
+  #     context: ./Roll
+  #     dockerfile: Dockerfile
+  #   container_name: roll
 
-# transactionsadmin:
-#   build:
-#     context: ./TransactionsAdmin
-#     dockerfile: Dockerfile
-#   container_name: transactionsadmin
-#   volumes:
-#     - ./config.json:/app/config.json
+  # transactionsadmin:
+  #   build:
+  #     context: ./TransactionsAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: transactionsadmin
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-# transactionsuser:
-#   build:
-#     context: ./TransactionsUser
-#     dockerfile: Dockerfile
-#   container_name: transactionsuser
-#   volumes:
-#     - ./config.json:/app/config.json
+  # transactionsuser:
+  #   build:
+  #     context: ./TransactionsUser
+  #     dockerfile: Dockerfile
+  #   container_name: transactionsuser
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-# usersadmin:
-#   build:
-#     context: ./UsersAdmin
-#     dockerfile: Dockerfile
-#   container_name: usersadmin
-#   volumes:
-#     - ./config.json:/app/config.json
+  # usersadmin:
+  #   build:
+  #     context: ./UsersAdmin
+  #     dockerfile: Dockerfile
+  #   container_name: usersadmin
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-# usersuser:
-#   build:
-#     context: ./UsersUser
-#     dockerfile: Dockerfile
-#   container_name: usersuser
-#   volumes:
-#     - ./config.json:/app/config.json
+  # usersuser:
+  #   build:
+  #     context: ./UsersUser
+  #     dockerfile: Dockerfile
+  #   container_name: usersuser
+  #   volumes:
+  #     - ./config.json:/app/config.json
 
-# rabbit:
-#   hostname: rabbit
-#   image: "rabbitmq:3-management"
-#   environment:
-#     - RABBITMQ_DEFAULT_USER=admin
-#     - RABBITMQ_DEFAULT_PASS=mypass
-#   ports:
-#     - "15672:15672"
-#     - "5672:5672"
+  rabbit:
+    hostname: rabbit
+    image: "rabbitmq:3-management"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+    ports:
+      - "15672:15672"
+      - "5672:5672"
 
-# auction_worker:
-#   build:
-#     context: ./AuctionWorker
-#     dockerfile: Dockerfile
-#   user: nobody
-#   depends_on:
-#     - rabbit
-#   volumes:
-#     - ./config.json:/app/config.json
+  auction_worker:
+    build:
+      context: ./AuctionWorker
+      dockerfile: dockerfile
+    user: nobody
+    depends_on:
+      - rabbit
+    volumes:
+      - ./config.json:/app/config.json
+      - ./AuctionWorker:/AuctionWorker
+
+  auctioneer:
+    build:
+      context: ./Auctioneer
+      dockerfile: dockerfile
+    container_name: auctioneer
+    # depends_on:
+    #   - auctiondbmanager
+    volumes:
+      - ./config.json:/app/config.json
+      - ./Auctioneer:/Auctioneer
+
+volumes:
+  uservolume:
+    driver: local
+  gachavolume:
+    driver: local
+  auctionsvolume:
+    driver: local
+  transactionsvolume:
+    driver: local
