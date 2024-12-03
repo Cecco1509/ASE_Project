@@ -55,7 +55,7 @@ jobs:
 
     - name: Build user image
       run: |
-        docker build -f ./UsersMicroservice/dockerfile-test -t userstest .
+        docker build -f ./UsersMicroservice/dockerfile_test -t userstest .
     - name: Run user image
       run: |
         docker run --rm --name userst -d -p 5000:5000 userstest
