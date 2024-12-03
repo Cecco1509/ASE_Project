@@ -11,7 +11,8 @@ builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 DB_MANAGER_GACHA_URL = config.dbmanagers.gacha
 DB_MANAGER_USER_URL = config.dbmanagers.user
-ROLL_PRICE = config.system_settings.gacha_roll_price
+ROLL_PRICE = config.roll.price
+ROLL_PROBABILITY = config.roll.probability
 
 
 """ ----------------- ADMIN ENDPOINTS ----------------- """
@@ -188,27 +189,19 @@ def get_system_gacha_details(gachaId, auth_response=None):
 @handle_errors
 @validate_player_token
 def roll_gacha(auth_response=None):
-
-    # TODO remove this
-    print("Auth response:", auth_response.json(), flush=True)
-    
-    # TODO remove this
+    # Check if the request contains JSON data
     json_data = request.get_json()
     if not json_data:
         return make_response(jsonify({"message":"No JSON data provided"}), 400)
 
+    # Validate the JSON data
     is_valid, validation_message = is_valid_roll_data(json_data)
     if not is_valid:
         return make_response(jsonify({"message": validation_message}), 400)
+    rarity_level = json_data["rarity_level"]
 
-    
-
-    
-    
-    
-    
     # Fetch user info to verify in-game currency
-    userId = json_data['userId']
+    userId = auth_response.json()['userId']
     user_response = requests.get(f'{DB_MANAGER_USER_URL}/user/{userId}', verify=False)
 
     # Check if the user exists
@@ -222,7 +215,8 @@ def roll_gacha(auth_response=None):
     userIngameCurrency = user['ingameCurrency']
 
     # Check if the user has enough ingame currency to roll
-    if userIngameCurrency < ROLL_PRICE:
+    roll_price = getattr(ROLL_PRICE,rarity_level)
+    if userIngameCurrency < roll_price:
         return make_response(jsonify({"message":"Insufficient in-game currency"}), 400)
     
     # Fetch all gacha items
@@ -232,7 +226,7 @@ def roll_gacha(auth_response=None):
     gacha_items = gacha_response.json()
 
     # Randomly select a gacha item
-    selected_gacha = select_gacha(gacha_items)
+    selected_gacha = select_gacha(gacha_items, rarity_level)
 
     # Deduct the roll cost from the user's in-game currency
     userIngameCurrency -= ROLL_PRICE
@@ -259,24 +253,26 @@ def roll_gacha(auth_response=None):
 
     return make_response(create_gacha_collection_response.json(), create_gacha_collection_response.status_code)
 
-def select_gacha(gacha_items):
+def select_gacha(gacha_items, rarity_level):
     """
     Select a gacha item based on rarity distribution.
     """
+    # Retrieve probability for the selected level
+    rarity_probability = getattr(ROLL_PROBABILITY,rarity_level)
+
     # Create a weighted list where higher rarityPercent means lower chance of selection
     weighted_gacha_list = []
     for gacha in gacha_items:
         # Rarity Distribution: Lower rarityPercent means the item is more common, while higher rarityPercent means the item is rarer.
-        weight = 101 - gacha["rarityPercent"]
-        weighted_gacha_list.extend([gacha] * weight)
+        weight = (101 - gacha["rarityPercent"]) * rarity_probability
+        weighted_gacha_list.extend([gacha] * int(weight))
 
     # Randomly select an item from the weighted list
     return random.choice(weighted_gacha_list)
 
-# TODO: remove this
 def is_valid_roll_data(data):
     required_fields = {
-        "userId": int
+        "rarity_level": str
     }
 
     for field, expected_type in required_fields.items():
@@ -284,6 +280,10 @@ def is_valid_roll_data(data):
             return False, f"Missing required field: {field}"
         if not isinstance(data[field], expected_type):
             return False, f"Invalid type for field '{field}': Expected {expected_type.__name__}"
+    
+    # Additional validation: rarity_level should be either: "Common", "Rare", "Epic", "Legendary"
+    if data["rarity_level"] not in ["Common", "Rare", "Epic", "Legendary"]:
+        return False, "Invalid rarity level. Must be one of: Common, Rare, Epic, Legendary"
 
     return True, "Data is valid"
 
