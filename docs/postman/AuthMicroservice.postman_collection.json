@@ -1,0 +1,877 @@
+{
+	"info": {
+		"_postman_id": "2c97b0db-4b03-4c3b-85f6-a416d5edc225",
+		"name": "AuthUser Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39691060"
+	},
+	"item": [
+		{
+			"name": "Registration successful test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration success test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ \"userId\": 1 });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"protocolVersion": "http1"
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user123\",\r\n    \"password\":\"password1\",\r\n    \"profilePicture\":\"link to picture\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registration username taken test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration username taken test\", function(){\r",
+							"pm.response.to.have.status(409);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ \"message\":\"Username taken.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user1\",\r\n    \"password\":\"pass123\",\r\n    \"profilePicture\":\" \"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registration invalid data test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration invalid data test\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Invalid data.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\":\"pass123\",\r\n    \"profilePicture\":\" \"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login successful test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login succesful test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.have.property(\"Access token\");\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"auth_token\", jsonData[\"Access token\"]);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user1\",\r\n    \"password\":\"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"login"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login wrong credentials test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login unsuccesful test\", function(){\r",
+							"pm.response.to.have.status(401);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Username or password incorrect.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user123\",\r\n    \"password\":\"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login invalid data test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login unsuccesful test\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Invalid data.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User info test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\r",
+							"        'id': 1,\r",
+							"        'authId': 1,\r",
+							"        'ingameCurrency': 0,\r",
+							"        'profilePicture': \"link to picture\",\r",
+							"        'registrationDate': \"01/12/2024\",\r",
+							"        'status': \"ACTIVE\"\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/UserInfo",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"UserInfo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User info unsuccessful",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User info test\", function(){\r",
+							"pm.response.to.have.status(401);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({'message':'Token is missing!'});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/UserInfo",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"UserInfo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logut out successful test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Logout succesful test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"User succesfully logged out.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/logout",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout unauthorized test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Logout unauthorized test\", function(){\r",
+							"pm.response.to.have.status(401);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({'message': 'Token is missing!'});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/logout",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Registration successful test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration success test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ \"accountId\": 1 });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"protocolVersion": "http1"
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user123\",\r\n    \"password\":\"password\",\r\n    \"profilePicture\":\"link to picture\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Registration username taken test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration username taken test\", function(){\r",
+							"pm.response.to.have.status(409);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ \"message\":\"Username taken.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user1\",\r\n    \"password\":\"pass123\",\r\n    \"profilePicture\":\" \"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Registration invalid data test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration invalid data test\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Invalid data.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\":\"pass123\",\r\n    \"profilePicture\":\" \"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Login successful test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login succesful test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.have.property(\"Access token\");\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"auth_token\", jsonData[\"Access token\"]);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user1\",\r\n    \"password\":\"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"login"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Login wrong credentials test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login unsuccesful test\", function(){\r",
+							"pm.response.to.have.status(401);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Username or password incorrect.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user1234\",\r\n    \"password\":\"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Login invalid data test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login unsuccesful test\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Invalid data.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Logut out successful test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Logout succesful test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Admin succesfully logged out.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/admin/logout",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Logout unauthorized test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Logout unauthorized test\", function(){\r",
+							"pm.response.to.have.status(401);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({'message': 'Token is missing!'});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/admin/logout",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
