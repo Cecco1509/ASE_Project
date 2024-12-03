@@ -38,59 +38,31 @@ jobs:
     - name: Stop gacha microservice image
       run: |
         docker stop gachams_test_
-        
-    - name: Build currency payment user image
-      run: |
-        docker build -f ./PaymentUser/dockerfile_test -t paymentusertest .
-    - name: Run currency payment user image
-      run: |
-        docker run --rm --name paymentusert -d -p 5000:5000 paymentusertest
-    - name: Run currency payment user unit tests
-      run: |
-        cd docs/postman
-        newman run PaymentsUser_tests.postman_collection.json
-    - name: Stop currency payment user image
-      run: |
-        docker stop paymentsusert
 
-    - name: Build currency payment admin image
+    - name: Build currency payment image
       run: |
-        docker build -f ./PaymentsAdmin/dockerfile_test -t paymentsamintest .
-    - name: Run payments admin image
+        docker build -f ./PaymentsMicroservice/dockerfile_test -t paymentstest .
+    - name: Run payments image
       run: |
-        docker run --rm --name paymentsadmint -d -p 5000:5000 paymentsadmintest
-    - name: Run payments admin unit tests
+        docker run --rm --name paymentst -d -p 5000:5000 paymentstest
+    - name: Run payments unit tests
       run: |
         cd docs/postman
-        newman run PaymentsAdmin_test.postman_collection.json
-    - name: Stop payments admin image
+        newman run PaymentsMicroservice_tests.postman_collection.json
+    - name: Stop payments image
       run: |
-        docker stop paymentsadmint
+        docker stop paymentst
 
-    - name: Build user user image
+    - name: Build user image
       run: |
-        docker build -f ./UsersUser/dockerfile-test -t usersusertest .
-    - name: Run user user image
+        docker build -f ./UsersMicroservice/dockerfile-test -t userstest .
+    - name: Run user image
       run: |
-        docker run --rm --name usersusert -d -p 5000:5000 usersusertest
-    - name: Run user user unit tests
-      run: |
-        cd docs/postman
-        newman run UsersUser.postman_collection.json
-    - name: Stop user user image
-      run: |
-        docker stop usersusert
-        
-    - name: Build user admin image
-      run: |
-        docker build -f ./UsersAdmin/dockerfile-test -t useradmintest .
-    - name: Run user admin image
-      run: |
-        docker run --rm --name userusert -d -p 5000:5000 useradmintest
-    - name: Run user admin unit tests
+        docker run --rm --name userst -d -p 5000:5000 userstest
+    - name: Run user unit tests
       run: |
         cd docs/postman
-        newman run UsersAdmin.postman_collection.json
-    - name: Stop user admin image
+        newman run UsersMicroservice.postman_collection.json
+    - name: Stop user image
       run: |
-        docker stop usersusert
+        docker stop userst
