@@ -146,18 +146,20 @@ services:
     container_name: paymentsmicroservice
     volumes:
       - ./config.json:/app/config.json
+    secrets:
+      - payments_cert
+      - payments_cert_key
 
-  transactionsadmin:
+  transactionsmicroservice:
     build:
-      context: ./TransactionsAdmin
+      context: ./TransactionsMicroservice
       dockerfile: Dockerfile
-    container_name: transactionsadmin
-
-  transactionsuser:
-    build:
-      context: ./TransactionsUser
-      dockerfile: Dockerfile
-    container_name: transactionsuser
+    container_name: transactionsmicroservice
+    volumes:
+      - ./config.json:/app/config.json # Mounts config.json into the container
+    secrets:
+      - transactions_ms_cert
+      - transactions_ms_key
 
   usersmicroservice:
     build:
@@ -270,6 +272,37 @@ services:
       - user_db_manager_cert
       - user_db_manager_key
 
+  rabbit:
+    hostname: rabbit
+    image: "rabbitmq:3-management"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  auction_worker:
+    build:
+      context: ./AuctionWorker
+      dockerfile: dockerfile
+    user: nobody
+    depends_on:
+      - rabbit
+    volumes:
+      - ./config.json:/app/config.json
+      - ./AuctionWorker:/AuctionWorker
+
+  auctioneer:
+    build:
+      context: ./Auctioneer
+      dockerfile: dockerfile
+    container_name: auctioneer
+    # depends_on:
+    #   - auctiondbmanager
+    volumes:
+      - ./config.json:/app/config.json
+
 secrets:
   token_secret:
     file: ./secrets/token_secret.env
@@ -343,37 +376,10 @@ secrets:
     file: ./secrets/auction_ms_cert.pem
   auction_ms_key:
     file: ./secrets/auction_ms_key.pem
-
-  rabbit:
-    hostname: rabbit
-    image: "rabbitmq:3-management"
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=mypass
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-
-  auction_worker:
-    build:
-      context: ./AuctionWorker
-      dockerfile: dockerfile
-    user: nobody
-    depends_on:
-      - rabbit
-    volumes:
-      - ./config.json:/app/config.json
-      - ./AuctionWorker:/AuctionWorker
-
-  auctioneer:
-    build:
-      context: ./Auctioneer
-      dockerfile: dockerfile
-    container_name: auctioneer
-    # depends_on:
-    #   - auctiondbmanager
-    volumes:
-      - ./config.json:/app/config.json
+  transactions_ms_cert:
+    file: ./secrets/transactions_ms_cert.pem
+  transactions_ms_key:
+    file: ./secrets/transactions_ms_key.pem
 
 volumes:
   uservolume:

@@ -15,7 +15,7 @@ celery_app = Celery('worker',
 @celery_app.task
 def end_auction(auctionId):
     # Fetch auction details
-    print("PARTITOOOOOOOOO ", flush=True)
+    print("Started auctioneer process", flush=True)
 
     response = requests.get(f"{config.dbmanagers.auction}/auction/{auctionId}")
     auction_data = response.json()

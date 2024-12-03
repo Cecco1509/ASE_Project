@@ -51,7 +51,8 @@
     "usersmicroservice": "https://usersmicroservice:5000",
     "paymentsmicroservice": "http://paymentsmicroservice:5000",
     "authmicroservice": "https://authmicroservice:5000",
-    "auction": "http://auctionmicroservice:5000"
+    "auction": "https://auctionmicroservice:5000",
+    "transaction": "https://transactionsmicroservice:5000"
   },
   "system_settings": {
     "gacha_roll_price": 100
