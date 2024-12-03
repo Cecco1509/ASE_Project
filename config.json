@@ -54,7 +54,7 @@
         
     },
     "system_settings":{
-        "convert_price":100
+        "convert_price":100},
     "roll":{
         "probability": {
             "Common": 1.0,
