@@ -128,7 +128,7 @@ def login():
     if json_data and 'username' in json_data and 'password' in json_data:
         response = get_account_by_username(json_data['username'])
         if response==None:
-            return make_response(jsonify({"message":"Username or password incorrect."}, 401))
+            return make_response(jsonify({"message":"Username or password incorrect."}), 401)
         role ="player"
         if bcrypt.check_password_hash(response['password'], json_data['password']):
             token_data ={
@@ -153,12 +153,19 @@ def logout(user_info):
         return make_response(jsonify({"message":"User succesfully logged out."}),200)
     return make_response(jsonify({"message":"Error while log out."}),400)
 
+@app.route('/api/player/UserInfo', methods=['POST'])
+@token_required("player")
+def userInfo(user_info):
+    response = requests.post(f'{config.dbmanagers.user}/user/auth/{user_info['userId']}', verify=False)
+    if response.status_code==200:
+        return make_response(jsonify(response.json()),200)
+    return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/helloPlayer', methods=['GET'])
 @token_required("player")
 def verify_player_token(user_info=None):
     try:
-        return make_response(jsonify({"msg" : f"token verified successfully for user {user_info['username']}"}), 200)
+        return make_response(jsonify({"userId" : user_info['userId']}), 200)
     except Exception as e:
         return make_response(jsonify({"error" : str(e)}), 500)
  
@@ -176,7 +183,7 @@ def register_admin():
     if json_data and 'username' in json_data and 'password' in json_data:
         response = get_admin_by_username(json_data['username'])
         if response != None:
-            return make_response(jsonify({"message":"Username taken."}, 409))
+            return make_response(jsonify({"message":"Username taken."}), 409)
         salt = os.urandom(32)
         hashed_password=bcrypt.generate_password_hash(json_data['password']).decode('utf-8') 
         auth_data = {
@@ -196,7 +203,7 @@ def admin_login():
     if json_data and 'username' in json_data and 'password' in json_data:
         response = get_admin_by_username(json_data['username'])
         if response==None:
-            return make_response(jsonify({"message":"Username or password incorrect."}, 401))
+            return make_response(jsonify({"message":"Username or password incorrect."}), 401)
         role = "admin"
         if bcrypt.check_password_hash(response['password'], json_data['password']):
             token_data ={
@@ -210,7 +217,7 @@ def admin_login():
             valid_tokens[json_data['username']]=jwt_encoded
             return make_response({"Access token":jwt_encoded}, 200)
         else:
-            return make_response(jsonify({"message":f"Username or password incorrect. {response['password']}, {salt}"}), 401)
+            return make_response(jsonify({"message":f"Username or password incorrect."}), 401)
     return make_response(jsonify({"message":"Invalid data."}), 400)
 
 @app.route('/api/admin/logout', methods=['POST'])

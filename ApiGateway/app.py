@@ -1,10 +1,10 @@
 import requests, time
-
 from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
 from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
+from utils import *
 
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
@@ -29,13 +29,13 @@ def get_single_gacha(gachaId):
 @app.route('/api/admin/gacha', methods=['POST'])
 @handle_errors
 def create_gacha():
-    response = requests.post(GACHA_MICROSERVICE + '/api/admin/gacha', headers=request.headers, json=request.get_json(), verify=False)
+    response = requests.post(GACHA_MICROSERVICE + '/api/admin/gacha', headers=request.headers, json=sanitize_data(request.get_json()), verify=False)
     return make_response(response.json(), response.status_code)
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['PUT'])
 @handle_errors
 def update_gacha(gachaId):
-    response = requests.put(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', headers=request.headers, json=request.get_json(), verify=False)
+    response = requests.put(GACHA_MICROSERVICE + f'/api/admin/gacha/{gachaId}', headers=request.headers, json=sanitize_data(request.get_json()), verify=False)
     return make_response(response.json(), response.status_code)
 
 @app.route('/api/admin/gacha/<int:gachaId>', methods=['DELETE'])
@@ -93,7 +93,7 @@ def get_system_gacha_details(gachaId):
 @app.route('/api/player/gacha/roll', methods=['POST'])
 @handle_errors
 def roll_gacha():
-    response = requests.post(GACHA_MICROSERVICE + f'/api/player/gacha/roll', headers=request.headers, json=request.get_json(), verify=False)
+    response = requests.post(GACHA_MICROSERVICE + f'/api/player/gacha/roll', headers=request.headers, json=sanitize_data(request.get_json()), verify=False)
     return make_response(response.json(), response.status_code)
 
 def create_app():
@@ -104,51 +104,29 @@ def create_app():
 
 @app.route('/api/player/currency<int:user_id>', methods=['GET'])
 def get_transaction_history(user_id):
-    
-        # Send a GET request to the database manager service to fetch transaction history
-        response = requests.get(config.services.paymentsmicroservice+f'/api/player/currency/{user_id}', headers=request.headers, verify=False)
-        return make_response(jsonify(response.json()),response.status_code)
+    response = requests.get(config.services.paymentsmicroservice+f'/api/player/currency/{user_id}', headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()),response.status_code)
 
 
 @app.route('/api/player/currency/', methods=['POST'])
 def purchase_in_game_currency():
-        # Prepare payload
-        data = request.get_json()
-        # Send request to microservice
-        response = requests.post(f"{config.services.paymentsmicroservice}/api/player/currency/", json=data, headers=request.headers, verify=False)
-        # Forward the microservice's response to the user
-        return make_response(jsonify(response.json()),response.status_code)
+    response = requests.post(f"{config.services.paymentsmicroservice}/api/player/currency/", json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/decrease/<int:user_id>', methods=['PUT'])
 def decrease_in_game_currency(user_id):
-    
-        # Extract the amount to be deducted from the request body
-        data = request.get_json()
-        
-        response = requests.put(config.services.paymentsmicroservice+ f'/api/player/decrease/update_balance', json=data,  headers=request.headers, verify=False)
-        
-        return make_response(jsonify(response.json()),response.status_code)
-
+    response = requests.put(config.services.paymentsmicroservice+ f'/api/player/decrease/update_balance', json=sanitize_data(request.get_json()),  headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/increase/<int:user_id>', methods=['PUT'])
 def increase_currency(user_id):
-    
-        data = request.get_json()
-        
-        response = requests.put(config.services.paymentsmicroservice+ f'/api/player/increase/update_balance', json=data, headers=request.headers, verify=False)
-
-        return make_response(jsonify(response.json()),response.status_code)
-
-   
+    response = requests.put(config.services.paymentsmicroservice+ f'/api/player/increase/update_balance', json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()),response.status_code) 
 
 @app.route('/api/admin/currency/<int:user_id>', methods=['GET'])
 def get_transaction_history_admin(user_id):
-    
-        response = requests.get(config.services.paymentsmicroservice+f'/api/admin/currency/{user_id}', headers=request.headers, verify=False)
-        return make_response(jsonify(response.json()),response.status_code)
-
-       
-
+    response = requests.get(config.services.paymentsmicroservice+f'/api/admin/currency/{user_id}', headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
 def getPlayerInformation(user_id):
@@ -164,17 +142,13 @@ def getPlayerInformation(user_id):
 
 @app.route('/api/player/update/<int:user_id>', methods=['PUT'])
 def updatePlayerInformation(user_id):
-    payload=request.get_json()
-    response=requests.put(f'{config.services.usersmicroservice}/api/player/update/{user_id}',json=payload,verify=False)
+    response=requests.put(f'{config.services.usersmicroservice}/api/player/update/{user_id}',json=sanitize_data(request.get_json()),verify=False)
     return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
 def delete_player(user_id):
     delete_response = requests.delete(f'{config.services.usersmicroservice}/api/player/delete/{user_id}',verify=False)
     return make_response(jsonify(delete_response.json()),delete_response.status_code)
-    
-
-
 
 @app.route('/api/admin/users', methods=['GET'])
 def get_players():
@@ -187,7 +161,6 @@ def get_players():
     except requests.RequestException as e:
         return make_response(jsonify({"error": "Failed to connect to database API", "details": str(e)}), 500)
 
-
 @app.route('/api/admin/users/<int:user_id>', methods=['GET'])
 def get_player(user_id):
     try:
@@ -199,9 +172,6 @@ def get_player(user_id):
     except requests.RequestException as e:
         return make_response(jsonify({"error": "Failed to connect to database API", "details": str(e)}), 500)
 
-
-
-
 @app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
 def update_player(user_id):
     payload=request.get_json()
@@ -211,18 +181,17 @@ def update_player(user_id):
 
 @app.route('/api/admin/users/ban/<int:user_id>', methods=['POST'])
 def ban_player(user_id):
-    payload=request.get_json()
-    response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=payload,verify=False)
+    response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=sanitize_data(request.get_json()),verify=False)
     return make_response(response.json(),response.status_code)
     
 @app.route('/api/player/register', methods=['POST'])
 def register_user():
-    response = requests.post(f"{config.services.authmicroservice}/api/player/register", json=request.get_json(), verify=False)
+    response = requests.post(f"{config.services.authmicroservice}/api/player/register", json=sanitize_data(request.get_json()), verify=False)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/player/login', methods=['POST'])
 def user_login():
-    response = requests.post(f"{config.services.authmicroservice}/api/player/login", json=request.get_json(), verify=False)
+    response = requests.post(f"{config.services.authmicroservice}/api/player/login", json=sanitize_data(request.get_json()), verify=False)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/player/logout', methods=['POST'])
@@ -232,12 +201,12 @@ def user_logout():
 
 @app.route('/api/admin/register', methods=['POST'])
 def register_admin():
-    response = requests.post(f"{config.services.authmicroservice}/api/admin/register", json=request.get_json(), verify=False)
+    response = requests.post(f"{config.services.authmicroservice}/api/admin/register", json=sanitize_data(request.get_json()), verify=False)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/admin/login', methods=['POST'])
 def admin_login():
-    response = requests.post(f"{config.services.authmicroservice}/api/admin/login", json=request.get_json(), verify=False)
+    response = requests.post(f"{config.services.authmicroservice}/api/admin/login", json=sanitize_data(request.get_json()), verify=False)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/admin/logout', methods=['POST'])

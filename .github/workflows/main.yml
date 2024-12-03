@@ -66,3 +66,17 @@ jobs:
     - name: Stop user image
       run: |
         docker stop userst
+        
+    - name: Build auth image
+      run: |
+        docker build -f ./AuthMicroservice/dockerfile_test -t authtest .
+    - name: Run auth image
+      run: |
+        docker run --rm --name autht -d -p 5000:5000 authtest
+    - name: Run auth unit tests
+      run: |
+        cd docs/postman
+        newman run AuthMicroservice.postman_collection.json --insecure
+    - name: Stop auth image
+      run: |
+        docker stop autht
