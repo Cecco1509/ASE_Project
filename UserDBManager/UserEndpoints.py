@@ -19,7 +19,12 @@ def get_all_users():
 
 
 
-
+@app.route('/user/auth/<int:accountId>', methods=['GET'])
+def get_user_by_authId(accountId):
+    user = db.session.execute(db.select(User).where(User.authId==accountId)).scalar_one()
+    if user:
+        return make_response(jsonify(user.to_dict()), 200)
+    return make_response(jsonify({"message":"User not found"}), 404)
 
 
 
