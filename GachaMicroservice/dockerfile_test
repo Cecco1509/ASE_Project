@@ -4,6 +4,8 @@ ADD . /GachaMicroservice
 WORKDIR /GachaMicroservice
 
 COPY config.json /app/
+COPY /secrets/gacha_ms_cert.pem /run/secrets/gacha_ms_cert
+COPY /secrets/gacha_ms_key.pem /run/secrets/gacha_ms_key
 
 RUN pip3 install -r ./GachaMicroservice/requirements.txt
 
@@ -11,4 +13,4 @@ ENV FLASK_APP=./GachaMicroservice/app_test.py
 
 EXPOSE 5000:5000
 
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000", "--cert=/run/secrets/gacha_ms_cert", "--key=/run/secrets/gacha_ms_key"]

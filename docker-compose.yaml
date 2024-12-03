@@ -13,10 +13,8 @@ services:
       - transactiondbmanager
       - paymentdbmanager
       - gachamicroservice
-      #- paymentsadmin
-      #- paymentsuser
-      #- transactionsadmin
-      #- transactionsuser
+      - paymentsmicroservice
+      - transactionsmicroservice
     ports:
       - "8080:5000"
     volumes:
@@ -141,96 +139,11 @@ services:
       - gacha_ms_cert
       - gacha_ms_cert_key
 
-  # gachasuser:
-  #   build:
-  #     context: ./GatchasUser
-  #     dockerfile: Dockerfile
-  #   container_name: gachasuser
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  # paymentsadmin:
-  #   build:
-  #     context: ./PaymentsAdmin
-  #     dockerfile: Dockerfile
-  #   container_name: paymentsadmin
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  # paymentsuser:
-  #   build:
-  #     context: ./PaymentsUser
-  #     dockerfile: Dockerfile
-  #   container_name: paymentsuser
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  # roll:
-  #   build:
-  #     context: ./Roll
-  #     dockerfile: Dockerfile
-  #   container_name: roll
-
-  # transactionsadmin:
-  #   build:
-  #     context: ./TransactionsAdmin
-  #     dockerfile: Dockerfile
-  #   container_name: transactionsadmin
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  # transactionsuser:
-  #   build:
-  #     context: ./TransactionsUser
-  #     dockerfile: Dockerfile
-  #   container_name: transactionsuser
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  # usersadmin:
-  #   build:
-  #     context: ./UsersAdmin
-  #     dockerfile: Dockerfile
-  #   container_name: usersadmin
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  # usersuser:
-  #   build:
-  #     context: ./UsersUser
-  #     dockerfile: Dockerfile
-  #   container_name: usersuser
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  rabbit:
-    hostname: rabbit
-    image: "rabbitmq:3-management"
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=mypass
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-
-  auction_worker:
+  paymentsmicroservice:
     build:
-      context: ./AuctionWorker
-      dockerfile: dockerfile
-    user: nobody
-    depends_on:
-      - rabbit
-    volumes:
-      - ./config.json:/app/config.json
-      - ./AuctionWorker:/AuctionWorker
-
-  auctioneer:
-    build:
-      context: ./Auctioneer
-      dockerfile: dockerfile
-    container_name: auctioneer
-    # depends_on:
-    #   - auctiondbmanager
+      context: ./PaymentsMicroservice
+      dockerfile: Dockerfile
+    container_name: paymentsmicroservice
     volumes:
       - ./config.json:/app/config.json
 
@@ -418,6 +331,10 @@ secrets:
     file: ./secrets/api_gateway_cert.pem
   api_gateway_cert_key:
     file: ./secrets/api_gateway_key.pem
+  payments_cert:
+    file: ./secrets/payments_cert.pem
+  payments_cert_key:
+    file: ./secrets/payments_key.pem
   gacha_ms_cert:
     file: ./secrets/gacha_ms_cert.pem
   gacha_ms_cert_key:
@@ -426,6 +343,37 @@ secrets:
     file: ./secrets/auction_ms_cert.pem
   auction_ms_key:
     file: ./secrets/auction_ms_key.pem
+
+  rabbit:
+    hostname: rabbit
+    image: "rabbitmq:3-management"
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  auction_worker:
+    build:
+      context: ./AuctionWorker
+      dockerfile: dockerfile
+    user: nobody
+    depends_on:
+      - rabbit
+    volumes:
+      - ./config.json:/app/config.json
+      - ./AuctionWorker:/AuctionWorker
+
+  auctioneer:
+    build:
+      context: ./Auctioneer
+      dockerfile: dockerfile
+    container_name: auctioneer
+    # depends_on:
+    #   - auctiondbmanager
+    volumes:
+      - ./config.json:/app/config.json
 
 volumes:
   uservolume:
