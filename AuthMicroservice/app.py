@@ -158,7 +158,7 @@ def logout(user_info):
 @token_required("player")
 def verify_player_token(user_info=None):
     try:
-        return make_response(jsonify({"msg" : f"token verified successfully for user {user_info['username']}"}), 200)
+        return make_response(jsonify({"userId" : user_info['userId']}), 200)
     except Exception as e:
         return make_response(jsonify({"error" : str(e)}), 500)
  
