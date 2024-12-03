@@ -1,6 +1,7 @@
 import requests
 from flask import Flask, request, make_response, jsonify
 from python_json_config import ConfigBuilder
+import random
 from handle_errors import handle_errors
 from auth_utils import validate_player_token, validate_admin_token
 
@@ -187,44 +188,66 @@ def get_system_gacha_details(gachaId, auth_response=None):
 @handle_errors
 @validate_player_token
 def roll_gacha(auth_response=None):
-    json_data = request.get_json()
 
+    # TODO remove this
+    print("Auth response:", auth_response.json(), flush=True)
+    
+    # TODO remove this
+    json_data = request.get_json()
     if not json_data:
         return make_response(jsonify({"message":"No JSON data provided"}), 400)
-    
+
     is_valid, validation_message = is_valid_roll_data(json_data)
     if not is_valid:
         return make_response(jsonify({"message": validation_message}), 400)
+
     
+
+    
+    
+    
+    
+    # Fetch user info to verify in-game currency
     userId = json_data['userId']
-    get_user_response = requests.get(f'{DB_MANAGER_USER_URL}/user/{userId}', verify=False)
-    get_user_response.raise_for_status()
+    user_response = requests.get(f'{DB_MANAGER_USER_URL}/user/{userId}', verify=False)
+
+    # Check if the user exists
+    if user_response.status_code == 404:
+        return make_response(jsonify({"message": "User not found"}), 404)
+    elif user_response.status_code != 200:
+        return make_response(jsonify({"message": "Error retrieving user info"}), 500)
     
-    user = get_user_response.json()
+    # Get the user's in-game currency
+    user = user_response.json()
     userIngameCurrency = user['ingameCurrency']
 
-    # check if the user has enough ingame currency to roll
+    # Check if the user has enough ingame currency to roll
     if userIngameCurrency < ROLL_PRICE:
         return make_response(jsonify({"message":"Insufficient in-game currency"}), 400)
     
-    # get a random gacha from the system collection
-    get_random_gacha_response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha/random', verify=False)
-    get_random_gacha_response.raise_for_status()
-    random_gacha = get_random_gacha_response.json()
+    # Fetch all gacha items
+    gacha_response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha', verify=False)
+    if gacha_response.status_code != 200:
+        return make_response(jsonify({"message": "Error retrieving gacha items"}), 500)
+    gacha_items = gacha_response.json()
 
-    # deduct the roll price from the user's in-game currency
+    # Randomly select a gacha item
+    selected_gacha = select_gacha(gacha_items)
+
+    # Deduct the roll cost from the user's in-game currency
     userIngameCurrency -= ROLL_PRICE
     update_user_response = requests.patch(
         f'{DB_MANAGER_USER_URL}/user/{userId}', 
         json={"ingameCurrency":userIngameCurrency}
     )
-    update_user_response.raise_for_status()
+    if update_user_response.status_code != 200:
+        return make_response(jsonify({"message": "Error updating the user's in-game currency balance"}), 500)
 
-    # add the gacha to the player's collection
+    # Add the selected gacha to the player's collection
     create_gacha_collection_response = requests.post(
         f'{DB_MANAGER_GACHA_URL}/gachacollection', 
         json={
-            "gachaId":random_gacha['id'],
+            "gachaId":selected_gacha['id'],
             "userId":userId,
             "source":"ROLL"
         },
@@ -236,6 +259,21 @@ def roll_gacha(auth_response=None):
 
     return make_response(create_gacha_collection_response.json(), create_gacha_collection_response.status_code)
 
+def select_gacha(gacha_items):
+    """
+    Select a gacha item based on rarity distribution.
+    """
+    # Create a weighted list where higher rarityPercent means lower chance of selection
+    weighted_gacha_list = []
+    for gacha in gacha_items:
+        # Rarity Distribution: Lower rarityPercent means the item is more common, while higher rarityPercent means the item is rarer.
+        weight = 101 - gacha["rarityPercent"]
+        weighted_gacha_list.extend([gacha] * weight)
+
+    # Randomly select an item from the weighted list
+    return random.choice(weighted_gacha_list)
+
+# TODO: remove this
 def is_valid_roll_data(data):
     required_fields = {
         "userId": int
