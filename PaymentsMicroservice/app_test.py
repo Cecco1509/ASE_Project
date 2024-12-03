@@ -17,7 +17,8 @@ def get_transaction_history(userId):
     try:
         auth_response = check_validation(request.headers)
         if auth_response==False:
-            return "Invalid token"
+            return make_response(jsonify({'error': 'Token required'}), 401)
+
 
         # Send a GET request to the database manager service to fetch transaction history
         transaction_history= get_history(userId)
@@ -48,7 +49,7 @@ def purchase_in_game_currency():
     try:
         auth_response = check_validation(request.headers)
         if auth_response==False:
-            return "Invalid token"
+            return make_response(jsonify({'error': 'Token required'}), 401)
 
         # Extract data from request body
         data = request.get_json()
@@ -109,7 +110,7 @@ def decrease_in_game_currency(userId):
     try:
         auth_response = check_validation(request.headers)
         if auth_response==False:
-            return "Invalid token"
+            return make_response(jsonify({'error': 'Token required'}), 401)
 
         # Extract the amount to be deducted from the request body
         data = request.get_json()
@@ -179,7 +180,8 @@ def increase_currency(userId):
     try:
         auth_response = check_validation(request.headers)
         if auth_response==False:
-            return "Invalid token"
+            return make_response(jsonify({'error': 'Token required'}), 401)
+
 
         # Get the amount to increase from the JSON payload
         data = request.get_json()
@@ -231,7 +233,8 @@ def get_transaction_history_admin(userId):
     try:
         auth_response = check_validation(request.headers)
         if auth_response==False:
-            return "Invalid token"
+            return make_response(jsonify({'error': 'Token required'}), 401)
+
  
         # Prepare the request URL for fetching transaction history
         response = get_history(userId)
