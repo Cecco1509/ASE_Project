@@ -54,6 +54,6 @@
         
     },
     "system_settings":{
-        "gacha_roll_price":100
+        "convert_price":100
     }
 }

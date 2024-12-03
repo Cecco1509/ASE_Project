@@ -75,7 +75,7 @@ def purchase_in_game_currency():
 
 
         # Calculate the real amount of money based on the in-game currency and currency rate
-        real_amount = in_game_currency * config.system_settings.gacha_roll_price
+        real_amount = in_game_currency * config.system_settings.convert_price
 
         # Define the payload to send to the database manager service
         payload = {
