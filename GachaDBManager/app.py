@@ -8,8 +8,11 @@ import time
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 
+with open('/run/secrets/db_password', 'r') as file:
+    password = file.read().strip()
+
 def create_connection_string(db):
-    return f'mssql+pyodbc://{db.username}:{db.password}@{db.server}:{db.port}/{db.name}?driver=ODBC+Driver+17+for+SQL+Server'
+    return f'mssql+pyodbc://{db.username}:{password}@{db.server}:{db.port}/{db.name}?driver=ODBC+Driver+17+for+SQL+Server'
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
@@ -21,7 +24,8 @@ for i in range(config.databases.retries):
                             f'SERVER={config.databases.gacha.server},{config.databases.gacha.port};'
                             f'DATABASE=master;'
                             f'UID={config.databases.gacha.username};'
-                            f'PWD={config.databases.gacha.password}')
+                            f'PWD={password};'
+                            'Encrypt=yes;TrustServerCertificate=yes')
         conn.autocommit = True
         cursor = conn.cursor()
         cursor.execute(f"IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{config.databases.gacha.name}') \

@@ -1,0 +1,9 @@
+Flask
+requests
+datetime
+python_json_config
+pyjwt
+flask_sqlalchemy
+pyodbc
+flask_bcrypt
+python-dotenv

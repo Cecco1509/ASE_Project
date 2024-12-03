@@ -5,193 +5,136 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway
     depends_on:
-      - auctionsmicroservice
-      #- authadmin
-      #- authuser
-      #- authdbmanager
+      - auctionsadmin
+      - auctionsuser
+      - authmicroservice
       - auctiondbmanager
       - userdbmanager
       - gachadbmanager
       - transactiondbmanager
-      #- paymentdbmanager
-      #- gachasadmin
-      #- gachasuser
-      #- paymentsadmin
-      #- paymentsuser
-      #- roll
-      #- transactionsadmin
-      #- transactionsuser
-      #- usersadmin
-      #- usersuser
+      - paymentdbmanager
+      - gachamicroservice
+      - paymentsadmin
+      - paymentsuser
+      - transactionsadmin
+      - transactionsuser
     ports:
       - "8080:5000"
     volumes:
       - ./config.json:/app/config.json
+      - .:/ApiGateway
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./ApiGateway/app.py
+    secrets:
+      - api_gateway_cert
+      - api_gateway_cert_key
 
-  auctionsmicroservice:
+  auctionsadmin:
     build:
-      context: ./AuctionsMicroservice
-      dockerfile: dockerfile
-    container_name: auctionsmicroservice
-    # depends_on:
-    #   - auctiondbmanager
-    ports:
-      - "5005:5000"
-    volumes:
-      - ./config.json:/app/config.json
-      - ./AuctionsMicroservice:/AuctionsMicroservice
-
-  # authadmin:
-  #   build:
-  #     context: ./AuthAdmin
-  #     dockerfile: Dockerfile
-  #   container_name: authadmin
-
-  # authuser:
-  #   build:
-  #     context: ./AuthUser
-  #     dockerfile: Dockerfile
-  #   container_name: authuser
-
-  # authdbmanager:
-  #   build:
-  #     context: ./AuthDBManager
-  #     dockerfile: Dockerfile
-  #   container_name: authdbmanager
-  #   depends_on:
-  #     - authdatabase
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  auctiondbmanager:
-    build:
-      context: ./AuctionDBManager
+      context: ./AuctionsAdmin
       dockerfile: Dockerfile
-    container_name: auctiondbmanager
-    depends_on:
-      - auctiondatabase
-    ports:
-      - 5004:5000
-    volumes:
-      - ./config.json:/app/config.json
-      - ./AuctionDBManager:/AuctionDBManager
+    container_name: auctionsadmin
 
-  gachadbmanager:
+  auctionsuser:
     build:
-      context: ./GachaDBManager
+      context: ./AuctionsUser
       dockerfile: Dockerfile
-    container_name: gachadbmanager
-    depends_on:
-      - gachadatabase
-    ports:
-      - 5003:5000
-    volumes:
-      - ./config.json:/app/config.json
+    container_name: auctionsuser
 
-  # paymentdbmanager:
-  #   build:
-  #     context: ./PaymentDBManager
-  #     dockerfile: Dockerfile
-  #   container_name: paymentdbmanager
-  #   depends_on:
-  #     - paymentdatabase
-  #   volumes:
-  #     - ./config.json:/app/config.json
-
-  transactiondbmanager:
+  authmicroservice:
     build:
-      context: ./TransactionDBManager
+      context: ./AuthMicroservice
       dockerfile: Dockerfile
-    container_name: transactiondbmanager
+    container_name: authmicroservice
     depends_on:
-      - transactiondatabase
+      - authdatabase
     volumes:
       - ./config.json:/app/config.json
+    secrets:
+      - token_secret
+      - auth_cert
+      - auth_cert_key
+      - db_password
 
-  userdbmanager:
-    build:
-      context: ./UserDBManager
-      dockerfile: Dockerfile
-    container_name: userdbmanager
-    ports:
-      - 5001:5000
-    depends_on:
-      - userdatabase
-    volumes:
-      - ./config.json:/app/config.json
-      - ./UserDBManager:/UserDBManager
-
-  # authdatabase:
-  #   image: mcr.microsoft.com/mssql/server:2017-latest
-  #   environment:
-  #     - SA_PASSWORD=Password1.
-  #     - ACCEPT_EULA=Y
-  #   container_name: authdatabase
+  authdatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+      - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/auth_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/auth_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
+    container_name: authdatabase
+    secrets:
+      - db_password
+      - auth_db_cert
+      - auth_db_key
 
   gachadatabase:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
-      - SA_PASSWORD=Password1.
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/gacha_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/gacha_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
     container_name: gachadatabase
-    ports:
-      - "1433:1433"
-    volumes:
-      - gachavolume:/var/opt/mssql
+    secrets:
+      - db_password
+      - gacha_db_cert
+      - gacha_db_key
 
   userdatabase:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
-      - SA_PASSWORD=Password1.
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
-    ports:
-      - "1434:1433"
+      - MSSQL_TLS_CERT=/run/secrets/user_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/user_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
     container_name: userdatabase
-    volumes:
-      - uservolume:/var/opt/mssql
-    #volumes:
-    #  - mssql_data:/var/opt/mssql
-  # volumes:
-  #   mssql_data:
-  #     driver: local # Named volume to store SQL Server data
-
-  # paymentdatabase:
-  #   image: mcr.microsoft.com/mssql/server:2017-latest
-  #   environment:
-  #     - SA_PASSWORD=Password1.
-  #     - ACCEPT_EULA=Y
-
-  #   container_name: paymentdatabase
+    secrets:
+      - db_password
+      - user_db_cert
+      - user_db_key
 
   auctiondatabase:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
-      - SA_PASSWORD=Password1.
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/auction_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/auction_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
     container_name: auctiondatabase
-    ports:
-      - "1435:1433"
-    volumes:
-      - auctionsvolume:/var/opt/mssql
+    secrets:
+      - db_password
+      - auction_db_cert
+      - auction_db_key
 
-  transactiondatabase:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+  gachamicroservice:
+    build:
+      context: ./GachaMicroservice
+      dockerfile: Dockerfile
+    container_name: gachamicroservice
+    volumes:
+      - ./config.json:/app/config.json
+      - .:/GachaMicroservice
     environment:
-      - SA_PASSWORD=Password1.
-      - ACCEPT_EULA=Y
-    ports:
-      - "1436:1433"
-    container_name: transactiondatabase
-    volumes:
-      - transactionsvolume:/var/opt/mssql
-
-  # gachasadmin:
-  #   build:
-  #     context: ./GatchasAdmin
-  #     dockerfile: Dockerfile
-  #   container_name: gachasadmin
-  #   volumes:
-  #     - ./config.json:/app/config.json
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./GachaMicroservice/app.py
+    depends_on:
+      - gachadbmanager
+    secrets:
+      - gacha_ms_cert
+      - gacha_ms_cert_key
 
   # gachasuser:
   #   build:
@@ -285,6 +228,195 @@ services:
     #   - auctiondbmanager
     volumes:
       - ./config.json:/app/config.json
+
+  transactionsadmin:
+    build:
+      context: ./TransactionsAdmin
+      dockerfile: Dockerfile
+    container_name: transactionsadmin
+
+  transactionsuser:
+    build:
+      context: ./TransactionsUser
+      dockerfile: Dockerfile
+    container_name: transactionsuser
+
+  usersmicroservice:
+    build:
+      context: ./UsersMicroservice
+      dockerfile: Dockerfile
+    container_name: usersmicroservice
+    volumes:
+      - ./config.json:/app/config.json # Mounts config.json into the container
+    secrets:
+      - users_cert
+      - users_cert_key
+
+  paymentdatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+      - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/payment_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/payment_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
+    container_name: paymentdatabase
+    secrets:
+      - db_password
+      - payment_db_cert
+      - payment_db_key
+
+  transactiondatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+      - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/transaction_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/transaction_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
+    container_name: transactiondatabase
+    secrets:
+      - db_password
+      - transaction_db_cert
+      - transaction_db_key
+
+  auctiondbmanager:
+    build:
+      context: ./AuctionDBManager
+      dockerfile: Dockerfile
+    container_name: auctiondbmanager
+    depends_on:
+      - auctiondatabase
+    volumes:
+      - ./config.json:/app/config.json
+    secrets:
+      - db_password
+      - auction_db_manager_cert
+      - auction_db_manager_key
+
+  gachadbmanager:
+    build:
+      context: ./GachaDBManager
+      dockerfile: Dockerfile
+    container_name: gachadbmanager
+    depends_on:
+      - gachadatabase
+    volumes:
+      - ./config.json:/app/config.json
+    secrets:
+      - db_password
+      - gacha_db_manager_cert
+      - gacha_db_manager_key
+
+  paymentdbmanager:
+    build:
+      context: ./PaymentDBManager
+      dockerfile: Dockerfile
+    container_name: paymentdbmanager
+    depends_on:
+      - paymentdatabase
+    volumes:
+      - ./config.json:/app/config.json
+    secrets:
+      - db_password
+      - payment_db_manager_cert
+      - payment_db_manager_key
+
+  transactiondbmanager:
+    build:
+      context: ./TransactionDBManager
+      dockerfile: Dockerfile
+    container_name: transactiondbmanager
+    depends_on:
+      - transactiondatabase
+    volumes:
+      - ./config.json:/app/config.json
+    secrets:
+      - db_password
+      - transaction_db_manager_cert
+      - transaction_db_manager_key
+
+  userdbmanager:
+    build:
+      context: ./UserDBManager
+      dockerfile: Dockerfile
+    container_name: userdbmanager
+    depends_on:
+      - userdatabase
+    volumes:
+      - ./config.json:/app/config.json
+    secrets:
+      - db_password
+      - user_db_manager_cert
+      - user_db_manager_key
+
+secrets:
+  token_secret:
+    file: ./secrets/token_secret.env
+  users_cert:
+    file: ./secrets/users_cert.pem
+  users_cert_key:
+    file: ./secrets/users_key.pem
+  auth_cert:
+    file: ./secrets/auth_cert.pem
+  auth_cert_key:
+    file: ./secrets/auth_key.pem
+  db_password:
+    file: ./secrets/db_password.txt
+  auth_db_cert:
+    file: ./secrets/auth_db_cert.pem
+  auth_db_key:
+    file: ./secrets/auth_db_key.pem
+  user_db_cert:
+    file: ./secrets/user_db_cert.pem
+  user_db_key:
+    file: ./secrets/user_db_key.pem
+  gacha_db_cert:
+    file: ./secrets/gacha_db_cert.pem
+  gacha_db_key:
+    file: ./secrets/gacha_db_key.pem
+  payment_db_cert:
+    file: ./secrets/payment_db_cert.pem
+  payment_db_key:
+    file: ./secrets/payment_db_key.pem
+  auction_db_cert:
+    file: ./secrets/auction_db_cert.pem
+  auction_db_key:
+    file: ./secrets/auction_db_key.pem
+  transaction_db_cert:
+    file: ./secrets/transaction_db_cert.pem
+  transaction_db_key:
+    file: ./secrets/transaction_db_key.pem
+  auction_db_manager_cert:
+    file: ./secrets/auction_db_manager_cert.pem
+  auction_db_manager_key:
+    file: ./secrets/auction_db_manager_key.pem
+  gacha_db_manager_cert:
+    file: ./secrets/gacha_db_manager_cert.pem
+  gacha_db_manager_key:
+    file: ./secrets/gacha_db_manager_key.pem
+  payment_db_manager_cert:
+    file: ./secrets/payment_db_manager_cert.pem
+  payment_db_manager_key:
+    file: ./secrets/payment_db_manager_key.pem
+  transaction_db_manager_cert:
+    file: ./secrets/transaction_db_manager_cert.pem
+  transaction_db_manager_key:
+    file: ./secrets/transaction_db_manager_key.pem
+  user_db_manager_cert:
+    file: ./secrets/user_db_manager_cert.pem
+  user_db_manager_key:
+    file: ./secrets/user_db_manager_key.pem
+  api_gateway_cert:
+    file: ./secrets/api_gateway_cert.pem
+  api_gateway_cert_key:
+    file: ./secrets/api_gateway_key.pem
+  gacha_ms_cert:
+    file: ./secrets/gacha_ms_cert.pem
+  gacha_ms_cert_key:
+    file: ./secrets/gacha_ms_key.pem
       - ./Auctioneer:/Auctioneer
 
 volumes:

@@ -1,7 +1,7 @@
 FROM amd64/python:3.12.0b1-slim-buster
 
-ADD . /AuthDBManager
-WORKDIR /AuthDBManager
+ADD . /AuthMicroservice
+WORKDIR /AuthMicroservice
 
 RUN pip3 install -r requirements.txt
 RUN apt-get update && apt-get install -y \
@@ -17,7 +17,6 @@ RUN apt-get update
 
 #&& apt-get install -y curl gnupg2 ca-certificates lsb-release
 RUN ACCEPT_EULA=Y apt-get install -y unixodbc-dev msodbcsql17
-
 EXPOSE 5000
 
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000", "--cert=/run/secrets/auth_cert", "--key=/run/secrets/auth_cert_key"]
