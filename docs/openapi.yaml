@@ -1735,7 +1735,244 @@ paths:
               schema:
                 $ref: '#/components/schemas/Admin'
         '404':
-          description: "Admin not found"        
+          description: "Admin not found"  
+  /player/auction/market:
+    get:
+      summary: "Get all active auctions in the market"
+      tags: ["Auction"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "List of all active auctions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionListResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /player/auction/create:
+    post:
+      summary: "Create a new auction"
+      tags: ["Auction"]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuctionCreateRequest'
+      responses:
+        '201':
+          description: "Auction created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionResponse'
+        '400':
+          description: "Invalid data"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /player/auction/bid/{auction_id}:
+    post:
+      summary: "Place a bid on an active auction"
+      tags: ["Auction"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: auction_id
+          required: true
+          schema:
+            type: integer
+          description: "Auction ID to place a bid on"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BidRequest'
+      responses:
+        '200':
+          description: "Bid placed successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BidResponse'
+        '400':
+          description: "Invalid bid amount or auction status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /player/auction/history/{userId}:
+    get:
+      summary: "Get auction history for a specific user"
+      tags: ["Auction"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          description: "User ID to get the auction history for"
+      responses:
+        '200':
+          description: "Auction history"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionHistoryResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/auction:
+    get:
+      summary: "Get all auctions (admin view)"
+      tags: ["Admin Auction"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "List of all auctions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionListResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/auction/{auction_id}:
+    get:
+      summary: "Get specific auction details (admin view)"
+      tags: ["Admin Auction"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: auction_id
+          required: true
+          schema:
+            type: integer
+          description: "Auction ID to retrieve"
+      responses:
+        '200':
+          description: "Auction details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+    put:
+      summary: "Update a specific auction (admin view)"
+      tags: ["Admin Auction"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: auction_id
+          required: true
+          schema:
+            type: integer
+          description: "Auction ID to update"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuctionUpdateRequest'
+      responses:
+        '200':
+          description: "Auction updated successfully"
+        '400':
+          description: "Invalid auction data"
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/auction/history:
+    get:
+      summary: "Get auction history (admin view)"
+      tags: ["Admin Auction"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "Auction history"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionHistoryResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/auction/history/{user_id}:
+    get:
+      summary: "Get specific user auction history (admin view)"
+      tags: ["Admin Auction"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "User ID to retrieve auction history for"
+      responses:
+        '200':
+          description: "Auction history for the user"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionHistoryResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'        
+          
 components:  
   securitySchemes:
     bearerAuth:
@@ -2342,6 +2579,89 @@ components:
         password:
           type: string
         salt:
+          type: string  
+    AuctionListResponse:
+      type: object
+      properties:
+        market:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuctionA'
+    AuctionResponse:
+      type: object
+      properties:
+        auction:
+          $ref: '#/components/schemas/AuctionA'
+    AuctionCreateRequest:
+      type: object
+      properties:
+        gachaCollectionId:
+          type: integer
+        userId:
+          type: integer
+        auctionStart:
+          type: string
+        auctionEnd:
+          type: string
+        minimumBid:
+          type: number
+        status:
+          type: string
+    AuctionHistoryResponse:
+      type: object
+      properties:
+        auctions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuctionA'
+    AuctionUpdateRequest:
+      type: object
+      properties:
+        gachaCollectionId:
+          type: integer
+        auctionStart:
+          type: string
+        auctionEnd:
+          type: string
+        status:
+          type: string
+    AuctionA:
+      type: object
+      properties:
+        auctionId:
+          type: integer
+        gachaCollectionId:
+          type: integer
+        auctionStart:
+          type: string
+        auctionEnd:
+          type: string
+        status:
+          type: string
+    BidRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+        bidAmount:
+          type: number
+    BidResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        bidAmount:
+          type: number
+        auctionId:
+          type: integer
+        timestamp:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
           type: string      
 security:
   - bearerAuth: []
