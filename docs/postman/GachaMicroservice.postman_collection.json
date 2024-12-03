@@ -1,0 +1,1338 @@
+{
+	"info": {
+		"_postman_id": "08eea755-39fc-4f4f-b079-48f07e66512f",
+		"name": "GachaMicroservice",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15910404"
+	},
+	"item": [
+		{
+			"name": "player login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Token received\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var accessToken = jsonData[\"Access token\"];\r",
+							"\r",
+							"    if (accessToken) {\r",
+							"        pm.environment.set(\"ase_player_token\", accessToken);\r",
+							"    } else {\r",
+							"        console.log(\"Access token not found in the response.\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"user0\",\r\n    \"password\": \"user0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Token received\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var accessToken = jsonData[\"Access token\"];\r",
+							"\r",
+							"    if (accessToken) {\r",
+							"        pm.environment.set(\"ase_admin_token\", accessToken);\r",
+							"    } else {\r",
+							"        console.log(\"Access token not found in the response.\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"admin0\",\r\n    \"password\": \"admin0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get gacha item 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test if the response contains the expected fields\r",
+							"pm.test(\"Response has the expected structure\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('name');\r",
+							"    pm.expect(jsonData).to.have.property('description');\r",
+							"    pm.expect(jsonData).to.have.property('image');\r",
+							"    pm.expect(jsonData).to.have.property('rarityPercent');\r",
+							"});\r",
+							"\r",
+							"// Test if the 'id' is 1 (based on the URL passed)\r",
+							"pm.test(\"ID should be 1\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(1);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/admin/gacha/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"gacha",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get gacha item 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Invalid ID (non-existent ID)\r",
+							"pm.test(\"Expect 404 for non-existent gacha item\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/admin/gacha/999",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"gacha",
+						"999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get gacha collection 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Gacha Collection - Status 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"     \r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an(\"array\"); // Expect response to be an array\r",
+							"    \r",
+							"    // Check that each item in the array has the required properties\r",
+							"    jsonData.forEach(item => {\r",
+							"        pm.expect(item).to.have.property(\"gachaId\");\r",
+							"        pm.expect(item).to.have.property(\"id\");\r",
+							"        pm.expect(item).to.have.property(\"source\");\r",
+							"        pm.expect(item).to.have.property(\"timestamp\");\r",
+							"        pm.expect(item).to.have.property(\"userId\");\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/admin/gachacollection",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"gachacollection"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin add gacha 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200 (created) and if it returns gachaId\r",
+							"pm.test(\"Status code is 200 and gachaId is returned\", function () {\r",
+							"    pm.response.to.have.status(200);  // Expecting status 200 for successful creation\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('gachaId');  // Check if gachaId is returned\r",
+							"    pm.expect(jsonData.gachaId).to.be.a('number');  // Check if gachaId is a number\r",
+							"});\r",
+							"\r",
+							"// Test if the request body contains the required fields\r",
+							"pm.test(\"Request body contains the expected fields\", function () {\r",
+							"    var jsonData = pm.request.body.raw;  // Get the raw request body\r",
+							"    var parsedBody = JSON.parse(jsonData);  // Parse it into a JSON object\r",
+							"    pm.expect(parsedBody).to.have.property('description');\r",
+							"    pm.expect(parsedBody).to.have.property('image');\r",
+							"    pm.expect(parsedBody).to.have.property('name');\r",
+							"    pm.expect(parsedBody).to.have.property('rarityPercent');\r",
+							"});\r",
+							"\r",
+							"// Test if the 'rarityPercent' field is between 0 and 100\r",
+							"pm.test(\"Rarity percent should be between 0 and 100\", function () {\r",
+							"    var jsonData = pm.request.body.raw;  // Get the raw request body\r",
+							"    var parsedBody = JSON.parse(jsonData);  // Parse it into a JSON object\r",
+							"    pm.expect(parsedBody.rarityPercent).to.be.a('number').that.is.greaterThanOrEqual(0).and.lessThanOrEqual(100);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"Test item.\",\r\n    \"image\": \"https://super.abril.com.br/wp-content/uploads/2019/12/reproducao_pokemon_episodio_pokemon_centenas_criancas_hospital.jpg\",\r\n    \"name\": \"New Test Item\",\r\n    \"rarityPercent\": 50.9\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/gacha",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"gacha"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin add gacha 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test case: Create Gacha Item - Missing Name Field\r",
+							"pm.test(\"Create Gacha Item - Missing Name Field\", function () {\r",
+							"    pm.response.to.have.status(400); // Expect 400 Bad Request\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"Test item\",\r\n    \"image\": \"https://super.abril.com.br/wp-content/uploads/2019/12/reproducao_pokemon_episodio_pokemon_centenas_criancas_hospital.jpg\",\r\n    \"rarityPercent\": 70.7\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/gacha",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"gacha"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin update gacha item 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200 and the success message is returned\r",
+							"pm.test(\"Status code is 200 and update successful\", function () {\r",
+							"    pm.response.to.have.status(200);  // Expecting status 200 for successful update\r",
+							"});\r",
+							"\r",
+							"// Test if the request body contains the required fields\r",
+							"pm.test(\"Request body contains the expected fields\", function () {\r",
+							"    var jsonData = pm.request.body.raw;  // Get the raw request body\r",
+							"    var parsedBody = JSON.parse(jsonData);  // Parse it into a JSON object\r",
+							"    pm.expect(parsedBody).to.have.property('description');\r",
+							"    pm.expect(parsedBody).to.have.property('image');\r",
+							"    pm.expect(parsedBody).to.have.property('name');\r",
+							"    pm.expect(parsedBody).to.have.property('rarityPercent');\r",
+							"});\r",
+							"\r",
+							"// Test if the 'rarityPercent' field is between 0 and 100\r",
+							"pm.test(\"Rarity percent should be between 0 and 100\", function () {\r",
+							"    var jsonData = pm.request.body.raw;  // Get the raw request body\r",
+							"    var parsedBody = JSON.parse(jsonData);  // Parse it into a JSON object\r",
+							"    pm.expect(parsedBody.rarityPercent).to.be.a('number').that.is.greaterThanOrEqual(0).and.lessThanOrEqual(100);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"Updated item.\",\r\n    \"image\": \"https://super.abril.com.br/wp-content/uploads/2019/12/reproducao_pokemon_episodio_pokemon_centenas_criancas_hospital.jpg\",\r\n    \"name\": \"New Test Item\",\r\n    \"rarityPercent\": 0.4\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/gacha/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"gacha",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin update gacha item 400",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Missing required field 'name'\r",
+							"pm.test(\"Missing required field 'name'\", function () {\r",
+							"    pm.response.to.have.status(400);  // Expecting status 200 for successful update\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"Updated item.\",\r\n    \"image\": \"https://super.abril.com.br/wp-content/uploads/2019/12/reproducao_pokemon_episodio_pokemon_centenas_criancas_hospital.jpg\",\r\n    \"rarityPercent\": 0.4\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/gacha/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"gacha",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete gacha 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Successful deletion (ID exists)\r",
+							"pm.test(\"Status code is 200 and item is deleted\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/gacha/2",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"gacha",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete gacha 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Resource not found (ID does not exist)\r",
+							"pm.test(\"Resource not found (ID does not exist)\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/admin/gacha/999",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"gacha",
+						"999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get all gacha items 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 for valid request\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an(\"array\");\r",
+							"\r",
+							"    // Check that each item in the array has the required properties\r",
+							"    jsonData.forEach(item => {\r",
+							"        pm.expect(item).to.have.property(\"description\");\r",
+							"        pm.expect(item).to.have.property(\"id\");\r",
+							"        pm.expect(item).to.have.property(\"image\");\r",
+							"        pm.expect(item).to.have.property(\"name\");\r",
+							"        pm.expect(item).to.have.property(\"rarityPercent\");\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/admin/gacha",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"admin",
+						"gacha"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get full system gacha collection 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 for valid request\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an(\"array\");\r",
+							"\r",
+							"    // Check that each item in the array has the required properties\r",
+							"    jsonData.forEach(item => {\r",
+							"        pm.expect(item).to.have.property(\"description\");\r",
+							"        pm.expect(item).to.have.property(\"id\");\r",
+							"        pm.expect(item).to.have.property(\"image\");\r",
+							"        pm.expect(item).to.have.property(\"name\");\r",
+							"        pm.expect(item).to.have.property(\"rarityPercent\");\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/system-collection",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"system-collection"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get system gacha item details 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test if the response contains the expected fields\r",
+							"pm.test(\"Response has the expected structure\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('name');\r",
+							"    pm.expect(jsonData).to.have.property('description');\r",
+							"    pm.expect(jsonData).to.have.property('image');\r",
+							"    pm.expect(jsonData).to.have.property('rarityPercent');\r",
+							"});\r",
+							"\r",
+							"// Test if the 'id' is 1 (based on the URL passed)\r",
+							"pm.test(\"ID should be 1\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(1);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/system-collection/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"system-collection",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get system gacha item details 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Invalid ID (non-existent ID)\r",
+							"pm.test(\"Expect 404 for non-existent gacha item\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/system-collection/999",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"system-collection",
+						"999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get player collection 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 for valid request\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an(\"array\");\r",
+							"\r",
+							"    // Check that each item in the array has the required properties\r",
+							"    jsonData.forEach(item => {\r",
+							"        pm.expect(item).to.have.property(\"gachaId\");\r",
+							"        pm.expect(item).to.have.property(\"id\");\r",
+							"        pm.expect(item).to.have.property(\"source\");\r",
+							"        pm.expect(item).to.have.property(\"timestamp\");\r",
+							"        pm.expect(item).to.have.property(\"userId\");\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/player-collection/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"player-collection",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get player collection item 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test if the response contains the expected fields\r",
+							"pm.test(\"Response has the expected structure\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('gachaId');\r",
+							"    pm.expect(jsonData).to.have.property('source');\r",
+							"    pm.expect(jsonData).to.have.property('timestamp');\r",
+							"    pm.expect(jsonData).to.have.property('userId');\r",
+							"});\r",
+							"\r",
+							"// Test if the 'id' is 1 (based on the URL passed)\r",
+							"pm.test(\"ID should be 1\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(1);\r",
+							"});\r",
+							"\r",
+							"// Test if the 'source' field is one of the valid values (\"ROLL\", \"AUCTION\", \"UNKNOWN\")\r",
+							"pm.test(\"Source should be one of 'ROLL', 'AUCTION', or 'UNKNOWN'\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var validSources = ['ROLL', 'AUCTION', 'UNKNOWN'];\r",
+							"    pm.expect(validSources).to.include(jsonData.source);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/player-collection/item/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"player-collection",
+						"item",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get player collection item 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Invalid ID (non-existent ID)\r",
+							"pm.test(\"Expect 404 for non-existent gacha collection item\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/player-collection/item/999",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"player-collection",
+						"item",
+						"999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get player gacha item 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response contains the expected fields\r",
+							"pm.test(\"Response has the expected structure\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('name');\r",
+							"    pm.expect(jsonData).to.have.property('description');\r",
+							"    pm.expect(jsonData).to.have.property('image');\r",
+							"    pm.expect(jsonData).to.have.property('rarityPercent');\r",
+							"});\r",
+							"\r",
+							"// Test if the 'id' is 1 (based on the URL passed)\r",
+							"pm.test(\"ID should be 1\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(1);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/player-collection/1/gacha/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"player-collection",
+						"1",
+						"gacha",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get player gacha item 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Invalid ID (non-existent ID)\r",
+							"pm.test(\"Expect 404 for non-existent gacha item\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/player-collection/1/gacha/999",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"player-collection",
+						"1",
+						"gacha",
+						"999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player roll a new gacha using in-game currency 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Existing user with enough in-game currency\r",
+							"pm.test(\"Existing user with enough in-game currency\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"rarity_level\": \"Common\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/roll",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"roll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player roll a new gacha using in-game currency 400",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Gacha Roll - Non-Existent Rarity Level\r",
+							"pm.test(\"Gacha Roll - Non-Existent Rarity Level\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"rarity_level\": \"Default\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/roll",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"roll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player roll a new gacha using in-game currency 400",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Missing Authorization header\r",
+							"pm.test(\"Missing Authorization Header\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"rarity_level\": \"Common\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/roll",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"roll"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
