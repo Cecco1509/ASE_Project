@@ -11,6 +11,7 @@ builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 DB_MANAGER_GACHA_URL = config.dbmanagers.gacha
 DB_MANAGER_USER_URL = config.dbmanagers.user
+AUTH_MICROSERVICE_URL = config.services.authmicroservice
 ROLL_PRICE = config.roll.price
 ROLL_PROBABILITY = config.roll.probability
 
@@ -201,10 +202,7 @@ def roll_gacha(auth_response=None):
     rarity_level = json_data["rarity_level"]
 
     # Fetch user info to verify in-game currency
-    userId = auth_response.json()['userId']
-    user_response = requests.get(f'{DB_MANAGER_USER_URL}/user/{userId}', verify=False)
-
-    # Check if the user exists
+    user_response = requests.get(f'{AUTH_MICROSERVICE_URL}/api/player/UserInfo', headers=request.headers, verify=False)
     if user_response.status_code == 404:
         return make_response(jsonify({"message": "User not found"}), 404)
     elif user_response.status_code != 200:
@@ -213,6 +211,7 @@ def roll_gacha(auth_response=None):
     # Get the user's in-game currency
     user = user_response.json()
     userIngameCurrency = user['ingameCurrency']
+    userId = user['userId']
 
     # Check if the user has enough ingame currency to roll
     roll_price = getattr(ROLL_PRICE,rarity_level)
