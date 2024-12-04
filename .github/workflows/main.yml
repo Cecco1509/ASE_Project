@@ -83,28 +83,28 @@ jobs:
 
       - name: Build Auctions image
         run: |
-          docker build -f ./AuctionsMicroservice/dockerfile_test -t Auctionstest .
+          docker build -f ./AuctionsMicroservice/dockerfile_test -t auctionstest .
       - name: Run Auctions image
         run: |
-          docker run --rm --name auctionst -d -p 5000:5000 Auctionstest
+          docker run --rm --name auctionst -d -p 5000:5000 auctionstest
       - name: Run Auctions unit tests
         run: |
           cd docs/postman
           newman run AuctionMicroservice.postman_collection.json --insecure
       - name: Stop Auctions image
         run: |
-          docker stop autht
+          docker stop auctionst
 
       - name: Build Transactions image
         run: |
-          docker build -f ./TransactionsMicroservice/dockerfile_test -t Transactionstest .
+          docker build -f ./TransactionsMicroservice/dockerfile_test -t transactionstest .
       - name: Run Transactions image
         run: |
-          docker run --rm --name transactionst -d -p 5000:5000 Transactionstest
+          docker run --rm --name transactionst -d -p 5000:5000 transactionstest
       - name: Run Transactions unit tests
         run: |
           cd docs/postman
           newman run TransactionsMicroservice.postman_collection.json --insecure
       - name: Stop Transactions image
         run: |
-          docker stop autht
+          docker stop transactionst
