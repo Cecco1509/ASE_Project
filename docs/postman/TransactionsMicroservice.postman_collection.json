@@ -1,238 +1,264 @@
 {
-  "info": {
-    "_postman_id": "ed250037-bdc7-483e-8ce1-ca6b00dac801",
-    "name": "TransactionsMicroservice",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "37354036"
-  },
-  "item": [
-    {
-      "name": "admin get user market history 200",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Response status is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "pm.test(\"Response should be a JSON array\", function () {",
-              "    pm.response.to.be.json;",
-              "    pm.expect(pm.response.json()).to.be.an('array');",
-              "});",
-              "",
-              "pm.test(\"Check if the transactions are correctly filtered by 1\", function () {",
-              "    const userId = parseInt(pm.request.url.path[3]);  // Extract user_id from URL",
-              "    const responseJson = pm.response.json();",
-              "    ",
-              "    // Check if all transactions in the response match the user_id as either seller or buyer",
-              "    responseJson.forEach(transaction => {",
-              "        pm.expect(transaction.sellerId).to.eql(userId);",
-              "        pm.expect(transaction.buyerId).to.eql(userId);",
-              "    });",
-              "});",
-              "",
-              "pm.test(\"Check if response is empty for a user with no matching transactions\", function () {",
-              "    const responseJson = pm.response.json();",
-              "    pm.expect(responseJson.length).to.be.at.least(0); // Ensures the response is an empty array when no matching transactions",
-              "});",
-              "",
-              "pm.test(\"Check if error message is handled correctly\", function () {",
-              "    const responseJson = pm.response.json();",
-              "    if (responseJson.message) {",
-              "        pm.expect(responseJson.message).to.not.be.empty;",
-              "    }",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{ase_ase_token}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "https://localhost:5001/api/admin/market-transaction/1",
-          "protocol": "https",
-          "host": ["localhost"],
-          "port": "5001",
-          "path": ["api", "admin", "market-transaction", "1"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "player get market history 200",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Response status is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "pm.test(\"Response should be a JSON array\", function () {",
-              "    pm.response.to.be.json;",
-              "    pm.expect(pm.response.json()).to.be.an('array');",
-              "});",
-              "",
-              "pm.test(\"Check if the transactions are correctly filtered by 1\", function () {",
-              "    const userId = parseInt(pm.request.url.path[3]);  // Extract user_id from URL",
-              "    const responseJson = pm.response.json();",
-              "    ",
-              "    // Check if all transactions in the response match the user_id as either seller or buyer",
-              "    responseJson.forEach(transaction => {",
-              "        pm.expect(transaction.sellerId).to.eql(userId);",
-              "        pm.expect(transaction.buyerId).to.eql(userId);",
-              "    });",
-              "});",
-              "",
-              "pm.test(\"Check if response is empty for a user with no matching transactions\", function () {",
-              "    const responseJson = pm.response.json();",
-              "    pm.expect(responseJson.length).to.be.at.least(0); // Ensures the response is an empty array when no matching transactions",
-              "});",
-              "",
-              "pm.test(\"Check if error message is handled correctly\", function () {",
-              "    const responseJson = pm.response.json();",
-              "    if (responseJson.message) {",
-              "        pm.expect(responseJson.message).to.not.be.empty;",
-              "    }",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{ase_player_token}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "https://localhost:5000/api/player/market-transaction/",
-          "protocol": "https",
-          "host": ["localhost"],
-          "port": "5000",
-          "path": ["api", "player", "market-transaction", ""]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "player login",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Token received\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "\r",
-              "    var jsonData = pm.response.json();\r",
-              "    var accessToken = jsonData[\"Access token\"];\r",
-              "\r",
-              "    if (accessToken) {\r",
-              "        pm.environment.set(\"ase_player_token\", accessToken);\r",
-              "    } else {\r",
-              "        console.log(\"Access token not found in the response.\");\r",
-              "    }\r",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"username\": \"user0\",\r\n    \"password\": \"user0\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "https://localhost:5000/api/player/login",
-          "protocol": "https",
-          "host": ["localhost"],
-          "port": "5000",
-          "path": ["api", "player", "login"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "admin login",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Token received\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "\r",
-              "    var jsonData = pm.response.json();\r",
-              "    var accessToken = jsonData[\"Access token\"];\r",
-              "\r",
-              "    if (accessToken) {\r",
-              "        pm.environment.set(\"ase_admin_token\", accessToken);\r",
-              "    } else {\r",
-              "        console.log(\"Access token not found in the response.\");\r",
-              "    }\r",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"username\": \"admin0\",\r\n    \"password\": \"admin0\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "https://localhost:5001/api/admin/login",
-          "protocol": "https",
-          "host": ["localhost"],
-          "port": "5001",
-          "path": ["api", "admin", "login"]
-        }
-      },
-      "response": []
-    }
-  ]
+	"info": {
+		"_postman_id": "ed250037-bdc7-483e-8ce1-ca6b00dac801",
+		"name": "TransactionsMicroservice",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354036"
+	},
+	"item": [
+		{
+			"name": "player login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Token received\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var accessToken = jsonData[\"Access token\"];\r",
+							"\r",
+							"    if (accessToken) {\r",
+							"        pm.environment.set(\"ase_player_token\", accessToken);\r",
+							"    } else {\r",
+							"        console.log(\"Access token not found in the response.\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"user0\",\r\n    \"password\": \"user0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5002/api/player/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"api",
+						"player",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Token received\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var accessToken = jsonData[\"Access token\"];\r",
+							"\r",
+							"    if (accessToken) {\r",
+							"        pm.environment.set(\"ase_admin_token\", accessToken);\r",
+							"    } else {\r",
+							"        console.log(\"Access token not found in the response.\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"admin0\",\r\n    \"password\": \"admin0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5001/api/admin/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get user market history 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response should be a JSON array\", function () {",
+							"    pm.response.to.be.json;",
+							"    pm.expect(pm.response.json()).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Check if the transactions are correctly filtered by 1\", function () {",
+							"    const userId = parseInt(pm.request.url.path[3]);  // Extract user_id from URL",
+							"    const responseJson = pm.response.json();",
+							"    ",
+							"    // Check if all transactions in the response match the user_id as either seller or buyer",
+							"    responseJson.forEach(transaction => {",
+							"        pm.expect(transaction.sellerId).to.eql(userId);",
+							"        pm.expect(transaction.buyerId).to.eql(userId);",
+							"    });",
+							"});",
+							"",
+							"pm.test(\"Check if response is empty for a user with no matching transactions\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.length).to.be.at.least(0); // Ensures the response is an empty array when no matching transactions",
+							"});",
+							"",
+							"pm.test(\"Check if error message is handled correctly\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    if (responseJson.message) {",
+							"        pm.expect(responseJson.message).to.not.be.empty;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_ase_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5001/api/admin/market-transaction/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"market-transaction",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get market history 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response should be a JSON array\", function () {",
+							"    pm.response.to.be.json;",
+							"    pm.expect(pm.response.json()).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Check if the transactions are correctly filtered by 1\", function () {",
+							"    const userId = parseInt(pm.request.url.path[3]);  // Extract user_id from URL",
+							"    const responseJson = pm.response.json();",
+							"    ",
+							"    // Check if all transactions in the response match the user_id as either seller or buyer",
+							"    responseJson.forEach(transaction => {",
+							"        pm.expect(transaction.sellerId).to.eql(userId);",
+							"        pm.expect(transaction.buyerId).to.eql(userId);",
+							"    });",
+							"});",
+							"",
+							"pm.test(\"Check if response is empty for a user with no matching transactions\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.length).to.be.at.least(0); // Ensures the response is an empty array when no matching transactions",
+							"});",
+							"",
+							"pm.test(\"Check if error message is handled correctly\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    if (responseJson.message) {",
+							"        pm.expect(responseJson.message).to.not.be.empty;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5002/api/player/market-transaction/",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"api",
+						"player",
+						"market-transaction",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
 }

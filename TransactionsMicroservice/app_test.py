@@ -30,5 +30,13 @@ def get_player_transaction_history():
     except Exception as e:
         return make_response(jsonify({"message": str(e)}), 500)
 
+@app.route('/api/admin/login', methods=['POST'])
+def login_admin():
+    return make_response(jsonify({"Access token" : ""}), 200)
+
+@app.route('/api/player/login', methods=['POST'])
+def login_player():
+    return make_response(jsonify({"Access token" : ""}), 200)
+
 def create_app():
     return app
