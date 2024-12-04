@@ -982,6 +982,312 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "admin put auction 200",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var after2day = new Date();",
+							"var after1day = new Date();",
+							"",
+							"after1day.setDate(after1day.getDate() +1);",
+							"after2day.setDate(after2day.getDate() +2);",
+							"",
+							"var body = {",
+							"    \"auctionStart\" : after1day.toISOString(),",
+							"    \"auctionEnd\" :   after2day.toISOString(),",
+							"    \"status\" : null",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"PUT Auction - Status 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/admin/auction/4",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin put auction 400 auction already closed",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var after2day = new Date();",
+							"var after1day = new Date();",
+							"",
+							"after1day.setDate(after1day.getDate() +1);",
+							"after2day.setDate(after2day.getDate() +2);",
+							"",
+							"var body = {",
+							"    \"auctionStart\" : null,",
+							"    \"auctionEnd\" :   null,",
+							"    \"status\" : \"PASSED\"",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"PUT Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response message - cannot end twice\", function () {",
+							"        var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"    pm.expect(jsonData.message).be.eq('Auction cannot be ended twice');",
+							"})",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/admin/auction/2",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin put auction 400 auction already started",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var after2day = new Date();",
+							"var after1day = new Date();",
+							"",
+							"after1day.setDate(after1day.getDate() +1);",
+							"after2day.setDate(after2day.getDate() +2);",
+							"",
+							"var body = {",
+							"    \"auctionStart\" : after1day.toISOString(),",
+							"    \"auctionEnd\" :   after2day.toISOString(),",
+							"    \"status\" : null",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"PUT Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response message - cannot re-start\", function () {",
+							"        var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"    pm.expect(jsonData.message).be.eq('Auction is already started, cannot modify its start time');",
+							"})",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/admin/auction/2",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin put auction 200 close an auction",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var after2day = new Date();",
+							"var after1day = new Date();",
+							"",
+							"after1day.setDate(after1day.getDate() +1);",
+							"after2day.setDate(after2day.getDate() +2);",
+							"",
+							"var body = {",
+							"    \"auctionStart\" : null,",
+							"    \"auctionEnd\" :   null,",
+							"    \"status\" : \"PASSED\"",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"PUT Auction - Status 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response auction status - status equals PASSED\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('status');",
+							"    pm.expect(jsonData.status).be.eq('PASSED');",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/admin/auction/1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction",
+						"1"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

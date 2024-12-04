@@ -31,6 +31,16 @@ mock_auctions = [
         'minimumBid': 200.0,
         'timestamp': datetime.now() ,
         'status': "PASSED"
+    },
+    {
+        'id': 4,
+        'gachaCollectionId': 4,
+        'userId': 4,
+        'auctionStart': datetime.now() + timedelta(days=4),
+        'auctionEnd': datetime.now() + timedelta(days=5),
+        'minimumBid': 200.0,
+        'timestamp': datetime.now() ,
+        'status': "ACTIVE"
     }
 ]
 

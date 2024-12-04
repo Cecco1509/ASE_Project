@@ -31,10 +31,7 @@ def create_auction():
             not 'auctionEnd' in data or
             not 'minimumBid' in data) :
 
-            return make_response(jsonify({"message": "Invalid data"}), 400);
-    
-        tz = pytz.timezone('Europe/Rome')
-
+            return make_response(jsonify({"message": "Invalid data"}), 400)
         
         ok = False
         for gacha_collection in mock_gacha_collection_list:
@@ -210,45 +207,85 @@ def get_auction(auction_id):
 @app.route('/api/admin/auction/<int:auction_id>', methods=['PUT'])
 @handle_errors
 def update_auction(auction_id):
-    print(f"PUT auction", auction_id)
+    print(f"PUT auction ", auction_id, flush=True) 
     try:
         # Parse JSON data from the request
-        data = request.get_json()
-        if not data:
-            return make_response(jsonify({"message": "Invalid auction data"}), 400)
+        try:
+            data = request.get_json()
+            if not data:
+                return make_response(jsonify({"message": "Invalid auction data"}), 400)
+        except Exception as e:
+            return make_response(jsonify({"message": "Invalid JSON data"}), 400)
         
         # Validate auction data
-        if (not 'gachaCollectionId' in data or
+        if (
             not 'auctionStart' in data or
             not 'auctionEnd' in data or
-            not 'minimumBid' in data or
-            not 'userId' in data or
             not 'status' in data) :
 
             return make_response(jsonify({"message": "Invalid data"}), 400);
-
+        
         auction = None
         for auction_data in mock_auctions:
             if auction_data["id"] == auction_id:
                 auction = auction_data
                 break
-
+        
         if auction is None:
             return make_response(jsonify({"message": "Auction not found"}), 404)
         
-        auction = {
-            "id": auction_id,
-            "gachaCollectionId": data["gachaCollectionId"],
-            "auctionStart": data["auctionStart"],
-            "auctionEnd": data["auctionEnd"],
-            "minimumBid": data["minimumBid"],
-            "userId": data["userId"],
-            "status": data["status"],
-            "timestamp" : data['timestamp']
-        }
+        if data["auctionStart"] is not None:
+            start = datetime.strptime(data['auctionStart'], '%Y-%m-%dT%H:%M:%S.%fZ')
+        else:
+            start = None
+        
+        if data["auctionEnd"] is not None:
+            end = datetime.strptime(data['auctionEnd'], '%Y-%m-%dT%H:%M:%S.%fZ')
+        else:
+            end = None
+        
+        now = datetime.now()
+        if end is not None:
+            end = end.replace(second=0, microsecond=0)
+        cmp_now = now.replace(second=0, microsecond=0)
+        
+        if (start is not None and auction["auctionStart"] < cmp_now):
+            return make_response(jsonify({"message": "Auction is already started, cannot modify its start time"}), 400);
+    
+        if (start is not None and start < cmp_now):
+            return make_response(jsonify({"message": "Auction start time must be in the future"}), 400);
+    
+        if end is not None and end < cmp_now:
+            return make_response(jsonify({"message": "Auction end time must be in the future"}), 400);
+    
+        if (start is not None and end is not None and start >= end):
+            return make_response(jsonify({"message": "Auction start time must be before end time"}), 400);
+    
+        if (data["status"] is not None and data["status"] == "ACTIVE"):
+            if auction["auctionEnd"] <= cmp_now:
+                return make_response(jsonify({"message": "Auction cannot be started after it has already ended"}), 400);
+
+        ### END ????
+        if data["status"] == "PASSED" and auction["status"] != "PASSED" and data["auctionEnd"] is None and data["auctionStart"] is None:
+            #close_auction(auction)
+            auction["status"] = "PASSED"
+            auction["auctionEnd"] = now
+            print("CLOSED", flush=True)
+        elif data["status"] == "PASSED" and data["auctionEnd"] is None and data["auctionStart"] is None:
+            return make_response(jsonify({"message": "Auction cannot be ended twice"}), 400);
+        elif data["status"] == "PASSED":
+            return make_response(jsonify({"message": "Cannot set start time or end time when closing an auction"}), 400);
+
+        if data["status"] != "PASSED":
+            if (data["status"] is not None):
+                auction["status"] = data["status"]
+            if (data["auctionEnd"] is not None):
+                auction["auctionEnd"] = datetime.strptime(data["auctionEnd"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            if (data["auctionStart"] is not None):
+                auction["auctionStart"] = datetime.strptime(data["auctionStart"], "%Y-%m-%dT%H:%M:%S.%fZ")
         
         # Return success response
-        return make_response(jsonify({"message": "Auction updated successfully"}), 200)
+        return make_response(jsonify(auction), 200)
     except requests.exceptions.RequestException as e:
         print(f"External request failed: {e}")
         return make_response(jsonify({"message": "Failed to update auction", "error": str(e)}), 500)
