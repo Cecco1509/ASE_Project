@@ -80,7 +80,7 @@ def purchase_in_game_currency():
         # Define the payload to send to the database manager service
         payload = {
             'userId': user_id,
-            'timeStamp': datetime.now(),
+            'timeStamp': datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
             'ingameAmount': in_game_currency,
             'realAmount': real_amount
         }
