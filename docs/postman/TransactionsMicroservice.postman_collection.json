@@ -44,12 +44,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:5002/api/player/login",
+					"raw": "https://localhost:5000/api/player/login",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
-					"port": "5002",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -244,17 +244,16 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:5002/api/player/market-transaction/",
+					"raw": "https://localhost:5000/api/player/market-transaction",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
-					"port": "5002",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
-						"market-transaction",
-						""
+						"market-transaction"
 					]
 				}
 			},
