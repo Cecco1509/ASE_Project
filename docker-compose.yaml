@@ -16,7 +16,7 @@ services:
       - paymentsmicroservice
       - transactionsmicroservice
     ports:
-      - "5000:5000"
+      - "5002:5000"
     volumes:
       - ./config.json:/app/config.json
       - .:/ApiGatewayUser
@@ -88,11 +88,13 @@ services:
       - authdatabase
     volumes:
       - ./config.json:/app/config.json
+      - ./AuthMicroservice:/AuthMicroservice
     secrets:
       - token_secret
       - auth_cert
       - auth_cert_key
       - db_password
+      - auctioneer_credentials
     networks:
       - user_network
       - admin_network
@@ -208,7 +210,12 @@ services:
     build:
       context: ./TransactionsMicroservice
       dockerfile: Dockerfile
-    container_name: transactionsadmin
+    container_name: transactionsmicroservice
+    volumes:
+      - ./config.json:/app/config.json # Mounts config.json into the container
+    secrets:
+      - transactions_ms_cert
+      - transactions_ms_key
     networks:
       - user_network
       - admin_network
@@ -376,6 +383,8 @@ services:
     container_name: auctioneer
     depends_on:
       - auctiondbmanager
+      - auctionmicroservice
+      - authmicroservice
     volumes:
       - ./config.json:/app/config.json
       - ./Auctioneer:/Auctioneer

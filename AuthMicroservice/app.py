@@ -19,6 +19,7 @@ app.config['SECRET_KEY']=str(os.getenv("SECRET_KEY"))
 
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
+auctioneer_credentials = builder.parse_config('/run/secrets/auctioneer_credentials')
 
 with open('/run/secrets/db_password', 'r') as file:
     password = file.read().strip()
@@ -47,11 +48,26 @@ import models
 from AccountDBMethods import *
 from AdminDBMethods import *
 
-with app.app_context():
-    db.create_all()
-
 valid_tokens = dict()
 bcrypt = Bcrypt(app)
+
+with app.app_context():
+
+    db.create_all()
+
+    existing_user = Admin.query.filter_by(username=auctioneer_credentials.username).first()
+    if not existing_user:
+        # Generate a hashed password with a salt
+        salt = os.urandom(32)
+        hashed_password = bcrypt.generate_password_hash(auctioneer_credentials.password).decode('utf-8')
+        
+        # Add the user
+        new_user = Admin(username=auctioneer_credentials.username, password=hashed_password, salt=salt)
+        db.session.add(new_user)
+        db.session.commit()
+        print("Auctioneer account user created.", flush=True)
+    else:
+        print("Auctioneer account user already exists.", flush=True)
 
 def parse_json(data):
     return json.loads(json.dumps(data))

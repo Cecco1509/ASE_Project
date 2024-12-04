@@ -16,18 +16,24 @@ credentials = builder.parse_config('/run/secrets/auctioneer_credentials')
 
 def checker():
 
-    ## authentication
-    auth_res = requests.post(f"{config.services.authmicroservice}/api/admin/login", json={
-        "username": credentials.username,
-        "password": credentials.password
-    }, verify=False)
+    authenticated = False
 
-    if auth_res.status_code != 200:
-        print("Authentication failed")
-        return
+    while not authenticated:
+    ## authentication
+        auth_res = requests.post(f"{config.services.authmicroservice}/api/admin/login", json={
+            "username": credentials.username,
+            "password": credentials.password
+        }, verify=False)
+
+        if auth_res.status_code != 200:
+            print("Authentication failed ", auth_res)
+            sleep(10)
+        else:
+            authenticated = True
+            print("Authenticated")
     
     data = auth_res.json()
-    jwt_token = data['token']
+    jwt_token = data['Access token']
     headers = {
         "Authorization": f"Bearer {jwt_token}",
     }
