@@ -50,7 +50,7 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-@app.route('/api/player/currency/purchase/', methods=['POST'])
+@app.route('/api/player/currency/purchase', methods=['POST'])
 def purchase_in_game_currency():
     try:
         auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)

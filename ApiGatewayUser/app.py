@@ -70,7 +70,7 @@ def get_transaction_history(user_id):
     return make_response(jsonify(response.json()),response.status_code)
 
 
-@app.route('/api/player/currency/', methods=['POST'])
+@app.route('/api/player/currency', methods=['POST'])
 def purchase_in_game_currency():
     response = requests.post(f"{config.services.paymentsmicroservice}/api/player/currency/", json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
     return make_response(jsonify(response.json()),response.status_code)
