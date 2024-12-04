@@ -49,7 +49,7 @@
     "services":{
         "gacha":"https://gachamicroservice:5000",
         "usersmicroservice":"https://usersmicroservice:5000",
-        "paymentsmicroservice": "http://paymentsmicroservice:5000",
+        "paymentsmicroservice": "https://paymentsmicroservice:5000",
         "authmicroservice":"https://authmicroservice:5000"
         
     },
