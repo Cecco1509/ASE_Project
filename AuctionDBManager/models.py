@@ -36,7 +36,7 @@ class Auction(db.Model):
 class AuctionBid(db.Model):
     __tablename__ = 'auctionBid'
     id: Mapped[int] = mapped_column(primary_key=True)
-    bidCode: Mapped[str] = mapped_column(String(255), unique=True)  # bidCode = "{auctionId}:{bid_num}" 
+    #bidCode: Mapped[str] = mapped_column(String(255), unique=True)  # bidCode = "{auctionId}:{bid_num}" 
     userId: Mapped[int]
     bidAmount: Mapped[float]
     auctionId: Mapped[int] = mapped_column(ForeignKey("auction.id"))
