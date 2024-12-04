@@ -1,4 +1,4 @@
-Flask
-requests
-datetime
-python-json-config
+Flask==3.1.0
+requests==2.32.3
+python-json-config==1.2.3
+datetime==5.5
