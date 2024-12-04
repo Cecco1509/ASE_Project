@@ -127,8 +127,6 @@ services:
       - MSSQL_TLS_PROTOCOLS=1.2
       - MSSQL_FORCE_ENCRYPTION=1
     container_name: gachadatabase
-    ports:
-      - "1433:1433"
     secrets:
       - db_password
       - gacha_db_cert
@@ -165,8 +163,6 @@ services:
       - MSSQL_TLS_PROTOCOLS=1.2
       - MSSQL_FORCE_ENCRYPTION=1
     container_name: auctiondatabase
-    ports:
-      - "1435:1433"
     secrets:
       - db_password
       - auction_db_cert
@@ -266,8 +262,6 @@ services:
       - MSSQL_TLS_PROTOCOLS=1.2
       - MSSQL_FORCE_ENCRYPTION=1
     container_name: transactiondatabase
-    ports:
-      - "1434:1433"
     secrets:
       - db_password
       - transaction_db_cert
