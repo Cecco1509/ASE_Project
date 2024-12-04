@@ -22,13 +22,9 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 
-celery_app = Celery('worker',
-                broker='amqp://admin:mypass@rabbit:5672', 
-                backend='rpc://')
-
 ############################################################# USER ##########################################################
 
-@app.route('/player/auction/market', methods=['GET'])
+@app.route('/api/player/auction/market', methods=['GET'])
 @handle_errors
 @validate_player_token
 def get_auctions(auth_response=None):
@@ -40,7 +36,7 @@ def get_auctions(auth_response=None):
         return make_response(jsonify({"message": str(err)}, 500))
 
 #POST /api/player/auction/create: Create a new auction listing for a gacha item. (input: gacha id, bid min, auctionStart, auctionEnd etc)
-@app.route('/player/auction/create', methods=['POST'])
+@app.route('/api/player/auction/create', methods=['POST'])
 @handle_errors
 @validate_player_token
 def create_auction(auth_response=None):
@@ -52,8 +48,6 @@ def create_auction(auth_response=None):
             not 'minimumBid' in data) :
 
             return make_response(jsonify({"message": "Invalid data"}), 400);
-    
-        tz = pytz.timezone('Europe/Rome')
 
         try:
             gacha_res = requests.get(f"{config.dbmanagers.gacha}/gachacollection/item/{data["gachaCollectionId"]}")
@@ -61,22 +55,24 @@ def create_auction(auth_response=None):
             if gacha_res.json()['userId'] != auth_response["userId"] :
                 return make_response(jsonify({"message": "Invalid user"}), 400);
         except Exception as e:
-            return make_response(jsonify({"message": "Gacha Collection does not exits"}), 400);
+            return make_response(jsonify({"message": "User does not have the required gacha collection"}), 400);
 
 
-        start = tz.localize(datetime.strptime(data['auctionStart'], '%Y-%m-%dT%H:%M:%SZ'))
-        end = tz.localize(datetime.strptime(data['auctionEnd'], '%Y-%m-%dT%H:%M:%SZ'))
+        start = datetime.strptime(data['auctionStart'], '%Y-%m-%dT%H:%M:%S.%fZ')
+        end = datetime.strptime(data['auctionEnd'], '%Y-%m-%dT%H:%M:%S.%fZ')
         
-        now = datetime.now(tz);
+        now = datetime.now();
         end = end.replace(second=0, microsecond=0)
-        start = start.replace(second=0, microsecond=0)
-        now = now.replace(second=0, microsecond=0)
+        cmp_now = now.replace(second=0, microsecond=0)
 
-        if (start < now or end < now or start >= end):
-            print(start, end, now, flush=True)
-            return make_response(jsonify({"message": "Auction start or end time must be in the future"}), 400);
-        else :
-            print(start, end, now, flush=True)
+        if (start < cmp_now):
+            return make_response(jsonify({"message": "Auction start time must be in the future"}), 400);
+    
+        if end < cmp_now:
+            return make_response(jsonify({"message": "Auction end time must be in the future"}), 400);
+    
+        if (start >= end):
+            return make_response(jsonify({"message": "Auction start time must be before end time"}), 400);
         # check if user already has an active auction for this gachaCollection
         
         active_auction = requests.get(config.dbmanagers.auction + f'/auction/{auth_response["userId"]}/{data["gachaCollectionId"]}/1')
@@ -84,27 +80,41 @@ def create_auction(auth_response=None):
             active = active_auction.json()
             print("ACTIVE : ", active, flush=True)
             if(len(active) > 0):
-                return make_response(jsonify({"message": f"User {data['userId']} already has an active auction for tha gachaCollection"}), 400);
+                return make_response(jsonify({"message": f"User {auth_response['userId']} already has an active auction for tha gachaCollection"}), 400);
         except Exception as e:
             print("EXPLODED "+str(e), flush=True)
             print(active, flush=True)
     
-        data["timestamp"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-        response = requests.post(config.dbmanagers.auction + '/auction', json=data)
-        new_auction = response.json()['auctionId'];
-        print(new_auction)
+        data["timestamp"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
-        return make_response(jsonify(auction=response.json()), 201)
+        new_auction = {
+            "gachaCollectionId": data["gachaCollectionId"],
+            "userId": auth_response["userId"],
+            "auctionStart": start.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            "auctionEnd": end.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            "minimumBid": data["minimumBid"],
+            "timestamp": data["timestamp"],
+            "status": "ACTIVE"
+        }
+
+        response = requests.post(config.dbmanagers.auction + '/auction', json=new_auction)
+        new_auction_id = response.json()['auctionId'];
+
+        return make_response(jsonify({"auctionId" : new_auction_id}), 201)
     except Exception as err:
         return make_response(jsonify({"message": str(err)}), 500)
     
 #POST /api/player/auction/{auction_id}/bid: Place a bid on an active auction.
-@app.route('/player/auction/bid/<auction_id>', methods=['POST']) ## {userID, amount}
+@app.route('/api/player/auction/bid/<int:auction_id>', methods=['POST']) ## {userID, amount}
 @handle_errors
 @validate_player_token
 def bid_on_auction(auction_id, auth_response=None):
     try:
         data = request.get_json()
+
+        if ("bidAmount" not in data or
+            "userId" not in data ):
+            return make_response(jsonify({"message": "invalid payload"}), 400);
         response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}')
         response.raise_for_status()
         auction = response.json()
@@ -112,7 +122,7 @@ def bid_on_auction(auction_id, auth_response=None):
         if (auction["status"] != "ACTIVE" ):
             return make_response(jsonify({"message": "Auction is not active"}), 400);
     
-        if (datetime.strptime(auction["auctionStart"], "%a, %d %b %Y %H:%M:%S %Z")).replace(second=0, microsecond=0) > datetime.now().replace(second=0, microsecond=0):
+        if (datetime.strptime(auction["auctionStart"], "%a, %d %b %Y %H:%M:%S %Z")) > datetime.now():
             return make_response(jsonify({"message": "Auction has not started yet"}), 400);
 
         if (auction["userId"] == auth_response["userId"]):
@@ -155,7 +165,7 @@ def bid_on_auction(auction_id, auth_response=None):
                 'bidCode': f"{auction_id}:{len(auction_bids)}",
                 'bidAmount': data["bidAmount"],
                 'auctionId':auction_id, 
-                'timestamp':datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+                'timestamp':datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             }
         
         try:
@@ -216,7 +226,7 @@ def bid_on_auction(auction_id, auth_response=None):
 
     ## TOKENS DA INSERIRE
 
-@app.route('/player/auction/history', methods=['GET'])
+@app.route('/api/player/auction/history', methods=['GET'])
 @handle_errors
 @validate_player_token
 def auction_player_history(auth_response=None):
@@ -319,7 +329,7 @@ def close_auction(auction, headers) -> bool:
 ##################################################### ADMIN ############################################################
 
 #GET /auctions: Admin view of all auctions.
-@app.route('/admin/auction', methods=['GET'])
+@app.route('/api/admin/auction', methods=['GET'])
 @handle_errors
 @validate_admin_token
 def get_all_auctions(auth_response=None):
@@ -335,7 +345,7 @@ def get_all_auctions(auth_response=None):
 
     
 #GET /auction/<auctions_id>: Admin view specific auction.
-@app.route('/admin/auction/<int:auction_id>', methods=['GET'])
+@app.route('/api/admin/auction/<int:auction_id>', methods=['GET'])
 @handle_errors
 @validate_admin_token
 def get_auction(auction_id, auth_response=None):
@@ -351,7 +361,7 @@ def get_auction(auction_id, auth_response=None):
     
 
 # PUT /api/admin/auction/{auction_id}: Modify a specific auction.
-@app.route('/admin/auction/<int:auction_id>', methods=['PUT'])
+@app.route('/api/admin/auction/<int:auction_id>', methods=['PUT'])
 @handle_errors
 @validate_admin_token
 def update_auction(auction_id, auth_response=None):
@@ -414,10 +424,12 @@ def update_auction(auction_id, auth_response=None):
                 return make_response(jsonify({"message": "Auction cannot be started after it has already ended"}), 400);
 
         if data["status"] == "PASSED" and auction["status"] != "PASSED" and data["auctionEnd"] is None and data["auctionStart"] is None:
-            close_auction(auction, request.headers)
-            auction["status"] = "PASSED"
-            auction["auctionEnd"] = now
-            print("CLOSED", flush=True)
+            if close_auction(auction, request.headers):
+                auction["status"] = "PASSED"
+                auction["auctionEnd"] = now
+                return make_response(jsonify(auction), 200)
+            else:
+                return make_response(jsonify({"message": "Failed to close auction"}), 500);
         elif data["status"] == "PASSED" and data["auctionEnd"] is None and data["auctionStart"] is None:
             return make_response(jsonify({"message": "Auction cannot be ended twice"}), 400);
         elif data["status"] == "PASSED":
@@ -443,7 +455,7 @@ def update_auction(auction_id, auth_response=None):
 
     
 # GET /api/admin/auction/history: Admin view of all market history (old auctions).
-@app.route('/admin/auction/history', methods=['GET'])
+@app.route('/api/admin/auction/history', methods=['GET'])
 @handle_errors
 @validate_admin_token
 def history(auth_response=None):
@@ -459,7 +471,7 @@ def history(auth_response=None):
         return make_response(jsonify({"message": str(e)}, 500))
     
 
-@app.route('/admin/auction/history/<user_id>', methods=['GET'])
+@app.route('/api/admin/auction/history/<int:user_id>', methods=['GET'])
 @handle_errors
 @validate_admin_token
 def user_history(user_id, auth_response=None):

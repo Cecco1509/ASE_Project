@@ -25,7 +25,7 @@ def get_player_transaction_history_admin(user_id, auth_response=None):
     except Exception as e:
         return make_response(jsonify({"message": str(e)}), 500)
 
-@app.route('/api/admin/market-transaction', methods=['GET'])
+@app.route('/api/player/market-transaction', methods=['GET'])
 @handle_errors
 @validate_player_token
 def get_player_transaction_history(auth_response=None):

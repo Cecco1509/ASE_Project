@@ -16,19 +16,17 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 def get_player_transaction_history_admin(user_id):
     try:
 
-        transactions = [transaction for transaction in mock_transactions if transaction['sellerId'] == user_id
-                                                                            and transaction["buyerId"] == user_id]
-
-        return make_response(jsonify(), 200)
+        return make_response(jsonify([transaction for transaction in mock_transactions if transaction['sellerId'] == user_id
+                                                                            and transaction["buyerId"] == user_id]), 200)
     except Exception as e:
         return make_response(jsonify({"message": str(e)}), 500)
 
-@app.route('/api/player/market-transaction/<int:user_id>', methods=['GET'])
+@app.route('/api/player/market-transaction', methods=['GET'])
 @handle_errors
-def get_player_transaction_history(user_id):
+def get_player_transaction_history():
     try:
-        return make_response(jsonify([transaction for transaction in mock_transactions if transaction['sellerId'] == user_id
-                                                                            and transaction["buyerId"] == user_id]), 200)
+        return make_response(jsonify([transaction for transaction in mock_transactions if transaction['sellerId'] == 1
+                                                                            and transaction["buyerId"] == 1]), 200)
     except Exception as e:
         return make_response(jsonify({"message": str(e)}), 500)
 

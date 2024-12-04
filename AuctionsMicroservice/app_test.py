@@ -20,7 +20,7 @@ def get_auctions():
     except Exception as err:
         return make_response(jsonify({"message": str(err)}, 500))
 
-#POST //api/player/auction/create: Create a new auction listing for a gacha item. (input: gacha id, bid min, auctionStart, auctionEnd etc)
+#POST /api/player/auction/create: Create a new auction listing for a gacha item. (input: gacha id, bid min, auctionStart, auctionEnd etc)
 @app.route('/api/player/auction/create', methods=['POST'])
 @handle_errors
 def create_auction():
@@ -87,7 +87,7 @@ def create_auction():
     except Exception as err:
         return make_response(jsonify({"message": str(err)}), 500)
     
-#POST //api/player/auction/{auction_id}/bid: Place a bid on an active auction.
+#POST /api/player/auction/{auction_id}/bid: Place a bid on an active auction.
 @app.route('/api/player/auction/bid/<int:auction_id>', methods=['POST']) ## {userID, amount}
 @handle_errors
 def bid_on_auction(auction_id):
@@ -162,12 +162,12 @@ def bid_on_auction(auction_id):
         print(str(err), flush=True)
         return make_response(jsonify({"message": str(err)}), 500)
 
-@app.route('/api/player/auction/history/<int:userId>', methods=['GET'])
+@app.route('/api/player/auction/history', methods=['GET'])
 @handle_errors
 def auction_player_history(userId):
     try:
         return make_response(jsonify([auction for auction in mock_auctions if auction['status'] == "PASSED"
-                                                                            and auction["userId"] == userId]), 200)
+                                                                            and auction["userId"] == 2]), 200)
     except Exception as err:
         return make_response(jsonify({"message": str(err)}), 500)
 
@@ -265,7 +265,6 @@ def update_auction(auction_id):
             if auction["auctionEnd"] <= cmp_now:
                 return make_response(jsonify({"message": "Auction cannot be started after it has already ended"}), 400);
 
-        ### END ????
         if data["status"] == "PASSED" and auction["status"] != "PASSED" and data["auctionEnd"] is None and data["auctionStart"] is None:
             #close_auction(auction)
             auction["status"] = "PASSED"
@@ -311,6 +310,18 @@ def user_history(user_id):
                                                                             and auction["userId"] == user_id]), 200)
     except Exception as e:
         return make_response(jsonify({"message": str(e)}, 500))
+    
+
+
+## Mock auth
+
+@app.route('/api/admin/login', methods=['POST'])
+def login_admin():
+    return make_response(jsonify({"Access token" : ""}), 200)
+
+@app.route('/api/player/login', methods=['POST'])
+def login_player():
+    return make_response(jsonify({"Access token" : ""}), 200)
 
 def create_app():
     return app

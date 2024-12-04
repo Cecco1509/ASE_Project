@@ -20,17 +20,17 @@ def checker():
 
     while not authenticated:
     ## authentication
-        auth_res = requests.post(f"{config.services.authmicroservice}/api/admin/login", json={
-            "username": credentials.username,
-            "password": credentials.password
-        }, verify=False)
+        try:
+            auth_res = requests.post(f"{config.services.authmicroservice}/api/admin/login", json={
+                "username": credentials.username,
+                "password": credentials.password
+            }, verify=False)
 
-        if auth_res.status_code != 200:
-            print("Authentication failed ", auth_res)
-            sleep(10)
-        else:
             authenticated = True
-            print("Authenticated")
+        except Exception as e:
+            print("Error while connecting to auth microservice: ", e)
+            sleep(10)
+            continue
     
     data = auth_res.json()
     jwt_token = data['Access token']
