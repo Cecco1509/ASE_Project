@@ -10,6 +10,8 @@ paths:
     get:
       summary: "Get all gacha items"
       tags: ["GachaMicroservice"]
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: "List of all gacha items"
@@ -24,6 +26,8 @@ paths:
     post:
       summary: "Add new gacha item"
       tags: ["GachaMicroservice"]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -43,10 +47,13 @@ paths:
                     description: "ID of the newly created gacha item"
         '400':
           description: "Invalid input data"
+
   /api/admin/gacha/{gacha_id}:
     get:
       summary: "Get specific gacha item"
       tags: ["GachaMicroservice"]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: gacha_id
@@ -66,6 +73,8 @@ paths:
     delete:
       summary: "Delete a gacha item"
       tags: ["GachaMicroservice"]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: gacha_id
@@ -89,6 +98,8 @@ paths:
     put:
       summary: "Update gacha item details"
       tags: ["GachaMicroservice"]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: gacha_id
@@ -115,6 +126,7 @@ paths:
                     example: "Gacha item successfully updated."
         '400':
           description: "Invalid input data"
+
   /api/player/gacha/player-collection/{user_id}:
     get:
       summary: "Get player's gacha collection"
@@ -137,6 +149,7 @@ paths:
                   $ref: '#/components/schemas/GachaCollectionItem'
         '404':
           description: "User not found"
+
   /api/player/gacha/player-gacha/item/{gacha_id}:
     get:
       summary: "Get specific gacha collection item for a player"
@@ -157,6 +170,7 @@ paths:
                 $ref: '#/components/schemas/GachaCollectionItem'
         '404':
           description: "Gacha collection item not found"
+
   /api/player/gacha/player-collection/{user_id}/gacha/{gacha_id}:
     get:
       summary: "Get specific gacha item details for a player"
@@ -183,6 +197,7 @@ paths:
                 $ref: '#/components/schemas/GachaItem'
         '404':
           description: "Gacha item not found"
+
   /api/player/gacha/system-collection:
     get:
       summary: "Get full system gacha collection"
@@ -196,6 +211,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GachaItem'
+
   /api/player/gacha/system-gacha/{gacha_id}:
     get:
       summary: "Get details of a specific system gacha item"
@@ -216,6 +232,7 @@ paths:
                 $ref: '#/components/schemas/GachaItem'
         '404':
           description: "Gacha item not found"
+
   /api/player/gacha/roll:
     post:
       summary: "Roll a new gacha item"
@@ -242,9 +259,9 @@ paths:
                     type: integer
                     description: "ID of the added item in user's collection"
         '404':
-          description: "User not found "
+          description: "User not found"
         '400':
-          description: "Rolling failed, for example the user's in-game balance is not suffisant"
+          description: "Rolling failed, for example the user's in-game balance is not sufficient"
   /api/player/currency/{user_id}:
     get:
       summary: "Get player's transaction history"
@@ -1305,7 +1322,657 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         '404':
-          description: "User not found"        
+          description: "User not found"   
+  /api/player/register:
+    post:
+      summary: "Register a new player"
+      tags: ["Player"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterPlayerRequest'
+      responses:
+        '200':
+          description: "Player registered successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerResponse'
+        '400':
+          description: "Invalid input or registration failed"
+        '409':
+          description: "Username already taken"
+        
+  /api/player/login:
+    post:
+      summary: "Login a player"
+      tags: ["Player"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: "Invalid username or password"
+        '401':
+          description: "Unauthorized access"
+        
+  /api/player/logout:
+    post:
+      summary: "Log out a player"
+      tags: ["Player"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "Player successfully logged out"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: "Error during logout"
+        '401':
+          description: "Unauthorized access"
+        
+  /api/admin/logout:
+    post:
+      summary: "Log out an admin"
+      tags: ["Admin"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "Admin successfully logged out"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: "Error during logout"
+        '401':
+          description: "Unauthorized access"
+        
+  /api/player/UserInfo:
+    post:
+      summary: "Retrieve player info"
+      tags: ["Player"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "Successfully retrieved player info"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerInfoResponse'
+        '400':
+          description: "Error retrieving player info"
+        '403':
+          description: "Unauthorized role"
+        
+  /helloPlayer:
+    get:
+      summary: "Verify player token"
+      tags: ["Player"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "Successfully verified player token"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+        '500':
+          description: "Internal server error"
+        
+  /helloAdmin:
+    get:
+      summary: "Verify admin token"
+      tags: ["Admin"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "Successfully verified admin token"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  adminId:
+                    type: integer
+        '500':
+          description: "Internal server error" 
+  /api/accounts:
+    get:
+      summary: "Get all accounts"
+      tags: ["AccountMicroservice"]
+      responses:
+        '200':
+          description: "List of all accounts"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+        '404':
+          description: "No accounts found"
+
+    post:
+      summary: "Create a new account"
+      tags: ["AccountMicroservice"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountInput'
+      responses:
+        '200':
+          description: "Account created successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: integer
+                    description: "ID of the newly created account"
+        '400':
+          description: "Invalid input data"
+
+  /api/accounts/{accountId}:
+    get:
+      summary: "Get a single account by ID"
+      tags: ["AccountMicroservice"]
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: integer
+          description: "ID of the account to retrieve"
+      responses:
+        '200':
+          description: "Account details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: "Account not found"
+
+    put:
+      summary: "Update account details"
+      tags: ["AccountMicroservice"]
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: integer
+          description: "ID of the account to update"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountInput'
+      responses:
+        '200':
+          description: "Account successfully updated"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Account successfully updated."
+        '400':
+          description: "Invalid input data"
+        '404':
+          description: "Account not found"
+
+    delete:
+      summary: "Delete an account"
+      tags: ["AccountMicroservice"]
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: integer
+          description: "ID of the account to delete"
+      responses:
+        '200':
+          description: "Account deleted successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Account successfully deleted."
+        '404':
+          description: "Account not found"
+
+  /api/accounts/username/{username}:
+    get:
+      summary: "Get a single account by username"
+      tags: ["AccountMicroservice"]
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+          description: "Username of the account to retrieve"
+      responses:
+        '200':
+          description: "Account details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: "Account not found"     
+  /api/admins:
+    get:
+      summary: "Get all admins"
+      tags: ["AdminMicroservice"]
+      responses:
+        '200':
+          description: "List of all admins"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Admin'
+        '404':
+          description: "No admins found"
+
+    post:
+      summary: "Create a new admin"
+      tags: ["AdminMicroservice"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminInput'
+      responses:
+        '200':
+          description: "Admin created successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  adminId:
+                    type: integer
+                    description: "ID of the newly created admin"
+        '400':
+          description: "Invalid input data"
+
+  /api/admins/{adminId}:
+    get:
+      summary: "Get a single admin by ID"
+      tags: ["AdminMicroservice"]
+      parameters:
+        - in: path
+          name: adminId
+          required: true
+          schema:
+            type: integer
+          description: "ID of the admin to retrieve"
+      responses:
+        '200':
+          description: "Admin details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '404':
+          description: "Admin not found"
+
+    put:
+      summary: "Update admin details"
+      tags: ["AdminMicroservice"]
+      parameters:
+        - in: path
+          name: adminId
+          required: true
+          schema:
+            type: integer
+          description: "ID of the admin to update"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminInput'
+      responses:
+        '200':
+          description: "Admin successfully updated"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Admin successfully updated."
+        '400':
+          description: "Invalid input data"
+        '404':
+          description: "Admin not found"
+
+    delete:
+      summary: "Delete an admin"
+      tags: ["AdminMicroservice"]
+      parameters:
+        - in: path
+          name: adminId
+          required: true
+          schema:
+            type: integer
+          description: "ID of the admin to delete"
+      responses:
+        '200':
+          description: "Admin deleted successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Admin successfully deleted."
+        '404':
+          description: "Admin not found"
+
+  /api/admins/username/{username}:
+    get:
+      summary: "Get a single admin by username"
+      tags: ["AdminMicroservice"]
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+          description: "Username of the admin to retrieve"
+      responses:
+        '200':
+          description: "Admin details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '404':
+          description: "Admin not found"  
+  /player/auction/market:
+    get:
+      summary: "Get all active auctions in the market"
+      tags: ["Auction"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "List of all active auctions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionListResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /player/auction/create:
+    post:
+      summary: "Create a new auction"
+      tags: ["Auction"]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuctionCreateRequest'
+      responses:
+        '201':
+          description: "Auction created successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionResponse'
+        '400':
+          description: "Invalid data"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /player/auction/bid/{auction_id}:
+    post:
+      summary: "Place a bid on an active auction"
+      tags: ["Auction"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: auction_id
+          required: true
+          schema:
+            type: integer
+          description: "Auction ID to place a bid on"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BidRequest'
+      responses:
+        '200':
+          description: "Bid placed successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BidResponse'
+        '400':
+          description: "Invalid bid amount or auction status"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /player/auction/history/{userId}:
+    get:
+      summary: "Get auction history for a specific user"
+      tags: ["Auction"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          description: "User ID to get the auction history for"
+      responses:
+        '200':
+          description: "Auction history"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionHistoryResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/auction:
+    get:
+      summary: "Get all auctions (admin view)"
+      tags: ["Admin Auction"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "List of all auctions"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionListResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/auction/{auction_id}:
+    get:
+      summary: "Get specific auction details (admin view)"
+      tags: ["Admin Auction"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: auction_id
+          required: true
+          schema:
+            type: integer
+          description: "Auction ID to retrieve"
+      responses:
+        '200':
+          description: "Auction details"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+    put:
+      summary: "Update a specific auction (admin view)"
+      tags: ["Admin Auction"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: auction_id
+          required: true
+          schema:
+            type: integer
+          description: "Auction ID to update"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuctionUpdateRequest'
+      responses:
+        '200':
+          description: "Auction updated successfully"
+        '400':
+          description: "Invalid auction data"
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/auction/history:
+    get:
+      summary: "Get auction history (admin view)"
+      tags: ["Admin Auction"]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "Auction history"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionHistoryResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/auction/history/{user_id}:
+    get:
+      summary: "Get specific user auction history (admin view)"
+      tags: ["Admin Auction"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "User ID to retrieve auction history for"
+      responses:
+        '200':
+          description: "Auction history for the user"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionHistoryResponse'
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'        
+          
 components:  
   securitySchemes:
     bearerAuth:
@@ -1827,6 +2494,174 @@ components:
           description: "Updated profile picture URL"
         status:
           type: string
-          description: "Updated status of the user"      
+          description: "Updated status of the user"
+    RegisterPlayerRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        profilePicture:
+          type: string
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+
+    PlayerResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+
+    PlayerInfoResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+        profilePicture:
+          type: string
+        status:
+          type: string
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+        salt:
+          type: string
+        verified:
+          type: boolean
+
+    AccountInput:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        salt:
+          type: string      
+    Admin:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+        salt:
+          type: string
+        verified:
+          type: boolean
+
+    AdminInput:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        salt:
+          type: string  
+    AuctionListResponse:
+      type: object
+      properties:
+        market:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuctionA'
+    AuctionResponse:
+      type: object
+      properties:
+        auction:
+          $ref: '#/components/schemas/AuctionA'
+    AuctionCreateRequest:
+      type: object
+      properties:
+        gachaCollectionId:
+          type: integer
+        userId:
+          type: integer
+        auctionStart:
+          type: string
+        auctionEnd:
+          type: string
+        minimumBid:
+          type: number
+        status:
+          type: string
+    AuctionHistoryResponse:
+      type: object
+      properties:
+        auctions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuctionA'
+    AuctionUpdateRequest:
+      type: object
+      properties:
+        gachaCollectionId:
+          type: integer
+        auctionStart:
+          type: string
+        auctionEnd:
+          type: string
+        status:
+          type: string
+    AuctionA:
+      type: object
+      properties:
+        auctionId:
+          type: integer
+        gachaCollectionId:
+          type: integer
+        auctionStart:
+          type: string
+        auctionEnd:
+          type: string
+        status:
+          type: string
+    BidRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+        bidAmount:
+          type: number
+    BidResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        bidAmount:
+          type: number
+        auctionId:
+          type: integer
+        timestamp:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string      
 security:
   - bearerAuth: []
