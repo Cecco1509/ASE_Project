@@ -1,11 +1,11 @@
 version: "3.8"
 
 services:
-  apigateway:
+  apigatewayuser:
     build:
-      context: ./ApiGateway
+      context: ./ApiGatewayUser
       dockerfile: Dockerfile
-    container_name: apigateway
+    container_name: apigatewayuser
     depends_on:
       - auctionsadmin
       - auctionsuser
@@ -23,26 +23,68 @@ services:
       - "5000:5000"
     volumes:
       - ./config.json:/app/config.json
-      - .:/ApiGateway
+      - .:/ApiGatewayUser
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
-      - FLASK_APP=./ApiGateway/app.py
+      - FLASK_APP=./ApiGatewayUser/app.py
     secrets:
-      - api_gateway_cert
-      - api_gateway_cert_key 
+      - gateway_user_cert
+      - gateway_user_key
+    networks:
+      - user_network
+
+  apigatewayadmin:
+    build:
+      context: ./ApiGatewayAdmin
+      dockerfile: Dockerfile
+    container_name: apigatewayadmin
+    depends_on:
+      - auctionsadmin
+      - auctionsuser
+      - authmicroservice
+      - auctiondbmanager
+      - userdbmanager
+      - gachadbmanager
+      - transactiondbmanager
+      - paymentdbmanager
+      - gachamicroservice
+      - paymentsmicroservice
+      - transactionsadmin
+      - transactionsuser
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./config.json:/app/config.json
+      - .:/ApiGatewayAdmin
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./ApiGatewayAdmin/app.py
+    secrets:
+      - gateway_admin_cert
+      - gateway_admin_key
+    networks:
+      - admin_network
+
 
   auctionsadmin:
     build:
       context: ./AuctionsAdmin
       dockerfile: Dockerfile
     container_name: auctionsadmin
+    networks:
+      - user_network
+      - admin_network
 
   auctionsuser:
     build:
       context: ./AuctionsUser
       dockerfile: Dockerfile
     container_name: auctionsuser
+    networks:
+      - user_network
+      - admin_network
 
   authmicroservice:
     build:
@@ -58,6 +100,9 @@ services:
       - auth_cert
       - auth_cert_key
       - db_password
+    networks:
+      - user_network
+      - admin_network
   
   authdatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -73,6 +118,9 @@ services:
       - db_password
       - auth_db_cert
       - auth_db_key
+    networks:
+      - user_network
+      - admin_network
 
   gachadatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -88,6 +136,9 @@ services:
       - db_password
       - gacha_db_cert
       - gacha_db_key
+    networks:
+      - user_network
+      - admin_network
 
   userdatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -103,6 +154,9 @@ services:
       - db_password
       - user_db_cert
       - user_db_key
+    networks:
+      - user_network
+      - admin_network
 
   auctiondatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -118,6 +172,9 @@ services:
       - db_password
       - auction_db_cert
       - auction_db_key
+    networks:
+      - user_network
+      - admin_network
 
   gachamicroservice:
     build:
@@ -136,6 +193,9 @@ services:
     secrets:
       - gacha_ms_cert
       - gacha_ms_cert_key
+    networks:
+      - user_network
+      - admin_network
 
   paymentsmicroservice:
     build:
@@ -147,18 +207,27 @@ services:
     secrets:
       - payments_cert
       - payments_cert_key
+    networks:
+      - user_network
+      - admin_network
 
   transactionsadmin:
     build:
       context: ./TransactionsAdmin
       dockerfile: Dockerfile
     container_name: transactionsadmin
+    networks:
+      - user_network
+      - admin_network
 
   transactionsuser:
     build:
       context: ./TransactionsUser
       dockerfile: Dockerfile
     container_name: transactionsuser
+    networks:
+      - user_network
+      - admin_network
 
   usersmicroservice:
     build:
@@ -170,6 +239,9 @@ services:
     secrets:
       - users_cert
       - users_cert_key
+    networks:
+      - user_network
+      - admin_network
 
   paymentdatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -185,6 +257,9 @@ services:
       - db_password
       - payment_db_cert
       - payment_db_key
+    networks:
+      - user_network
+      - admin_network
   
   transactiondatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -200,6 +275,9 @@ services:
       - db_password
       - transaction_db_cert
       - transaction_db_key
+    networks:
+      - user_network
+      - admin_network
    
   auctiondbmanager:
     build:
@@ -214,6 +292,9 @@ services:
       - db_password
       - auction_db_manager_cert
       - auction_db_manager_key
+    networks:
+      - user_network
+      - admin_network
 
   gachadbmanager:
     build:
@@ -228,6 +309,9 @@ services:
       - db_password
       - gacha_db_manager_cert
       - gacha_db_manager_key
+    networks:
+      - user_network
+      - admin_network
 
   paymentdbmanager:
     build:
@@ -242,6 +326,9 @@ services:
       - db_password
       - payment_db_manager_cert
       - payment_db_manager_key
+    networks:
+      - user_network
+      - admin_network
 
   transactiondbmanager:
     build:
@@ -256,6 +343,9 @@ services:
       - db_password
       - transaction_db_manager_cert
       - transaction_db_manager_key
+    networks:
+      - user_network
+      - admin_network
 
   userdbmanager:
     build:
@@ -270,6 +360,9 @@ services:
       - db_password
       - user_db_manager_cert
       - user_db_manager_key
+    networks:
+      - user_network
+      - admin_network
 
 secrets:
   token_secret:
@@ -328,10 +421,10 @@ secrets:
     file: ./secrets/user_db_manager_cert.pem
   user_db_manager_key:
     file: ./secrets/user_db_manager_key.pem
-  api_gateway_cert:
-    file: ./secrets/api_gateway_cert.pem
-  api_gateway_cert_key:
-    file: ./secrets/api_gateway_key.pem  
+  gateway_user_cert:
+    file: ./secrets/gateway_user_cert.pem
+  gateway_user_key:
+    file: ./secrets/gateway_user_key.pem  
   payments_cert:
     file: ./secrets/payments_cert.pem
   payments_cert_key:
@@ -340,3 +433,11 @@ secrets:
     file: ./secrets/gacha_ms_cert.pem
   gacha_ms_cert_key:
     file: ./secrets/gacha_ms_key.pem
+  gateway_admin_cert:
+    file: ./secrets/gateway_admin_cert.pem
+  gateway_admin_key:
+    file: ./secrets/gateway_admin_key.pem
+
+networks:
+  user_network:
+  admin_network:
