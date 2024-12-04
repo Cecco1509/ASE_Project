@@ -5,8 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: apigatewayuser
     depends_on:
-      - auctionsadmin
-      - auctionsuser
+      - auctionmicroservice
       - authmicroservice
       - auctiondbmanager
       - userdbmanager
@@ -15,8 +14,7 @@ services:
       - paymentdbmanager
       - gachamicroservice
       - paymentsmicroservice
-      - transactionsadmin
-      - transactionsuser
+      - transactionsmicroservice
     ports:
       - "5000:5000"
     volumes:
@@ -38,8 +36,7 @@ services:
       dockerfile: Dockerfile
     container_name: apigatewayadmin
     depends_on:
-      - auctionsadmin
-      - auctionsuser
+      - auctionmicroservice
       - authmicroservice
       - auctiondbmanager
       - userdbmanager
@@ -48,8 +45,7 @@ services:
       - paymentdbmanager
       - gachamicroservice
       - paymentsmicroservice
-      - transactionsadmin
-      - transactionsuser
+      - transactionsmicroservice
     ports:
       - "5001:5000"
     volumes:
@@ -68,7 +64,7 @@ services:
   auctionmicroservice:
     build:
       context: ./AuctionsMicroservice
-      dockerfile: dockerfile_test
+      dockerfile: dockerfile
     container_name: auctionmicroservice
     #depends_on:
     #  - auctiondbmanager
@@ -100,7 +96,7 @@ services:
     networks:
       - user_network
       - admin_network
-  
+
   authdatabase:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
@@ -248,7 +244,7 @@ services:
     networks:
       - user_network
       - admin_network
-  
+
   transactiondatabase:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
@@ -266,7 +262,7 @@ services:
     networks:
       - user_network
       - admin_network
-   
+
   auctiondbmanager:
     build:
       context: ./AuctionDBManager
@@ -352,36 +348,41 @@ services:
       - user_network
       - admin_network
 
-  rabbit:
-    hostname: rabbit
-    image: "rabbitmq:3-management"
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=mypass
-    ports:
-      - "15672:15672"
-      - "5672:5672"
+  # rabbit:
+  #   hostname: rabbit
+  #   image: "rabbitmq:3-management"
+  #   environment:
+  #     - RABBITMQ_DEFAULT_USER=admin
+  #     - RABBITMQ_DEFAULT_PASS=mypass
+  #   ports:
+  #     - "15672:15672"
+  #     - "5672:5672"
 
-  auction_worker:
-    build:
-      context: ./AuctionWorker
-      dockerfile: dockerfile
-    user: nobody
-    depends_on:
-      - rabbit
-    volumes:
-      - ./config.json:/app/config.json
-      - ./AuctionWorker:/AuctionWorker
+  # auction_worker:
+  #   build:
+  #     context: ./AuctionWorker
+  #     dockerfile: dockerfile
+  #   user: nobody
+  #   depends_on:
+  #     - rabbit
+  #   volumes:
+  #     - ./config.json:/app/config.json
+  #     - ./AuctionWorker:/AuctionWorker
 
   auctioneer:
     build:
       context: ./Auctioneer
       dockerfile: dockerfile
     container_name: auctioneer
-    # depends_on:
-    #   - auctiondbmanager
+    depends_on:
+      - auctiondbmanager
     volumes:
       - ./config.json:/app/config.json
+      - ./Auctioneer:/Auctioneer
+    secrets:
+      - auctioneer_credentials
+    networks:
+      - admin_network
 
 secrets:
   token_secret:
@@ -443,7 +444,7 @@ secrets:
   gateway_user_cert:
     file: ./secrets/gateway_user_cert.pem
   gateway_user_key:
-    file: ./secrets/gateway_user_key.pem  
+    file: ./secrets/gateway_user_key.pem
   payments_cert:
     file: ./secrets/payments_cert.pem
   payments_cert_key:
@@ -464,7 +465,8 @@ secrets:
     file: ./secrets/transactions_ms_cert.pem
   transactions_ms_key:
     file: ./secrets/transactions_ms_key.pem
-
+  auctioneer_credentials:
+    file: ./secrets/auctioneer_credentials.json
 
 networks:
   user_network:
