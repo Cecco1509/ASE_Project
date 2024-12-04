@@ -127,26 +127,25 @@ def user_logout():
 @handle_errors
 def auction_market():
     """GET auction history."""
-    response = requests.get(config.services.auction + f'/player/auction/market', headers=request.headers, verify=False)
+    response = requests.get(config.services.auction + f'/api/player/auction/market', headers=request.headers, verify=False)
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/player/auction/create', methods=['POST'])
-@handle_errors
 def create_auction():
-    response = requests.post(config.services.auction + f'/player/auction/create', json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
+    response = requests.post(config.services.auction + f'/api/player/auction/create', json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
     return make_response(response.json(), response.status_code)
 
 @app.route('/api/player/auction/bid/<auction_id>', methods=['POST'])
 @handle_errors
 def create_bid(auctionId):
-    response = requests.post(config.services.auction + f'/player/auction/{auctionId}/bid', json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
+    response = requests.post(config.services.auction + f'/api/player/auction/{auctionId}/bid', json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
     return make_response(response.json(), response.status_code)
 
 @app.route('/api/player/auction', methods=['GET'])
 @handle_errors
 def user_auction_history():
-    response = requests.post(config.services.auction + f'/player/auction/history' , headers=request.headers, verify=False)
+    response = requests.post(config.services.auction + f'/api/player/auction/history' , headers=request.headers, verify=False)
     return make_response(response.json(), response.status_code)
 
 

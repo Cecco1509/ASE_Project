@@ -78,6 +78,9 @@ services:
     secrets:
       - auction_ms_cert
       - auction_ms_key
+    networks:
+      - user_network
+      - admin_network
 
   authmicroservice:
     build:
@@ -366,27 +369,6 @@ services:
     networks:
       - user_network
       - admin_network
-
-  # rabbit:
-  #   hostname: rabbit
-  #   image: "rabbitmq:3-management"
-  #   environment:
-  #     - RABBITMQ_DEFAULT_USER=admin
-  #     - RABBITMQ_DEFAULT_PASS=mypass
-  #   ports:
-  #     - "15672:15672"
-  #     - "5672:5672"
-
-  # auction_worker:
-  #   build:
-  #     context: ./AuctionWorker
-  #     dockerfile: dockerfile
-  #   user: nobody
-  #   depends_on:
-  #     - rabbit
-  #   volumes:
-  #     - ./config.json:/app/config.json
-  #     - ./AuctionWorker:/AuctionWorker
 
   auctioneer:
     build:
