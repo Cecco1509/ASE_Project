@@ -80,3 +80,17 @@ jobs:
     - name: Stop auth image
       run: |
         docker stop autht
+
+    - name: Build Auctions image
+      run: |
+        docker build -f ./AuctionsMicroservice/dockerfile_test -t Auctionstest .
+    - name: Run Auctions image
+      run: |
+        docker run --rm --name Auctionst -d -p 5000:5000 Auctionstest
+    - name: Run Auctions unit tests
+      run: |
+        cd docs/postman
+        newman run AuctionMicroservice.postman_collection.json --insecure
+    - name: Stop Auctions image
+      run: |
+        docker stop autht
