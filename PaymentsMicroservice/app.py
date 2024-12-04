@@ -69,7 +69,7 @@ def purchase_in_game_currency():
         if in_game_currency <=0:     
             return make_response(jsonify({'error': 'in game currency must be greater than zero'}), 400)
 
-        user_response=requests.get(config.dbamangers.user+ f'/user/{user_id}', verify=False)  
+        user_response=requests.get(config.dbmanagers.user+ f'/user/{user_id}', verify=False)  
         if user_response.status_code == 404:
             return make_response(jsonify({'error': 'User not found'}), 404) 
 
@@ -137,7 +137,7 @@ def decrease_in_game_currency(userId):
         
         # Parse the balance data from the response
         user_data = balance_response.json()
-        in_game_amount = user_data.get('ingameAmount')
+        in_game_amount = user_data.get('ingameCurrency')
         profile_picture= user_data.get('profilePicture')
         status=user_data.get('status')
 
@@ -150,7 +150,7 @@ def decrease_in_game_currency(userId):
         payload = {
             'status': status,
             'profilePicture': profile_picture,
-            'ingameAmount': in_game_amount-amount
+            'ingameCurrency': in_game_amount-amount
         }
 
         # Send a PUT request to the database manager service to decrease the balance
