@@ -100,7 +100,7 @@ def register_user():
     if json_data and 'username' in json_data and 'password' in json_data and 'profilePicture' in json_data:
         response = get_account_by_username(json_data['username'])
         if response != None:
-            return make_response(jsonify({"message":"Username taken."}, 409))
+            return make_response(jsonify({"message":"Username taken."}), 409)
         salt = os.urandom(32)
         hashed_password=bcrypt.generate_password_hash(json_data['password']).decode('utf-8') 
         auth_data = {
