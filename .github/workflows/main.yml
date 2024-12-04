@@ -86,7 +86,7 @@ jobs:
           docker build -f ./AuctionsMicroservice/dockerfile_test -t Auctionstest .
       - name: Run Auctions image
         run: |
-          docker run --rm --name Auctionst -d -p 5000:5000 Auctionstest
+          docker run --rm --name auctionst -d -p 5000:5000 Auctionstest
       - name: Run Auctions unit tests
         run: |
           cd docs/postman
@@ -100,7 +100,7 @@ jobs:
           docker build -f ./TransactionsMicroservice/dockerfile_test -t Transactionstest .
       - name: Run Transactions image
         run: |
-          docker run --rm --name Transactionst -d -p 5000:5000 Transactionstest
+          docker run --rm --name transactionst -d -p 5000:5000 Transactionstest
       - name: Run Transactions unit tests
         run: |
           cd docs/postman
