@@ -66,23 +66,23 @@ def create_app():
 
 @app.route('/api/player/currency<int:user_id>', methods=['GET'])
 def get_transaction_history(user_id):
-    response = requests.get(config.services.paymentsmicroservice+f'/api/player/currency/{user_id}', headers=request.headers, verify=False)
+    response = requests.get(config.services.paymentsmicroservice+f'/api/player/currency/transaction-history/{user_id}', headers=request.headers, verify=False)
     return make_response(jsonify(response.json()),response.status_code)
 
 
 @app.route('/api/player/currency', methods=['POST'])
 def purchase_in_game_currency():
-    response = requests.post(f"{config.services.paymentsmicroservice}/api/player/currency/", json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
+    response = requests.post(f"{config.services.paymentsmicroservice}/api/player/currency/purchase", json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
     return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/decrease/<int:user_id>', methods=['PUT'])
 def decrease_in_game_currency(user_id):
-    response = requests.put(config.services.paymentsmicroservice+ f'/api/player/decrease/update_balance', json=sanitize_data(request.get_json()),  headers=request.headers, verify=False)
+    response = requests.put(config.services.paymentsmicroservice+ f'/api/player/currency/decrease/{user_id}', json=sanitize_data(request.get_json()),  headers=request.headers, verify=False)
     return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/increase/<int:user_id>', methods=['PUT'])
 def increase_currency(user_id):
-    response = requests.put(config.services.paymentsmicroservice+ f'/api/player/increase/update_balance', json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
+    response = requests.put(config.services.paymentsmicroservice+ f'/api/player/currency/increase/{user_id}', json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
     return make_response(jsonify(response.json()),response.status_code) 
 
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
