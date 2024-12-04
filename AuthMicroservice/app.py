@@ -153,6 +153,14 @@ def logout(user_info):
         return make_response(jsonify({"message":"User succesfully logged out."}),200)
     return make_response(jsonify({"message":"Error while log out."}),400)
 
+@app.route('/api/player/<int:user_id>', methods=['DELETE'])
+@token_required("player")
+def delete_account(user_id, user_info):
+    deleted = delete_account(user_id)
+    if deleted:
+        return make_response(jsonify({"message":"Account succesfully delted."}),200)
+    return make_response(jsonify({"message":"Account not found."}),404)
+
 @app.route('/api/player/UserInfo', methods=['POST'])
 @token_required("player")
 def userInfo(user_info):
