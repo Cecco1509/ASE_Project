@@ -25,6 +25,34 @@ jobs:
       - name: Set up Docker buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Build Auctions image
+        run: |
+          docker build -f ./AuctionsMicroservice/dockerfile_test -t auctionstest .
+      - name: Run Auctions image
+        run: |
+          docker run --rm --name auctionst -d -p 5000:5000 -p 5001:5000 auctionstest
+      - name: Run Auctions unit tests
+        run: |
+          cd docs/postman
+          newman run AuctionMicroservice.postman_collection.json --insecure
+      - name: Stop Auctions image
+        run: |
+          docker stop auctionst
+
+      - name: Build Transactions image
+        run: |
+          docker build -f ./TransactionsMicroservice/dockerfile_test -t transactionstest .
+      - name: Run Transactions image
+        run: |
+          docker run --rm --name transactionst -d -p 5000:5000 -p 5001:5000 transactionstest
+      - name: Run Transactions unit tests
+        run: |
+          cd docs/postman
+          newman run TransactionsMicroservice.postman_collection.json --insecure
+      - name: Stop Transactions image
+        run: |
+          docker stop transactionst
+
       - name: Build gacha microservice image
         run: |
           docker build -f ./GachaMicroservice/dockerfile_test -t gachams_test .
@@ -80,31 +108,3 @@ jobs:
       - name: Stop auth image
         run: |
           docker stop autht
-
-      - name: Build Auctions image
-        run: |
-          docker build -f ./AuctionsMicroservice/dockerfile_test -t auctionstest .
-      - name: Run Auctions image
-        run: |
-          docker run --rm --name auctionst -d -p 5000:5000 auctionstest
-      - name: Run Auctions unit tests
-        run: |
-          cd docs/postman
-          newman run AuctionMicroservice.postman_collection.json --insecure
-      - name: Stop Auctions image
-        run: |
-          docker stop auctionst
-
-      - name: Build Transactions image
-        run: |
-          docker build -f ./TransactionsMicroservice/dockerfile_test -t transactionstest .
-      - name: Run Transactions image
-        run: |
-          docker run --rm --name transactionst -d -p 5000:5000 transactionstest
-      - name: Run Transactions unit tests
-        run: |
-          cd docs/postman
-          newman run TransactionsMicroservice.postman_collection.json --insecure
-      - name: Stop Transactions image
-        run: |
-          docker stop transactionst
