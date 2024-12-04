@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ed5210a0-2d3d-489a-a548-4019f6057c50",
+		"_postman_id": "3a46da75-1429-4e15-8c0b-5ad93d87d4ca",
 		"name": "AuctionMicroservice",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "37354036"
@@ -230,7 +230,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://127.0.0.1:5000/api/player/auction/history/2",
+					"raw": "https://127.0.0.1:5000/api/player/auction/history",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -243,8 +243,7 @@
 						"api",
 						"player",
 						"auction",
-						"history",
-						"2"
+						"history"
 					]
 				}
 			},
@@ -747,7 +746,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"bidAmount\" : 100,\n    \"userId\" : 2\n}",
+					"raw": "{\n    \"bidAmount\" : 100,\n    \"userId\" : 3\n}",
 					"options": {
 						"raw": {
 							"language": "json"

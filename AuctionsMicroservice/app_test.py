@@ -163,7 +163,7 @@ def bid_on_auction(auction_id):
 
 @app.route('/api/player/auction/history', methods=['GET'])
 @handle_errors
-def auction_player_history(userId):
+def auction_player_history():
     try:
         return make_response(jsonify([auction for auction in mock_auctions if auction['status'] == "PASSED"
                                                                             and auction["userId"] == 2]), 200)
