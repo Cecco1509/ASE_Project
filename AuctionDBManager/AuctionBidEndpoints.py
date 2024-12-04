@@ -40,7 +40,7 @@ def get_auctionbids_for_user(userId, auctionId):
 def create_auctionbid():
     json_data = request.get_json()
     if json_data:
-        bid = AuctionBid(userId=json_data['userId'], bidCode=json_data['bidCode'], bidAmount=json_data['bidAmount'], auctionId=json_data['auctionId'], timestamp=json_data['timestamp'])
+        bid = AuctionBid(userId=json_data['userId'], bidAmount=json_data['bidAmount'], auctionId=json_data['auctionId'], timestamp=json_data['timestamp'])
         db.session.add(bid)
         db.session.commit()
         return make_response(jsonify({"bidId":bid.id}), 200)

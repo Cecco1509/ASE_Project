@@ -49,7 +49,6 @@ mock_auction_bids = [
     {
         'id': 1,
         'userId': 4,
-        'bidCode': "1:1",  # auctionId:bid_num
         'bidAmount': 55.0,
         'auctionId': 1,
         'timestamp': datetime.now() - timedelta(hours=2)
@@ -57,7 +56,6 @@ mock_auction_bids = [
     {
         'id': 2,
         'userId': 2,
-        'bidCode': "1:2",
         'bidAmount': 60.0,
         'auctionId': 1,
         'timestamp': datetime.now() - timedelta(hours=1)
@@ -65,7 +63,6 @@ mock_auction_bids = [
     {
         'id': 3,
         'userId': 3,
-        'bidCode': "2:1",
         'bidAmount': 110.0,
         'auctionId': 2,
         'timestamp': datetime.now() - timedelta(days=2)
@@ -73,7 +70,6 @@ mock_auction_bids = [
     {
         'id': 4,
         'userId': 4,
-        'bidCode': "3:1",
         'bidAmount': 250.0,
         'auctionId': 3,
         'timestamp': datetime.now() - timedelta(hours=5)

@@ -162,7 +162,6 @@ def bid_on_auction(auction_id, auth_response=None):
 
         bid = {
                 'userId': auth_response["userId"],
-                'bidCode': f"{auction_id}:{len(auction_bids)}",
                 'bidAmount': data["bidAmount"],
                 'auctionId':auction_id, 
                 'timestamp':datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")

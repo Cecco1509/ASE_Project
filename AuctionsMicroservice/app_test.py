@@ -147,7 +147,6 @@ def bid_on_auction(auction_id):
         bid = {
                 'id': len(mock_auction_bids) + 1,
                 'userId': data["userId"],
-                'bidCode': f"{auction_id}:{len(auction_bids)}",
                 'bidAmount': data["bidAmount"],
                 'auctionId': auction_id, 
                 'timestamp': datetime.now()
