@@ -31,7 +31,7 @@ celery_app = Celery('worker',
 @app.route('/player/auction/market', methods=['GET'])
 @handle_errors
 @validate_player_token
-def get_auctions():
+def get_auctions(auth_response=None):
     try:
         response = requests.get(config.dbmanagers.auction + '/auction/status/1')
         response.raise_for_status()
@@ -43,15 +43,13 @@ def get_auctions():
 @app.route('/player/auction/create', methods=['POST'])
 @handle_errors
 @validate_player_token
-def create_auction():
+def create_auction(auth_response=None):
     try:
         data = request.get_json()
         if (not 'gachaCollectionId' in data or
-            not 'userId'  in data or
             not 'auctionStart' in data or
             not 'auctionEnd' in data or
-            not 'minimumBid' in data or
-            not 'status' in data) :
+            not 'minimumBid' in data) :
 
             return make_response(jsonify({"message": "Invalid data"}), 400);
     
@@ -60,7 +58,7 @@ def create_auction():
         try:
             gacha_res = requests.get(f"{config.dbmanagers.gacha}/gachacollection/item/{data["gachaCollectionId"]}")
             gacha_res.raise_for_status()
-            if gacha_res.json()['userId'] != data["userId"] :
+            if gacha_res.json()['userId'] != auth_response["userId"] :
                 return make_response(jsonify({"message": "Invalid user"}), 400);
         except Exception as e:
             return make_response(jsonify({"message": "Gacha Collection does not exits"}), 400);
@@ -81,7 +79,7 @@ def create_auction():
             print(start, end, now, flush=True)
         # check if user already has an active auction for this gachaCollection
         
-        active_auction = requests.get(config.dbmanagers.auction + f'/auction/{data["userId"]}/{data["gachaCollectionId"]}/1')
+        active_auction = requests.get(config.dbmanagers.auction + f'/auction/{auth_response["userId"]}/{data["gachaCollectionId"]}/1')
         try:
             active = active_auction.json()
             print("ACTIVE : ", active, flush=True)
@@ -104,7 +102,7 @@ def create_auction():
 @app.route('/player/auction/bid/<auction_id>', methods=['POST']) ## {userID, amount}
 @handle_errors
 @validate_player_token
-def bid_on_auction(auction_id):
+def bid_on_auction(auction_id, auth_response=None):
     try:
         tz = pytz.timezone('Europe/Rome')
         data = request.get_json()
@@ -118,7 +116,7 @@ def bid_on_auction(auction_id):
         if (tz.localize(datetime.strptime(auction["auctionStart"], "%a, %d %b %Y %H:%M:%S %Z")).replace(second=0, microsecond=0) > datetime.now(tz).replace(second=0, microsecond=0)):
             return make_response(jsonify({"message": "Auction has not started yet"}), 400);
 
-        if (auction["userId"] == data["userId"]):
+        if (auction["userId"] == auth_response["userId"]):
             return make_response(jsonify({"message": "Can't bid on an owned auction"}), 400);
     
         if (auction["minimumBid"] > data["bidAmount"]):
@@ -143,7 +141,7 @@ def bid_on_auction(auction_id):
         else:
             print("NO BIDS FOR AUCTION " + str(auction_id), flush=True)
 
-        if (userBidId == data["userId"]):
+        if (userBidId == auth_response["userId"]):
             return make_response(jsonify({"message": "Can't bid twice in a row"}), 400)
         else:
             print("LAST BID USER ID " + str(userBidId), flush=True)
@@ -154,7 +152,7 @@ def bid_on_auction(auction_id):
             print("LAST BID AMOUNT " + str(auctionBidAmount), flush=True)
 
         bid = {
-                'userId': data["userId"],
+                'userId': auth_response["userId"],
                 'bidCode': f"{auction_id}:{len(auction_bids)}",
                 'bidAmount': data["bidAmount"],
                 'auctionId':auction_id, 
@@ -164,7 +162,7 @@ def bid_on_auction(auction_id):
         try:
             result = requests.post(config.dbmanagers.auction + f'/auctionbid', 
                         json={
-                            'userId': data["userId"],
+                            'userId': auth_response["userId"],
                             'bidCode': f"{auction_id}:{len(auction_bids)}",
                             'bidAmount': data["bidAmount"],
                             'auctionId':auction_id, 
@@ -184,7 +182,7 @@ def bid_on_auction(auction_id):
         try:
             ## Subtract money from the current bidder
             resp = requests.patch(
-                    f"{config.dbmanagers.user}/user/{data["userId"]}",
+                    f"{config.dbmanagers.user}/user/{auth_response["userId"]}",
                     json={"ingameCurrency": - (float(data['bidAmount']))}
                 )
                     
@@ -199,7 +197,7 @@ def bid_on_auction(auction_id):
                 if resp1.status_code != 200:
                     ## Trying to rollback if the currency isn't changed
                     resp2 = requests.patch(
-                        f"{config.dbmanagers.user}/user/{data["userId"]}",
+                        f"{config.dbmanagers.user}/user/{auth_response["userId"]}",
                         json={"ingameCurrency": (float(data['bidAmount']))}
                     )
                     resp1.raise_for_status()
@@ -217,13 +215,13 @@ def bid_on_auction(auction_id):
 
     ## TOKENS DA INSERIRE
 
-@app.route('/player/auction/history/<int:userId>', methods=['GET'])
+@app.route('/player/auction/history', methods=['GET'])
 @handle_errors
 @validate_player_token
-def auction_player_history(userId):
+def auction_player_history(auth_response=None):
     try:
         data = request.get_json()
-        response = requests.get(config.dbmanagers.auction + f'/auction/{userId}/2')
+        response = requests.get(config.dbmanagers.auction + f'/auction/{auth_response['userId']}/2')
         return make_response(response.json(), 200)
     except Exception as err:
         return make_response(jsonify({"message": str(err)}), 500)
@@ -245,7 +243,7 @@ def check_auction(auction) -> bool:
 @app.route('/admin/auction', methods=['GET'])
 @handle_errors
 @validate_admin_token
-def get_all_auctions():
+def get_all_auctions(auth_response=None):
     print(f"GET all auctions")
     try:
         response = requests.get(config.dbmanagers.auction + f'/auction', verify=False)
@@ -261,7 +259,7 @@ def get_all_auctions():
 @app.route('/admin/auction/<int:auction_id>', methods=['GET'])
 @handle_errors
 @validate_admin_token
-def get_auction(auction_id):
+def get_auction(auction_id, auth_response=None):
     print(f"GET auction", auction_id)
     try:
         response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}', verify=False)
@@ -277,7 +275,7 @@ def get_auction(auction_id):
 @app.route('/admin/auction/<int:auction_id>', methods=['PUT'])
 @handle_errors
 @validate_admin_token
-def update_auction(auction_id):
+def update_auction(auction_id, auth_response=None):
     print(f"PUT auction", auction_id)
     try:
         # Parse JSON data from the request
@@ -307,17 +305,15 @@ def update_auction(auction_id):
 @app.route('/admin/auction/history', methods=['GET'])
 @handle_errors
 @validate_admin_token
-def history():
+def history(auth_response=None):
     print(f"GET Auctions History")
     try:
 
         response = requests.get(config.dbmanagers.auction + f'/auction/2')
-        auctions = {"auctions" : []}
 
-        if response.status_code != 404:
-            auctions["auctions"] = response.json()
+        response.raise_for_status()
 
-        return make_response(jsonify(auctions), 200)
+        return make_response(jsonify(response.json()), 200)
     except Exception as e:
         return make_response(jsonify({"message": str(e)}, 500))
     
@@ -325,7 +321,7 @@ def history():
 @app.route('/admin/auction/history/<user_id>', methods=['GET'])
 @handle_errors
 @validate_admin_token
-def user_history(user_id):
+def user_history(user_id, auth_response=None):
     print(f"GET History of user " + user_id)
     try:
         data = request.get_json()

@@ -1,0 +1,987 @@
+{
+	"info": {
+		"_postman_id": "ed5210a0-2d3d-489a-a548-4019f6057c50",
+		"name": "AuctionMicroservice",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37354036"
+	},
+	"item": [
+		{
+			"name": "player get active auctions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Active Auctions - Status 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the expected structure\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"array\"); // Expect response to be an array",
+							"    ",
+							"    // Check that each item in the array has the required properties",
+							"    jsonData.forEach(item => {",
+							"        pm.expect(item).to.have.property(\"gachaCollectionId\");",
+							"        pm.expect(item).to.have.property(\"id\");",
+							"        pm.expect(item).to.have.property(\"auctionStart\");",
+							"        pm.expect(item).to.have.property(\"auctionEnd\");",
+							"        pm.expect(item).to.have.property(\"timestamp\");",
+							"        pm.expect(item).to.have.property(\"userId\");",
+							"        pm.expect(item).to.have.property(\"minimumBid\");",
+							"        pm.expect(item).to.have.property(\"status\");",
+							"",
+							"        pm.expect(item[\"status\"]).be.eq(\"ACTIVE\")",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/market",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"market"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get auction history 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Active Auctions - Status 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the expected structure\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"array\"); // Expect response to be an array",
+							"    ",
+							"    // Check that each item in the array has the required properties",
+							"    jsonData.forEach(item => {",
+							"        pm.expect(item).to.have.property(\"gachaCollectionId\");",
+							"        pm.expect(item).to.have.property(\"id\");",
+							"        pm.expect(item).to.have.property(\"auctionStart\");",
+							"        pm.expect(item).to.have.property(\"auctionEnd\");",
+							"        pm.expect(item).to.have.property(\"timestamp\");",
+							"        pm.expect(item).to.have.property(\"userId\");",
+							"        pm.expect(item).to.have.property(\"minimumBid\");",
+							"        pm.expect(item).to.have.property(\"status\");",
+							"",
+							"        pm.expect(item[\"status\"]).be.eq(\"PASSED\")",
+							"        pm.expect(item[\"userId\"]).be.eq(2)",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/history/2",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"history",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post auction 201",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var current = new Date();",
+							"var after1day = new Date();",
+							"",
+							"after1day.setDate(after1day.getDate() +1);",
+							"",
+							"var body = {",
+							"    \"gachaCollectionId\" : 2,",
+							"    \"userId\" : 2,",
+							"    \"auctionStart\" : current.toISOString(),",
+							"    \"auctionEnd\" :   after1day.toISOString(),",
+							"    \"minimumBid\" : 30,    ",
+							"    \"status\" : \"ACTIVE\"",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 201\", function () {",
+							"    pm.response.to.have.status(201);  // Expecting status 201 for successful creation",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('auctionId');  // Check if auctionId is returned",
+							"    pm.expect(jsonData.auctionId).to.be.a('number');  // Check if auctionId is a number",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/create",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post auction 400 already active",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var current = new Date();",
+							"var after1day = new Date();",
+							"",
+							"after1day.setDate(after1day.getDate() +1);",
+							"",
+							"var body = {",
+							"    \"gachaCollectionId\" : 1,",
+							"    \"userId\" : 1,",
+							"    \"auctionStart\" : current.toISOString(),",
+							"    \"auctionEnd\" :   after1day.toISOString(),",
+							"    \"minimumBid\" : 30,    ",
+							"    \"status\" : \"ACTIVE\"",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/create",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post auction 400 invalid dates",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var current = new Date();",
+							"var before1day = new Date();",
+							"",
+							"before1day.setDate(before1day.getDate() -1);",
+							"",
+							"var body = {",
+							"    \"gachaCollectionId\" : 1,",
+							"    \"userId\" : 1,",
+							"    \"auctionStart\" : current.toISOString(),",
+							"    \"auctionEnd\" :   before1day.toISOString(),",
+							"    \"minimumBid\" : 30,    ",
+							"    \"status\" : \"ACTIVE\"",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/create",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post auction 400 invalid gacha",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var current = new Date();",
+							"var after1day = new Date();",
+							"",
+							"after1day.setDate(after1day.getDate() +1);",
+							"",
+							"var body = {",
+							"    \"gachaCollectionId\" : 9,",
+							"    \"userId\" : 1,",
+							"    \"auctionStart\" : current.toISOString(),",
+							"    \"auctionEnd\" :   after1day.toISOString(),",
+							"    \"minimumBid\" : 30,    ",
+							"    \"status\" : \"ACTIVE\"",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/create",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post bid 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 200\", function () {",
+							"    pm.response.to.have.status(200);  // Expecting status 200 for successful creation",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('bidId');  // Check if auctionId is returned",
+							"    pm.expect(jsonData.bidId).to.be.a('number');  // Check if auctionId is a number",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bidAmount\" : 70,\n    \"userId\" : 3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/bid/1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"bid",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post bid 400 not enough bidAmount",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bidAmount\" : 54,\n    \"userId\" : 4\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/bid/1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"bid",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post bid 400 two bid in a row",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bidAmount\" : 100,\n    \"userId\" : 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/bid/1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"bid",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post bid 400 bid owned auction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bidAmount\" : 100,\n    \"userId\" : 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/bid/1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"bid",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post bid 400 bid old auction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bidAmount\" : 100,\n    \"userId\" : 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/player/auction/bid/2",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"bid",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get auctions 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Active Auctions - Status 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"     ",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"array\"); // Expect response to be an array",
+							"    ",
+							"    // Check that each item in the array has the required properties",
+							"    jsonData.forEach(item => {",
+							"        pm.expect(item).to.have.property(\"gachaCollectionId\");",
+							"        pm.expect(item).to.have.property(\"id\");",
+							"        pm.expect(item).to.have.property(\"auctionStart\");",
+							"        pm.expect(item).to.have.property(\"auctionEnd\");",
+							"        pm.expect(item).to.have.property(\"timestamp\");",
+							"        pm.expect(item).to.have.property(\"userId\");",
+							"        pm.expect(item).to.have.property(\"minimumBid\");",
+							"        pm.expect(item).to.have.property(\"status\");",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/admin/auction",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get auction item 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test if the response contains the expected fields",
+							"pm.test(\"Response has the expected structure\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"gachaCollectionId\");",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData).to.have.property(\"auctionStart\");",
+							"    pm.expect(jsonData).to.have.property(\"auctionEnd\");",
+							"    pm.expect(jsonData).to.have.property(\"timestamp\");",
+							"    pm.expect(jsonData).to.have.property(\"userId\");",
+							"    pm.expect(jsonData).to.have.property(\"minimumBid\");",
+							"    pm.expect(jsonData).to.have.property(\"status\");",
+							"});",
+							"",
+							"// Test if the 'id' is 1 (based on the URL passed)",
+							"pm.test(\"ID should be 1\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.id).to.eql(1);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/admin/auction/1",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get auction item 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/admin/auction/90",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction",
+						"90"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get old auctions 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Active Auctions - Status 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the expected structure\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"array\"); // Expect response to be an array",
+							"    ",
+							"    // Check that each item in the array has the required properties",
+							"    jsonData.forEach(item => {",
+							"        pm.expect(item).to.have.property(\"gachaCollectionId\");",
+							"        pm.expect(item).to.have.property(\"id\");",
+							"        pm.expect(item).to.have.property(\"auctionStart\");",
+							"        pm.expect(item).to.have.property(\"auctionEnd\");",
+							"        pm.expect(item).to.have.property(\"timestamp\");",
+							"        pm.expect(item).to.have.property(\"userId\");",
+							"        pm.expect(item).to.have.property(\"minimumBid\");",
+							"        pm.expect(item).to.have.property(\"status\");",
+							"",
+							"        pm.expect(item[\"status\"]).be.eq(\"PASSED\")",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/admin/auction/history",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction",
+						"history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get user auction history 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Active Auctions - Status 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the expected structure\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"array\"); // Expect response to be an array",
+							"    ",
+							"    // Check that each item in the array has the required properties",
+							"    jsonData.forEach(item => {",
+							"        pm.expect(item).to.have.property(\"gachaCollectionId\");",
+							"        pm.expect(item).to.have.property(\"id\");",
+							"        pm.expect(item).to.have.property(\"auctionStart\");",
+							"        pm.expect(item).to.have.property(\"auctionEnd\");",
+							"        pm.expect(item).to.have.property(\"timestamp\");",
+							"        pm.expect(item).to.have.property(\"userId\");",
+							"        pm.expect(item).to.have.property(\"minimumBid\");",
+							"        pm.expect(item).to.have.property(\"status\");",
+							"",
+							"        pm.expect(item[\"status\"]).be.eq(\"PASSED\")",
+							"        pm.expect(item[\"userId\"]).be.eq(2)",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/admin/auction/history/2",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction",
+						"history",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin get user auction history 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Active Auctions - Status 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the expected structure\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an(\"array\"); // Expect response to be an array",
+							"    pm.expect(Array.from(jsonData).length).be.eq(0)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:5001/api/admin/auction/history/90",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction",
+						"history",
+						"90"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

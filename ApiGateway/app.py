@@ -11,7 +11,7 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
-AUCTIONS_MICROSERVICE = config.services.auctionsservice
+AUCTIONS_MICROSERVICE = config.services.auction
 GACHA_MICROSERVICE = config.services.gacha
 
 """AuctionsAdmin ENDPOINTS"""
@@ -21,7 +21,7 @@ GACHA_MICROSERVICE = config.services.gacha
 @handle_errors
 def admin_auctions():
     """Fetch all auction items."""
-    response = requests.get(AUCTIONS_MICROSERVICE + '/auction')
+    response = requests.get(AUCTIONS_MICROSERVICE + '/admin/auction')
     response.raise_for_status()
     auction_items = response.json()
     return make_response(jsonify(auction_items), response.status_code)
@@ -31,7 +31,7 @@ def admin_auctions():
 @handle_errors
 def get_single_auction(auctionId):
     """Fetch a single auction item by ID."""
-    response = requests.get(AUCTIONS_MICROSERVICE + f'/auction/{auctionId}')
+    response = requests.get(AUCTIONS_MICROSERVICE + f'/admin/auction/{auctionId}')
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
     
@@ -50,7 +50,7 @@ def modify_auction(auctionId):
     # External request to modify auction
     try:
         response = requests.put(
-            f"{AUCTIONS_MICROSERVICE}/auction/{auctionId}",
+            f"{AUCTIONS_MICROSERVICE}/admin/auction/{auctionId}",
             json=json_data,
         )
         response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
@@ -67,7 +67,7 @@ def auction_history():
     """GET auction history."""
     try:
         # Make the external GET request
-        response = requests.get(f"{AUCTIONS_MICROSERVICE}/auction/history")
+        response = requests.get(f"{AUCTIONS_MICROSERVICE}/admin/auction/history")
         response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
         
         # Return the successful response to the client
@@ -82,7 +82,7 @@ def auction_history():
 @app.route('/api/admin/auction/history/<int:userId>', methods=['GET'])
 @handle_errors
 def admin_auction_user_history(userId):
-    response = requests.get(AUCTIONS_MICROSERVICE + '/history/{userId}')
+    response = requests.get(AUCTIONS_MICROSERVICE + '/admin/history/{userId}')
     response.raise_for_status()
     auction_collections = response.json()
     return make_response(jsonify(auction_collections), response.status_code)
@@ -93,9 +93,9 @@ def admin_auction_user_history(userId):
 # GET /api/player/auction/market: Get all active auctions in the market.
 @app.route('/api/player/auction/market', methods=['GET'])
 @handle_errors
-def auction_market(userId):
+def auction_market():
     """GET auction history."""
-    response = requests.get(AUCTIONS_MICROSERVICE + f'/auction/market')
+    response = requests.get(AUCTIONS_MICROSERVICE + f'/player/auction/market')
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
 
@@ -103,20 +103,20 @@ def auction_market(userId):
 @app.route('/api/player/auction/create>', methods=['POST'])
 @handle_errors
 def create_auction():
-    response = requests.post(AUCTIONS_MICROSERVICE + f'/auction/create', json=request.get_json())
+    response = requests.post(AUCTIONS_MICROSERVICE + f'/player/auction/create', json=request.get_json())
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
 # POST /api/player/auction/bid/{auction_id}: Place a bid on an active auction.
 @app.route('/api/player/auction/bid/<auction_id>', methods=['POST'])
 def create_bid(auctionId):
-    response = requests.post(AUCTIONS_MICROSERVICE + f'/auction/{auctionId}/bid', json=request.get_json())
+    response = requests.post(AUCTIONS_MICROSERVICE + f'/player/auction/{auctionId}/bid', json=request.get_json())
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
 @app.route('/api/player/auction/history', methods=['GET'])
 def user_auction_history(auctionId):
-    response = requests.post(AUCTIONS_MICROSERVICE + f'/auction/history')
+    response = requests.post(AUCTIONS_MICROSERVICE + f'/player/auction/history')
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 

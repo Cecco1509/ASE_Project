@@ -5,18 +5,18 @@ services:
       dockerfile: Dockerfile
     container_name: apigateway
     depends_on:
-      - authmicroservice
+      #- authmicroservice
       - auctionmicroservice
-      - auctiondbmanager
-      - userdbmanager
-      - gachadbmanager
-      - transactiondbmanager
-      - paymentdbmanager
-      - gachamicroservice
-      - paymentsmicroservice
-      - transactionsmicroservice
+      #- auctiondbmanager
+      #- userdbmanager
+      #- gachadbmanager
+      #- transactiondbmanager
+      #- paymentdbmanager
+      #- gachamicroservice
+      #- paymentsmicroservice
+      #- transactionsmicroservice
     ports:
-      - "8080:5000"
+      - "5000:5000" ### CHANGE BACK TO 5000
     volumes:
       - ./config.json:/app/config.json
       - .:/ApiGateway
@@ -31,10 +31,10 @@ services:
   auctionmicroservice:
     build:
       context: ./AuctionsMicroservice
-      dockerfile: Dockerfile
+      dockerfile: dockerfile_test
     container_name: auctionmicroservice
-    depends_on:
-      - auctiondbmanager
+    #depends_on:
+    #  - auctiondbmanager
     volumes:
       - ./config.json:/app/config.json
       - .:/AuctionsMicroservice
