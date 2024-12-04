@@ -7,6 +7,112 @@
 	},
 	"item": [
 		{
+			"name": "player login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Token received\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var accessToken = jsonData[\"Access token\"];\r",
+							"\r",
+							"    if (accessToken) {\r",
+							"        pm.environment.set(\"ase_player_token\", accessToken);\r",
+							"    } else {\r",
+							"        console.log(\"Access token not found in the response.\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"user0\",\r\n    \"password\": \"user0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "admin login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Token received\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var accessToken = jsonData[\"Access token\"];\r",
+							"\r",
+							"    if (accessToken) {\r",
+							"        pm.environment.set(\"ase_admin_token\", accessToken);\r",
+							"    } else {\r",
+							"        console.log(\"Access token not found in the response.\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"admin0\",\r\n    \"password\": \"admin0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5001/api/admin/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "player get active auctions",
 			"event": [
 				{
@@ -42,10 +148,20 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/market",
+					"raw": "https://127.0.0.1:5000/api/player/auction/market",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -53,7 +169,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -101,10 +217,20 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/history/2",
+					"raw": "https://127.0.0.1:5000/api/player/auction/history/2",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -112,7 +238,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -169,6 +295,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -181,7 +317,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/create",
+					"raw": "https://127.0.0.1:5000/api/player/auction/create",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -189,7 +325,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -242,6 +378,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -254,7 +400,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/create",
+					"raw": "https://127.0.0.1:5000/api/player/auction/create",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -262,7 +408,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -315,6 +461,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -327,7 +483,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/create",
+					"raw": "https://127.0.0.1:5000/api/player/auction/create",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -335,7 +491,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -388,6 +544,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -400,7 +566,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/create",
+					"raw": "https://127.0.0.1:5000/api/player/auction/create",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -408,7 +574,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -439,6 +605,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -451,7 +627,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/bid/1",
+					"raw": "https://127.0.0.1:5000/api/player/auction/bid/1",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -459,7 +635,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -488,6 +664,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -500,7 +686,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/bid/1",
+					"raw": "https://127.0.0.1:5000/api/player/auction/bid/1",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -508,7 +694,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -534,9 +720,29 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -549,7 +755,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/bid/1",
+					"raw": "https://127.0.0.1:5000/api/player/auction/bid/1",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -557,7 +763,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -586,6 +792,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -598,7 +814,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/bid/1",
+					"raw": "https://127.0.0.1:5000/api/player/auction/bid/1",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -606,7 +822,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -635,6 +851,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_player_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -647,7 +873,7 @@
 					}
 				},
 				"url": {
-					"raw": "https://127.0.0.1:5001/api/player/auction/bid/2",
+					"raw": "https://127.0.0.1:5000/api/player/auction/bid/2",
 					"protocol": "https",
 					"host": [
 						"127",
@@ -655,7 +881,7 @@
 						"0",
 						"1"
 					],
-					"port": "5001",
+					"port": "5000",
 					"path": [
 						"api",
 						"player",
@@ -699,6 +925,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -757,6 +993,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -797,6 +1043,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -855,6 +1111,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -914,6 +1180,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -960,6 +1236,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -1025,6 +1311,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -1103,6 +1399,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -1181,6 +1487,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -1258,6 +1574,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ase_admin_token}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
