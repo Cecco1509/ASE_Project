@@ -50,6 +50,8 @@ def create_auction(auth_response=None):
 
             return make_response(jsonify({"message": "Invalid data"}), 400);
 
+        if int(data["minimumBid"]) <= 0:
+            return make_response(jsonify({"message": "Minimum bid must be a positive integer, greater than 0"}), 400);
         try:
             gacha_res = requests.get(f"{config.dbmanagers.gacha}/gachacollection/item/{data["gachaCollectionId"]}", verify=False)
             gacha_res.raise_for_status()
@@ -123,6 +125,7 @@ def bid_on_auction(auction_id, auth_response=None):
         response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}', verify=False)
         response.raise_for_status()
         auction = response.json()
+        print(auction)
 
         if (auction["status"] != "ACTIVE" ):
             return make_response(jsonify({"message": "Auction is not active"}), 400);
@@ -174,14 +177,17 @@ def bid_on_auction(auction_id, auth_response=None):
         
         try:
             ## Subtract money from the current bidder
-            res = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/decrease/{current_user_id}",
-                        json={"amount": float(data['bidAmount'])},
-                        headers=request.headers,
-                        verify=False
-                    )
-            
-            ## This could raise an exception if the user has not enough ingameCurrency
-            res.raise_for_status()
+            try:
+                res = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/decrease/{current_user_id}",
+                            json={"amount": float(data['bidAmount'])},
+                            headers=request.headers,
+                            verify=False
+                        )
+                
+                ## This could raise an exception if the user has not enough ingameCurrency
+                res.raise_for_status()
+            except Exception as e:
+                return make_response(jsonify({"message": "Error decreasing player currency"}), 500)
 
             ## Giving money back to the last bidder
             if userBidId is not None:
@@ -257,7 +263,6 @@ def check_auction(auction) -> bool:
 
 
 def close_auction(auction, headers) -> bool:
-    print("Started auctioneer process", flush=True)
 
     if not auction or auction['status'] != "ACTIVE":  # Auction already closed
         print("Auction already closed", flush=True)
@@ -296,14 +301,12 @@ def close_auction(auction, headers) -> bool:
         "sellerId": auction['userId'],
         "buyerId": winningBid['userId'],
         "auctionBidId": winningBid['id'],
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     }
-
 
     resp = requests.post(f"{config.dbmanagers.transaction}/auctiontransaction", headers=headers, json=transaction, verify=False)
     if resp.status_code != 200:
-        return
-
+        return False
 
     resp = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/increase/{auction['userId']}",
                         json={"amount": float(winningBid['bidAmount'])},
@@ -323,6 +326,8 @@ def close_auction(auction, headers) -> bool:
 
     # Remove Gacha from the seller
     requests.delete(f"{config.dbmanagers.gacha}/gachacollection/{auction['gachaCollectionId']}", verify=False)
+
+    return True
 
 
 ##################################################### ADMIN ############################################################

@@ -139,7 +139,7 @@ def create_auction():
 @app.route('/api/player/auction/bid/<int:auction_id>', methods=['POST'])
 @handle_errors
 def create_bid(auction_id):
-    response = requests.post(config.services.auction + f'/api/player/auction/{auction_id}/bid', json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
+    response = requests.post(config.services.auction + f'/api/player/auction/bid/{auction_id}', json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
     return make_response(response.json(), response.status_code)
 
 @app.route('/api/player/auction', methods=['GET'])
