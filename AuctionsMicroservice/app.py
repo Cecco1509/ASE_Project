@@ -117,9 +117,9 @@ def bid_on_auction(auction_id, auth_response=None):
         current_user_id = auth_response.json()["userId"]
         data = request.get_json()
 
-        if ("bidAmount" not in data or
-            "userId" not in data ):
+        if ("bidAmount" not in data):
             return make_response(jsonify({"message": "invalid payload"}), 400);
+    
         response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}', verify=False)
         response.raise_for_status()
         auction = response.json()
