@@ -41,6 +41,7 @@ def get_auctions(auth_response=None):
 @validate_player_token
 def create_auction(auth_response=None):
     try:
+        current_user_id = auth_response.json()["userId"]
         data = request.get_json()
         if (not 'gachaCollectionId' in data or
             not 'auctionStart' in data or
@@ -52,11 +53,10 @@ def create_auction(auth_response=None):
         try:
             gacha_res = requests.get(f"{config.dbmanagers.gacha}/gachacollection/item/{data["gachaCollectionId"]}", verify=False)
             gacha_res.raise_for_status()
-            if gacha_res.json()['userId'] != auth_response["userId"] :
+            if gacha_res.json()['userId'] != current_user_id :
                 return make_response(jsonify({"message": "Invalid user"}), 400);
         except Exception as e:
-            return make_response(jsonify({"message": "Error invoking gacha dbmanager"}), 400);
-
+            return make_response(jsonify({"message": "Error invoking gacha dbmanager"}), 500);
 
         start = datetime.strptime(data['auctionStart'], '%Y-%m-%dT%H:%M:%S.%fZ')
         end = datetime.strptime(data['auctionEnd'], '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -75,23 +75,27 @@ def create_auction(auth_response=None):
             return make_response(jsonify({"message": "Auction start time must be before end time"}), 400);
         # check if user already has an active auction for this gachaCollection
         
-        active_auction = requests.get(config.dbmanagers.auction + f'/auction/{auth_response["userId"]}/{data["gachaCollectionId"]}/1', verify=False)
+        active_auction = requests.get(config.dbmanagers.auction + f'/auction/{current_user_id}/{data["gachaCollectionId"]}/1', verify=False)
         try:
             active = active_auction.json()
             print("ACTIVE : ", active, flush=True)
-            if(len(active) > 0):
-                return make_response(jsonify({"message": f"User {auth_response['userId']} already has an active auction for tha gachaCollection"}), 400);
+            i = 0
+            for item in active:
+                i += 1
+                break
+            if i > 0:
+                return make_response(jsonify({"message": f"User {current_user_id} already has an active auction for tha gachaCollection"}), 400);
         except Exception as e:
-            print("EXPLODED "+str(e), flush=True)
-            print(active, flush=True)
+            print("EXPLODED " + str(e), flush=True)
+            return make_response(jsonify({"message": f"{str(e)}"}), 500);
     
-        data["timestamp"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+        data["timestamp"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
 
         new_auction = {
             "gachaCollectionId": data["gachaCollectionId"],
-            "userId": auth_response["userId"],
-            "auctionStart": start.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
-            "auctionEnd": end.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            "userId": current_user_id,
+            "auctionStart": start.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "auctionEnd": end.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "minimumBid": data["minimumBid"],
             "timestamp": data["timestamp"],
             "status": "ACTIVE"
@@ -110,6 +114,7 @@ def create_auction(auth_response=None):
 @validate_player_token
 def bid_on_auction(auction_id, auth_response=None):
     try:
+        current_user_id = auth_response.json()["userId"]
         data = request.get_json()
 
         if ("bidAmount" not in data or
@@ -125,7 +130,7 @@ def bid_on_auction(auction_id, auth_response=None):
         if (datetime.strptime(auction["auctionStart"], "%a, %d %b %Y %H:%M:%S %Z")) > datetime.now():
             return make_response(jsonify({"message": "Auction has not started yet"}), 400);
 
-        if (auction["userId"] == auth_response["userId"]):
+        if (auction["userId"] == current_user_id):
             return make_response(jsonify({"message": "Can't bid on an owned auction"}), 400);
     
         if (auction["minimumBid"] > data["bidAmount"]):
@@ -150,7 +155,7 @@ def bid_on_auction(auction_id, auth_response=None):
         else:
             print("NO BIDS FOR AUCTION " + str(auction_id), flush=True)
 
-        if (userBidId == auth_response["userId"]):
+        if (userBidId == current_user_id):
             return make_response(jsonify({"message": "Can't bid twice in a row"}), 400)
         else:
             print("LAST BID USER ID " + str(userBidId), flush=True)
@@ -161,15 +166,15 @@ def bid_on_auction(auction_id, auth_response=None):
             print("LAST BID AMOUNT " + str(auctionBidAmount), flush=True)
 
         bid = {
-                'userId': auth_response["userId"],
+                'userId': current_user_id,
                 'bidAmount': data["bidAmount"],
                 'auctionId':auction_id, 
-                'timestamp':datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+                'timestamp':datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
             }
         
         try:
             ## Subtract money from the current bidder
-            res = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/decrease/{auth_response["userId"]}",
+            res = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/decrease/{current_user_id}",
                         json={"amount": float(data['bidAmount'])},
                         headers=request.headers,
                         verify=False
@@ -188,7 +193,7 @@ def bid_on_auction(auction_id, auth_response=None):
                 
                 if res1.status_code != 200:
                     ## Trying to rollback if the currency isn't changed
-                    res2 = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/increase/{auth_response["userId"]}",
+                    res2 = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/increase/{current_user_id}",
                         json={"amount": float(data['bidAmount'])},
                         headers=request.headers,
                         verify=False
@@ -202,7 +207,7 @@ def bid_on_auction(auction_id, auth_response=None):
         try:
             result = requests.post(config.dbmanagers.auction + f'/auctionbid', 
                         json={
-                            'userId': auth_response["userId"],
+                            'userId': current_user_id,
                             'bidAmount': data["bidAmount"],
                             'auctionId':auction_id, 
                             'timestamp':datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -231,8 +236,9 @@ def bid_on_auction(auction_id, auth_response=None):
 @validate_player_token
 def auction_player_history(auth_response=None):
     try:
+        current_user_id = auth_response.json()["userId"]
         data = request.get_json()
-        response = requests.get(config.dbmanagers.auction + f'/auction/{auth_response['userId']}/2', verify=False)
+        response = requests.get(config.dbmanagers.auction + f'/auction/{current_user_id}/2', verify=False)
         return make_response(response.json(), 200)
     except Exception as err:
         return make_response(jsonify({"message": str(err)}), 500)
@@ -252,13 +258,6 @@ def check_auction(auction) -> bool:
 
 def close_auction(auction, headers) -> bool:
     print("Started auctioneer process", flush=True)
-
-    try:
-        auction = auction.json()
-        print(auction, flush=True)
-    except Exception as e:
-        print("Failed decode auction", flush=True)
-        return False
 
     if not auction or auction['status'] != "ACTIVE":  # Auction already closed
         print("Auction already closed", flush=True)
