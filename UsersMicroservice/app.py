@@ -45,7 +45,11 @@ def updatePlayerInformation(user_id):
 def delete_player(user_id):
     delete_response = requests.delete(f'{config.dbmanagers.user}/user/{user_id}')  
     if delete_response.status_code == 200:
-        return make_response(jsonify({"message": "Player successfully deleted"}), 200)
+        delete_response = requests.delete(f'{config.services.authmicroservice}/player/{user_id}')  
+        if delete_response.status_code ==200:
+            return make_response(jsonify({"message": "Player successfully deleted"}), 200)
+        else:
+            return make_response(jsonify({"error": "Player not found"}), 404)
     elif delete_response.status_code == 500:
         return make_response(jsonify({"error": "Failed to delete player"}), 500)
     elif delete_response.status_code == 404:

@@ -19,7 +19,12 @@ def get_all_users():
 
 
 
-
+@app.route('/user/auth/<int:accountId>', methods=['GET'])
+def get_user_by_authId(accountId):
+    user = db.session.execute(db.select(User).where(User.authId==accountId)).scalar_one()
+    if user:
+        return make_response(jsonify(user.to_dict()), 200)
+    return make_response(jsonify({"message":"User not found"}), 404)
 
 
 
@@ -35,13 +40,7 @@ def get_single_user(userId):
 def create_user():
     json_data = request.get_json()
     if json_data:
-        user = User(
-            authId=json_data['authId'],
-            profilePicture=json_data['profilePicture'],
-            ingameCurrency=json_data['ingameCurrency'],
-            registrationDate=datetime.utcnow(),
-            status=UserStatus.ACTIVE
-        )
+        user = User(authId=json_data['authId'], profilePicture=json_data['profilePicture'], ingameCurrency=json_data['ingameCurrency'],registrationDate=json_data['registrationDate'], status=UserStatus[json_data['status']])
         db.session.add(user)
         db.session.commit()
         return make_response(jsonify({"userId":user.id}), 200)
@@ -60,29 +59,31 @@ def update_user(userId):
         return make_response(jsonify({"messgae":"User sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid user data"}), 400)
 
-@app.route('/user/<int:userId>', methods=['PATCH'])
-def patch_user(userId):
-    json_data = request.get_json()
-    
-    if not json_data:
-        return make_response(jsonify({"message": "No data provided"}), 400)
-    
-    # Get the user from the database
-    user = db.get_or_404(User, userId)
-    
-    # Loop through the fields provided in the JSON and update them
-    for key, value in json_data.items():
-        if hasattr(user, key):  # Check if the user model has the attribute
-            setattr(user, key, value)  # Set the field with the new value
-    
-    # Commit changes to the database
-    db.session.commit()
-    
-    return make_response(jsonify({"message": "User successfully updated."}), 200)
-
 @app.route('/user/<int:userId>', methods=['DELETE'])
 def delete_user(userId):
     user = db.get_or_404(User, userId)
     db.session.delete(user)
     db.session.commit()
     return make_response(jsonify({"messgae":"User sucessfully deleted."}), 200)
+
+@app.route('/user/<int:userId>', methods=['PATCH'])
+def patch_user(userId):
+    json_data = request.get_json()
+    if json_data:
+        user = db.get_or_404(User, userId)
+        if 'ingameCurrency' in json_data:
+            res = db.session.query(User.ingameCurrency).with_for_update().filter_by(id=userId).first()
+            money = float(res[0])
+            amount = float(json_data['ingameCurrency'])
+            if money + amount > 0:
+                print("(", money, " + (",amount,") = ", money + amount, flush=True)
+                user.ingameCurrency = money + amount
+            else:
+                return make_response(jsonify({"message":"Not enough money"}), 400)
+        if 'profilePicture' in json_data:
+            user.profilePicture = json_data['profilePicture']
+        if 'status' in json_data:
+            user.status = json_data['status']
+        db.session.commit()
+        return make_response(jsonify({"messgae":"User sucessfully updated."}), 200)
+    return make_response(jsonify({"message":"Invalid user data"}), 400)

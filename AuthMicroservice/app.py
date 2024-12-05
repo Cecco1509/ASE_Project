@@ -19,8 +19,12 @@ app.config['SECRET_KEY']=str(os.getenv("SECRET_KEY"))
 
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
+auctioneer_credentials = builder.parse_config('/run/secrets/auctioneer_credentials')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mssql+pyodbc://{config.databases.auth.username}:{config.databases.auth.password}@{config.databases.auth.server}:{config.databases.auth.port}/{config.databases.auth.name}?driver=ODBC+Driver+17+for+SQL+Server'
+with open('/run/secrets/db_password', 'r') as file:
+    password = file.read().strip()
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mssql+pyodbc://{config.databases.auth.username}:{password}@{config.databases.auth.server}:{config.databases.auth.port}/{config.databases.auth.name}?driver=ODBC+Driver+17+for+SQL+Server'
 
 for i in range(config.databases.retries):
     try:
@@ -28,7 +32,8 @@ for i in range(config.databases.retries):
                             f'SERVER={config.databases.auth.server},{config.databases.auth.port};'
                             f'DATABASE=master;'
                             f'UID={config.databases.auth.username};'
-                            f'PWD={config.databases.auth.password}')
+                            f'PWD={password};'
+                            'Encrypt=yes;TrustServerCertificate=yes')
         conn.autocommit = True
         cursor = conn.cursor()
         cursor.execute(f"IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{config.databases.auth.name}') \
@@ -43,11 +48,26 @@ import models
 from AccountDBMethods import *
 from AdminDBMethods import *
 
-with app.app_context():
-    db.create_all()
-
 valid_tokens = dict()
 bcrypt = Bcrypt(app)
+
+with app.app_context():
+
+    db.create_all()
+
+    existing_user = Admin.query.filter_by(username=auctioneer_credentials.username).first()
+    if not existing_user:
+        # Generate a hashed password with a salt
+        salt = os.urandom(32)
+        hashed_password = bcrypt.generate_password_hash(auctioneer_credentials.password).decode('utf-8')
+        
+        # Add the user
+        new_user = Admin(username=auctioneer_credentials.username, password=hashed_password, salt=salt)
+        db.session.add(new_user)
+        db.session.commit()
+        print("Auctioneer account user created.", flush=True)
+    else:
+        print("Auctioneer account user already exists.", flush=True)
 
 def parse_json(data):
     return json.loads(json.dumps(data))
@@ -79,7 +99,7 @@ def token_required(role=None):
                 valid_token = valid_tokens.get(data['username'])
                 if not valid_token:
                     return jsonify({'message':'Invalid token!'}),403
-                user = {"username":data['username'], "role":data['roles'], "token":token}
+                user = {"username":data['username'],"userId":data['userId'], "role":data['roles'], "token":token}
 
             except Exception as e:
                 print('Error decoding token: ', str(e))
@@ -96,7 +116,7 @@ def register_user():
     if json_data and 'username' in json_data and 'password' in json_data and 'profilePicture' in json_data:
         response = get_account_by_username(json_data['username'])
         if response != None:
-            return make_response(jsonify({"message":"Username taken."}, 409))
+            return make_response(jsonify({"message":"Username taken."}), 409)
         salt = os.urandom(32)
         hashed_password=bcrypt.generate_password_hash(json_data['password']).decode('utf-8') 
         auth_data = {
@@ -112,7 +132,7 @@ def register_user():
             'profilePicture': json_data['profilePicture'],
             'registrationDate': datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
             'status': "ACTIVE"}
-            response = requests.post(f'{config.dbmanagers.user}/user', json=userData)
+            response = requests.post(f'{config.dbmanagers.user}/user', json=userData, verify=False)
             if response.status_code==200:
                 return make_response(jsonify(response.json()), response.status_code)
         return make_response(jsonify({"message":"User registration failed."}), 400)
@@ -124,20 +144,21 @@ def login():
     if json_data and 'username' in json_data and 'password' in json_data:
         response = get_account_by_username(json_data['username'])
         if response==None:
-            return make_response(jsonify({"message":"Username or password incorrect."}, 401))
+            return make_response(jsonify({"message":"Username or password incorrect."}), 401)
         role ="player"
         if bcrypt.check_password_hash(response['password'], json_data['password']):
             token_data ={
                 "iss":"ASE Project",
                 "exp_time":str(datetime.now(timezone.utc)+timedelta(hours=5)) ,
                 "username":json_data['username'],
-                "roles":role
+                "roles":role,
+                "userId":response['id']
             }
             jwt_encoded = jwt.encode(token_data, app.config['SECRET_KEY'], algorithm="HS256")
             valid_tokens[json_data['username']]=jwt_encoded
             return make_response({"Access token":jwt_encoded}, 200)
         else:
-            return make_response(jsonify({"message":f"Username or password incorrect. {response['password']}, {salt}"}), 401)
+            return make_response(jsonify({"message":f"Username or password incorrect."}), 401)
     return make_response(jsonify({"message":"Invalid data."}), 400)
 
 @app.route('/api/player/logout', methods=['POST'])
@@ -148,12 +169,27 @@ def logout(user_info):
         return make_response(jsonify({"message":"User succesfully logged out."}),200)
     return make_response(jsonify({"message":"Error while log out."}),400)
 
+@app.route('/api/player/<int:user_id>', methods=['DELETE'])
+@token_required("player")
+def delete_account(user_id, user_info):
+    deleted = delete_account(user_id)
+    if deleted:
+        return make_response(jsonify({"message":"Account succesfully delted."}),200)
+    return make_response(jsonify({"message":"Account not found."}),404)
+
+@app.route('/api/player/UserInfo', methods=['POST'])
+@token_required("player")
+def userInfo(user_info):
+    response = requests.post(f'{config.dbmanagers.user}/user/auth/{user_info['userId']}', verify=False)
+    if response.status_code==200:
+        return make_response(jsonify(response.json()),200)
+    return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/helloPlayer', methods=['GET'])
 @token_required("player")
 def verify_player_token(user_info=None):
     try:
-        return make_response(jsonify({"msg" : f"token verified successfully for user {user_info['username']}"}), 200)
+        return make_response(jsonify({"userId" : user_info['userId']}), 200)
     except Exception as e:
         return make_response(jsonify({"error" : str(e)}), 500)
  
@@ -161,7 +197,7 @@ def verify_player_token(user_info=None):
 @token_required("admin")
 def verify_admin_token(user_info=None):
     try:
-        return make_response(jsonify({"msg" : f"token verified successfully for admin {user_info['username']}"}), 200)
+        return make_response(jsonify({"adminId" : user_info['userId']}), 200)
     except Exception as e:
         return make_response(jsonify({"error" : str(e)}), 500)
 
@@ -171,7 +207,7 @@ def register_admin():
     if json_data and 'username' in json_data and 'password' in json_data:
         response = get_admin_by_username(json_data['username'])
         if response != None:
-            return make_response(jsonify({"message":"Username taken."}, 409))
+            return make_response(jsonify({"message":"Username taken."}), 409)
         salt = os.urandom(32)
         hashed_password=bcrypt.generate_password_hash(json_data['password']).decode('utf-8') 
         auth_data = {
@@ -181,30 +217,31 @@ def register_admin():
         }
         response = create_admin(auth_data)
         if response != None:
-                return make_response(jsonify(response.json()), response.status_code)
+                return make_response(jsonify(response), 200)
         return make_response(jsonify({"message":"Admin registration failed."}), 400)
     return make_response(jsonify({"message":"Invalid data."}), 400)
 
-@app.route('/api/player/login', methods=['POST'])
+@app.route('/api/admin/login', methods=['POST'])
 def admin_login():
     json_data = request.get_json()
     if json_data and 'username' in json_data and 'password' in json_data:
         response = get_admin_by_username(json_data['username'])
         if response==None:
-            return make_response(jsonify({"message":"Username or password incorrect."}, 401))
+            return make_response(jsonify({"message":"Username or password incorrect."}), 401)
         role = "admin"
         if bcrypt.check_password_hash(response['password'], json_data['password']):
             token_data ={
                 "iss":"ASE Project",
                 "exp_time":str(datetime.now(timezone.utc)+timedelta(hours=5)) ,
                 "username":json_data['username'],
-                "roles":role
+                "roles":role,
+                "userId":response['id']
             }
             jwt_encoded = jwt.encode(token_data, app.config['SECRET_KEY'], algorithm="HS256")
             valid_tokens[json_data['username']]=jwt_encoded
             return make_response({"Access token":jwt_encoded}, 200)
         else:
-            return make_response(jsonify({"message":f"Username or password incorrect. {response['password']}, {salt}"}), 401)
+            return make_response(jsonify({"message":f"Username or password incorrect."}), 401)
     return make_response(jsonify({"message":"Invalid data."}), 400)
 
 @app.route('/api/admin/logout', methods=['POST'])

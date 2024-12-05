@@ -25,7 +25,7 @@ def get_admin_by_username(username):
 
 def create_admin(json_data):
     if json_data:
-        admin = Admin(username=json_data['username'], password=json_data['password'])
+        admin = Admin(username=json_data['username'], password=json_data['password'], salt=json_data['salt'])
         db.session.add(admin)
         db.session.commit()
         return {"adminId":admin.id}
