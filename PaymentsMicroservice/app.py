@@ -206,7 +206,7 @@ def increase_currency(userId):
         
         # Parse the balance data from the response
         user_data = balance_response.json()
-        in_game_amount = user_data.get('ingameAmount')
+        in_game_amount = user_data.get('ingameCurrency')
         profile_picture= user_data.get('profilePicture')
         status=user_data.get('status')
 
@@ -214,11 +214,12 @@ def increase_currency(userId):
         payload = {
             'status': status,
             'profilePicture': profile_picture,
-            'ingameAmount': in_game_amount+amount
+            'ingameCurrency': in_game_amount+amount
         }
 
         # Make a POST request to the database manager's /transactions endpoint
         response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload, verify=False, timeout=config.timeout.medium)
+        return make_response(jsonify(response.json()), response.status_code)
     except Exception as e:
         return make_response(jsonify({'error': str(e)}), 500)
 
