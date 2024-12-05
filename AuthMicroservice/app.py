@@ -59,7 +59,7 @@ with app.app_context():
     if not existing_user:
         # Generate a hashed password with a salt
         salt = os.urandom(32)
-        hashed_password = bcrypt.generate_password_hash(auctioneer_credentials.password).decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(auctioneer_credentials.password + salt).decode('utf-8')
         
         # Add the user
         new_user = Admin(username=auctioneer_credentials.username, password=hashed_password, salt=salt)
@@ -118,7 +118,7 @@ def register_user():
         if response != None:
             return make_response(jsonify({"message":"Username taken."}), 409)
         salt = os.urandom(32)
-        hashed_password=bcrypt.generate_password_hash(json_data['password']).decode('utf-8') 
+        hashed_password=bcrypt.generate_password_hash(json_data['password'] + salt).decode('utf-8') 
         auth_data = {
             'username': json_data['username'],
             'password': hashed_password,
@@ -132,7 +132,7 @@ def register_user():
             'profilePicture': json_data['profilePicture'],
             'registrationDate': datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
             'status': "ACTIVE"}
-            response = requests.post(f'{config.dbmanagers.user}/user', json=userData, verify=False)
+            response = requests.post(f'{config.dbmanagers.user}/user', json=userData, verify=False, timeout=config.timeout.medium)
             if response.status_code==200:
                 return make_response(jsonify(response.json()), response.status_code)
         return make_response(jsonify({"message":"User registration failed."}), 400)
@@ -146,7 +146,7 @@ def login():
         if response==None:
             return make_response(jsonify({"message":"Username or password incorrect."}), 401)
         role ="player"
-        if bcrypt.check_password_hash(response['password'], json_data['password']):
+        if bcrypt.check_password_hash(response['password'] + response['salt'], json_data['password']):
             token_data ={
                 "iss":"ASE Project",
                 "exp_time":str(datetime.now(timezone.utc)+timedelta(hours=5)) ,
@@ -180,7 +180,7 @@ def delete_account(user_id, user_info):
 @app.route('/api/player/UserInfo', methods=['POST'])
 @token_required("player")
 def userInfo(user_info):
-    response = requests.post(f'{config.dbmanagers.user}/user/auth/{user_info['userId']}', verify=False)
+    response = requests.post(f'{config.dbmanagers.user}/user/auth/{user_info['userId']}', verify=False, timeout=config.timeout.medium)
     if response.status_code==200:
         return make_response(jsonify(response.json()),200)
     return make_response(jsonify(response.json()),response.status_code)
@@ -209,7 +209,7 @@ def register_admin():
         if response != None:
             return make_response(jsonify({"message":"Username taken."}), 409)
         salt = os.urandom(32)
-        hashed_password=bcrypt.generate_password_hash(json_data['password']).decode('utf-8') 
+        hashed_password=bcrypt.generate_password_hash(json_data['password'] + salt).decode('utf-8') 
         auth_data = {
             'username': json_data['username'],
             'password': hashed_password,
@@ -229,7 +229,7 @@ def admin_login():
         if response==None:
             return make_response(jsonify({"message":"Username or password incorrect."}), 401)
         role = "admin"
-        if bcrypt.check_password_hash(response['password'], json_data['password']):
+        if bcrypt.check_password_hash(response['password'] + response['salt'], json_data['password']):
             token_data ={
                 "iss":"ASE Project",
                 "exp_time":str(datetime.now(timezone.utc)+timedelta(hours=5)) ,

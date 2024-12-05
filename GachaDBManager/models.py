@@ -43,6 +43,21 @@ class GachaCollection(db.Model):
             'timestamp': self.timestamp,
             'source': self.source.name
         }
+        def from_dict(data):
+        return GachaCollection(
+            gachaId=data['gachaId'],
+            userId=data['userId'],
+            timestamp=data['timestamp'],
+            source=GachaSource(data['source'])
+        )
+
+    def from_dict(data):
+        return GachaCollection(
+            gachaId=data['gachaId'],
+            userId=data['userId'],
+            timestamp=data['timestamp'],
+            source=GachaSource(data['source'])
+        )
 
     def from_dict(data):
         return GachaCollection(

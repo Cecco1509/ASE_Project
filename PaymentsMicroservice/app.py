@@ -20,12 +20,12 @@ def create_app():
 @app.route('/api/player/currency/transaction-history/<int:userId>', methods=['GET'])
 def get_transaction_history(userId):
     try:
-        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
+        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
         if auth_response.status_code != 200:
             return make_response(auth_response.json(), auth_response.status_code) 
 
         # Send a GET request to the database manager service to fetch transaction history
-        response = requests.get(config.dbamangers.payment+ f'/currencytransaction/{userId}', verify=False)
+        response = requests.get(config.dbamangers.payment+ f'/currencytransaction/{userId}', verify=False, timeout=config.timeout.medium)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 @app.route('/api/player/currency/purchase', methods=['POST'])
 def purchase_in_game_currency():
     try:
-        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
+        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
         if auth_response.status_code != 200:
             return make_response(auth_response.json(), auth_response.status_code)
         # Extract data from request body
@@ -69,7 +69,7 @@ def purchase_in_game_currency():
         if in_game_currency <=0:     
             return make_response(jsonify({'error': 'in game currency must be greater than zero'}), 400)
 
-        user_response=requests.get(config.dbmanagers.user+ f'/user/{user_id}', verify=False)  
+        user_response=requests.get(config.dbmanagers.user+ f'/user/{user_id}', verify=False, timeout=config.timeout.medium)  
         if user_response.status_code == 404:
             return make_response(jsonify({'error': 'User not found'}), 404) 
 
@@ -86,7 +86,7 @@ def purchase_in_game_currency():
         }
 
         # Send a POST request to the database manager service to process the purchase
-        response = requests.post(config.dbmanagers.payment+f'/currencytransaction', json=payload, verify=False)
+        response = requests.post(config.dbmanagers.payment+f'/currencytransaction', json=payload, verify=False, timeout=config.timeout.medium)
         
         # Check if the request was successful
         if response.status_code == 200:  # Assuming 200 for successful creation
@@ -113,7 +113,7 @@ def purchase_in_game_currency():
 @app.route('/api/player/currency/decrease/<int:userId>', methods=['PUT'])
 def decrease_in_game_currency(userId):
     try:
-        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
+        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
         if auth_response.status_code != 200:
             return make_response(auth_response.json(), auth_response.status_code)
         # Extract the amount to be deducted from the request body
@@ -127,7 +127,7 @@ def decrease_in_game_currency(userId):
             return make_response(jsonify({'error': 'amount must be greater than zero'}), 400)
 
         # Fetch the user's current balance from the database manager
-        balance_response = requests.get(config.dbmanagers.user+ f'/user/{userId}', verify=False)
+        balance_response = requests.get(config.dbmanagers.user+ f'/user/{userId}', verify=False, timeout=config.timeout.medium)
 
         
         if balance_response.status_code == 404:
@@ -154,7 +154,7 @@ def decrease_in_game_currency(userId):
         }
 
         # Send a PUT request to the database manager service to decrease the balance
-        response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload, verify=False)
+        response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload, verify=False, timeout=config.timeout.medium)
         
         # Check if the request was successful
         if response.status_code == 200:
@@ -182,7 +182,7 @@ def decrease_in_game_currency(userId):
 @app.route('/api/player/currency/increase/<int:userId>', methods=['PUT'])
 def increase_currency(userId):
     try:
-        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
+        auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
         if auth_response.status_code != 200:
             return make_response(auth_response.json(), auth_response.status_code)
         # Get the amount to increase from the JSON payload
@@ -197,7 +197,7 @@ def increase_currency(userId):
         if amount <= 0:
             return make_response(jsonify({'error': 'Amount must be a positive number'}), 400)
 
-        balance_response = requests.get(config.dbmanagers.user+ f'/user/{userId}', verify=False)
+        balance_response = requests.get(config.dbmanagers.user+ f'/user/{userId}', verify=False, timeout=config.timeout.medium)
         
         if balance_response.status_code == 404:
             return make_response(jsonify({'error': 'User not found'}), 404)
@@ -218,14 +218,14 @@ def increase_currency(userId):
         }
 
         # Make a POST request to the database manager's /transactions endpoint
-        response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload, verify=False)
+        response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload, verify=False, timeout=config.timeout.medium)
     except Exception as e:
         return make_response(jsonify({'error': str(e)}), 500)
 
 @app.route('/api/admin/currency/<int:user_id>', methods=['GET'])
 def get_transaction_history_admin(user_id):
     try:
-        auth_response = requests.get(config.services.authmicroservice + '/helloAdmin', headers=request.headers, verify=False)
+        auth_response = requests.get(config.services.authmicroservice + '/helloAdmin', headers=request.headers, verify=False, timeout=config.timeout.medium)
         if auth_response.status_code != 200:
             return make_response(auth_response.json(), auth_response.status_code)        
 

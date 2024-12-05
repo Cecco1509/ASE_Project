@@ -29,7 +29,7 @@ config = builder.parse_config('/app/config.json')
 @validate_player_token
 def get_auctions(auth_response=None):
     try:
-        response = requests.get(config.dbmanagers.auction + '/auction/status/1', verify=False)
+        response = requests.get(config.dbmanagers.auction + '/auction/status/1', timeout=config.timeout.medium, verify=False)
         response.raise_for_status()
         return make_response(jsonify(market=response.json()), 200)
     except Exception as err:
@@ -53,7 +53,7 @@ def create_auction(auth_response=None):
         if int(data["minimumBid"]) <= 0:
             return make_response(jsonify({"message": "Minimum bid must be a positive integer, greater than 0"}), 400);
         try:
-            gacha_res = requests.get(f"{config.dbmanagers.gacha}/gachacollection/item/{data["gachaCollectionId"]}", verify=False)
+            gacha_res = requests.get(f"{config.dbmanagers.gacha}/gachacollection/item/{data["gachaCollectionId"]}", timeout=config.timeout.medium, verify=False)
             gacha_res.raise_for_status()
             if gacha_res.json()['userId'] != current_user_id :
                 return make_response(jsonify({"message": "Invalid user"}), 400);
@@ -77,7 +77,7 @@ def create_auction(auth_response=None):
             return make_response(jsonify({"message": "Auction start time must be before end time"}), 400);
         # check if user already has an active auction for this gachaCollection
         
-        active_auction = requests.get(config.dbmanagers.auction + f'/auction/{current_user_id}/{data["gachaCollectionId"]}/1', verify=False)
+        active_auction = requests.get(config.dbmanagers.auction + f'/auction/{current_user_id}/{data["gachaCollectionId"]}/1', timeout=config.timeout.medium, verify=False)
         try:
             active = active_auction.json()
             print("ACTIVE : ", active, flush=True)
@@ -103,7 +103,7 @@ def create_auction(auth_response=None):
             "status": "ACTIVE"
         }
 
-        response = requests.post(config.dbmanagers.auction + '/auction', json=new_auction, verify=False)
+        response = requests.post(config.dbmanagers.auction + '/auction', json=new_auction, timeout=config.timeout.medium, verify=False)
         new_auction_id = response.json()['auctionId'];
 
         return make_response(jsonify({"auctionId" : new_auction_id}), 201)
@@ -122,7 +122,7 @@ def bid_on_auction(auction_id, auth_response=None):
         if ("bidAmount" not in data):
             return make_response(jsonify({"message": "invalid payload"}), 400);
     
-        response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}', verify=False)
+        response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}', timeout=config.timeout.medium, verify=False)
         response.raise_for_status()
         auction = response.json()
         print(auction)
@@ -139,7 +139,7 @@ def bid_on_auction(auction_id, auth_response=None):
         if (auction["minimumBid"] > data["bidAmount"]):
             return make_response(jsonify({"message": "Bid amount is lower than minimum bid"}), 400);
         
-        auction_bids_resp = requests.get(config.dbmanagers.auction + f'/auctionbid/auction/{auction_id}', verify=False)
+        auction_bids_resp = requests.get(config.dbmanagers.auction + f'/auctionbid/auction/{auction_id}', timeout=config.timeout.medium, verify=False)
         auction_bids_resp.raise_for_status()
         userBidId = None
         auction_bids = []
@@ -181,7 +181,7 @@ def bid_on_auction(auction_id, auth_response=None):
                 res = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/decrease/{current_user_id}",
                             json={"amount": float(data['bidAmount'])},
                             headers=request.headers,
-                            verify=False
+                            timeout=config.timeout.medium, verify=False
                         )
                 
                 ## This could raise an exception if the user has not enough ingameCurrency
@@ -194,7 +194,7 @@ def bid_on_auction(auction_id, auth_response=None):
                 res1 = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/increase/{userBidId}",
                         json={"amount": float(auctionBidAmount)},
                         headers=request.headers,
-                        verify=False
+                        timeout=config.timeout.medium, verify=False
                     )
                 
                 if res1.status_code != 200:
@@ -202,7 +202,7 @@ def bid_on_auction(auction_id, auth_response=None):
                     res2 = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/increase/{current_user_id}",
                         json={"amount": float(data['bidAmount'])},
                         headers=request.headers,
-                        verify=False
+                        timeout=config.timeout.medium, verify=False
                     )
                     res1.raise_for_status()
             
@@ -218,7 +218,7 @@ def bid_on_auction(auction_id, auth_response=None):
                             'auctionId':auction_id, 
                             'timestamp':datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
                         }
-                        , verify=False)
+                        , timeout=config.timeout.medium, verify=False)
             
             result.raise_for_status()
         except Exception as e:
@@ -244,7 +244,7 @@ def auction_player_history(auth_response=None):
     try:
         current_user_id = auth_response.json()["userId"]
         data = request.get_json()
-        response = requests.get(config.dbmanagers.auction + f'/auction/{current_user_id}/2', verify=False)
+        response = requests.get(config.dbmanagers.auction + f'/auction/{current_user_id}/2', timeout=config.timeout.medium, verify=False)
         return make_response(response.json(), 200)
     except Exception as err:
         return make_response(jsonify({"message": str(err)}), 500)
@@ -255,7 +255,7 @@ def check_auction(auction) -> bool:
     if auction.auctionStart > auction.auctionEnd:
         return False
     
-    collection = requests.get(config.dbmanagers.gacha+f"/gachacollection/{auction.gachaCollectionId}", verify=False)
+    collection = requests.get(config.dbmanagers.gacha+f"/gachacollection/{auction.gachaCollectionId}", timeout=config.timeout.medium, verify=False)
     if collection.status_code != 200:
         return False
     
@@ -283,12 +283,12 @@ def close_auction(auction, headers) -> bool:
 
     print("TRY SET TO PASSED", flush=True)
 
-    requests.put(f"{config.dbmanagers.auction}/auction/{auction["id"]}", json=auction, headers=headers, verify=False)
+    requests.put(f"{config.dbmanagers.auction}/auction/{auction["id"]}", json=auction, headers=headers, timeout=config.timeout.medium, verify=False)
 
     print("SET TO PASSED", flush=True)
 
     # Get all bids for the auction
-    bids = requests.get(f"{config.dbmanagers.auction}/auctionbid/auction/{auction["id"]}", headers=headers, verify=False).json()
+    bids = requests.get(f"{config.dbmanagers.auction}/auctionbid/auction/{auction["id"]}", headers=headers, timeout=config.timeout.medium, verify=False).json()
     if not bids:
         print("No bids for the auction", flush=True)
         return True
@@ -304,14 +304,14 @@ def close_auction(auction, headers) -> bool:
         "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
     }
 
-    resp = requests.post(f"{config.dbmanagers.transaction}/auctiontransaction", headers=headers, json=transaction, verify=False)
+    resp = requests.post(f"{config.dbmanagers.transaction}/auctiontransaction", headers=headers, json=transaction, timeout=config.timeout.medium, verify=False)
     if resp.status_code != 200:
         return False
 
     resp = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/increase/{auction['userId']}",
                         json={"amount": float(winningBid['bidAmount'])},
                         headers=headers,
-                        verify=False
+                        timeout=config.timeout.medium, verify=False
                     )
 
     # Assign Gacha to the winning bidder
@@ -321,11 +321,11 @@ def close_auction(auction, headers) -> bool:
             "gachaId": auction['id'],
             "userId": winningBid['userId'],
             "source": f"{auction['id']}"
-        }, verify=False
+        }, timeout=config.timeout.medium, verify=False
     )
 
     # Remove Gacha from the seller
-    requests.delete(f"{config.dbmanagers.gacha}/gachacollection/{auction['gachaCollectionId']}", verify=False)
+    requests.delete(f"{config.dbmanagers.gacha}/gachacollection/{auction['gachaCollectionId']}", timeout=config.timeout.medium, verify=False)
 
     return True
 
@@ -339,7 +339,7 @@ def close_auction(auction, headers) -> bool:
 def get_all_auctions(auth_response=None):
     print(f"GET all auctions")
     try:
-        response = requests.get(config.dbmanagers.auction + f'/auction', verify=False)
+        response = requests.get(config.dbmanagers.auction + f'/auction', timeout=config.timeout.medium, verify=False)
         response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
 
         auctions = response.json()
@@ -355,7 +355,7 @@ def get_all_auctions(auth_response=None):
 def get_auction(auction_id, auth_response=None):
     print(f"GET auction", auction_id)
     try:
-        response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}', verify=False)
+        response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}', timeout=config.timeout.medium, verify=False)
         response.raise_for_status() # Raises an HTTPError for bad responses (4xx or 5xx)
 
         auction = response.json()
@@ -388,7 +388,7 @@ def update_auction(auction_id, auth_response=None):
             return make_response(jsonify({"message": "Invalid data"}), 400);
         
         ## Retrieve the auction
-        res = requests.get(f"{config.dbmanagers.auction}/auction/{auction_id}", verify=False)
+        res = requests.get(f"{config.dbmanagers.auction}/auction/{auction_id}", timeout=config.timeout.medium, verify=False)
         res.raise_for_status()
 
         auction = res.json()
@@ -448,7 +448,7 @@ def update_auction(auction_id, auth_response=None):
                 auction["auctionStart"] = datetime.strptime(data["auctionStart"], "%Y-%m-%dT%H:%M:%S.%fZ")
 
         # Update the auction in the database
-        res = requests.put(f"{config.dbmanagers.auction}/auction/{auction_id}", json=auction, verify=False)
+        res = requests.put(f"{config.dbmanagers.auction}/auction/{auction_id}", json=auction, timeout=config.timeout.medium, verify=False)
         res.raise_for_status()
         
         # Return success response
@@ -466,7 +466,7 @@ def history(auth_response=None):
     print(f"GET Auctions History")
     try:
 
-        response = requests.get(config.dbmanagers.auction + f'/auction/2', verify=False)
+        response = requests.get(config.dbmanagers.auction + f'/auction/2', timeout=config.timeout.medium, verify=False)
 
         response.raise_for_status()
 
@@ -483,7 +483,7 @@ def user_history(user_id, auth_response=None):
     try:
         data = request.get_json()
 
-        auction = requests.get(config.dbmanagers.auction + f'/auction/user/{user_id}/2', verify=False)
+        auction = requests.get(config.dbmanagers.auction + f'/auction/user/{user_id}/2', timeout=config.timeout.medium, verify=False)
 
         return make_response(jsonify(auction.json()), 200) ## Substitute with DBManager request
     except Exception as e:
