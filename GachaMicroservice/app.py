@@ -200,9 +200,12 @@ def roll_gacha(auth_response=None):
     if not is_valid:
         return make_response(jsonify({"message": validation_message}), 400)
     rarity_level = json_data["rarity_level"]
+    print("rarity_level", rarity_level,flush=True)
 
     # Fetch user info to verify in-game currency
-    user_response = requests.get(f'{AUTH_MICROSERVICE_URL}/api/player/UserInfo', headers=request.headers, verify=False, timeout=config.timeout.medium)
+    userId = auth_response.json()['userId']
+    user_response = requests.get(f'{DB_MANAGER_USER_URL}/user/{userId}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+    print("user_response", user_response,flush=True)
     if user_response.status_code == 404:
         return make_response(jsonify({"message": "User not found"}), 404)
     elif user_response.status_code != 200:
@@ -211,7 +214,6 @@ def roll_gacha(auth_response=None):
     # Get the user's in-game currency
     user = user_response.json()
     userIngameCurrency = user['ingameCurrency']
-    userId = user['userId']
 
     # Check if the user has enough ingame currency to roll
     roll_price = getattr(ROLL_PRICE,rarity_level)
@@ -220,19 +222,26 @@ def roll_gacha(auth_response=None):
     
     # Fetch all gacha items
     gacha_response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha', verify=False, timeout=config.timeout.medium)
+    print("gacha_response", gacha_response,flush=True)
     if gacha_response.status_code != 200:
         return make_response(jsonify({"message": "Error retrieving gacha items"}), 500)
     gacha_items = gacha_response.json()
 
     # Randomly select a gacha item
     selected_gacha = select_gacha(gacha_items, rarity_level)
+    print("selected_gacha", selected_gacha,flush=True)
 
     # Deduct the roll cost from the user's in-game currency
-    userIngameCurrency -= ROLL_PRICE
+    userIngameCurrency -= roll_price
+    print("roll_price", roll_price,flush=True)
+    print("userIngameCurrency", userIngameCurrency,flush=True)
     update_user_response = requests.patch(
         f'{DB_MANAGER_USER_URL}/user/{userId}', 
-        json={"ingameCurrency":userIngameCurrency}
+        json={"ingameCurrency":userIngameCurrency},
+        verify=False,
+        timeout=config.timeout.medium
     )
+    print("update_user_response", update_user_response,flush=True)
     if update_user_response.status_code != 200:
         return make_response(jsonify({"message": "Error updating the user's in-game currency balance"}), 500)
 
@@ -251,7 +260,10 @@ def roll_gacha(auth_response=None):
 
     # TODO: handle failures, rollback changes if necessary
 
-    return make_response(create_gacha_collection_response.json(), create_gacha_collection_response.status_code)
+    if create_gacha_collection_response.status_code != 200:
+        return make_response(jsonify({"message": "Error adding gacha item to player's collection"}), 500)
+
+    return make_response(selected_gacha, 200)
 
 def select_gacha(gacha_items, rarity_level):
     """
