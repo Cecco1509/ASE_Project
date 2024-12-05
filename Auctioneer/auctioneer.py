@@ -22,6 +22,7 @@ def checker():
                 "password": credentials.password
             }, verify=False, timeout=config.timeout.medium)
 
+            auth_res.raise_for_status()
             authenticated = True
         except Exception as e:
             print("Error while connecting to auth microservice: ", e)
