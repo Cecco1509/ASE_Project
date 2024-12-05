@@ -1,7 +1,6 @@
 from datetime import datetime
 import requests
 from flask import jsonify
-import pytz
 
 from flask import Flask, request, make_response, jsonify
 from auth_utils import *

@@ -59,7 +59,7 @@ with app.app_context():
     if not existing_user:
         # Generate a hashed password with a salt
         salt = os.urandom(32)
-        hashed_password = bcrypt.generate_password_hash(auctioneer_credentials.password + salt).decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(auctioneer_credentials.password + str(salt)).decode('utf-8')
         
         # Add the user
         new_user = Admin(username=auctioneer_credentials.username, password=hashed_password, salt=salt)
@@ -118,7 +118,7 @@ def register_user():
         if response != None:
             return make_response(jsonify({"message":"Username taken."}), 409)
         salt = os.urandom(32)
-        hashed_password=bcrypt.generate_password_hash(json_data['password'] + salt).decode('utf-8') 
+        hashed_password=bcrypt.generate_password_hash(json_data['password'] + str(salt)).decode('utf-8') 
         auth_data = {
             'username': json_data['username'],
             'password': hashed_password,
@@ -209,7 +209,7 @@ def register_admin():
         if response != None:
             return make_response(jsonify({"message":"Username taken."}), 409)
         salt = os.urandom(32)
-        hashed_password=bcrypt.generate_password_hash(json_data['password'] + salt).decode('utf-8') 
+        hashed_password=bcrypt.generate_password_hash(json_data['password'] + str(salt)).decode('utf-8') 
         auth_data = {
             'username': json_data['username'],
             'password': hashed_password,
