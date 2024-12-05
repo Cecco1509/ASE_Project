@@ -16,7 +16,7 @@ services:
       - paymentsmicroservice
       - transactionsmicroservice
     ports:
-      - "5002:5000"
+      - "5000:5000"
     volumes:
       - ./config.json:/app/config.json
       - .:/ApiGatewayUser
