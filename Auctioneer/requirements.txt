@@ -1,0 +1,4 @@
+requests
+python_json_config
+celery
+pytz

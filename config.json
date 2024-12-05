@@ -1,72 +1,74 @@
 {
-    "databases":{
-       "timeout" :10, 
-       "retries":10,
-        "auth":{
-            "server":"authdatabase",
-            "port":"1433",
-            "name":"authdatabase",
-            "username":"sa"
-        },
-        "user":{
-            "server":"userdatabase",
-            "port":"1433",
-            "name":"userdatabase",
-            "username":"sa"
-        },
-        "gacha":{
-            "server":"gachadatabase",
-            "port":"1433",
-            "name":"gachadatabase",
-            "username":"sa"
-        },
-        "payment":{
-            "server":"paymentdatabase",
-            "port":"1433",
-            "name":"paymentdatabase",
-            "username":"sa"
-        },
-        "auction":{
-            "server":"auctiondatabase",
-            "port":"1433",
-            "name":"auctiondatabase",
-            "username":"sa"
-        },
-        "transaction":{
-            "server":"transactiondatabase",
-            "port":"1433",
-            "name":"transactiondatabase",
-            "username":"sa"
-        }
+  "databases": {
+    "timeout": 10,
+    "retries": 10,
+    "auth": {
+      "server": "authdatabase",
+      "port": "1433",
+      "name": "authdatabase",
+      "username": "sa"
     },
-    "dbmanagers":{
-        "user":"https://userdbmanager:5000",
-        "auction":"https://auctiondbmanager:5000",
-        "gacha":"https://gachadbmanager:5000",
-        "transaction":"https://transactiondbmanager:5000",
-        "payment":"https://paymentdbmanager:5000"
+    "user": {
+      "server": "userdatabase",
+      "port": "1433",
+      "name": "userdatabase",
+      "username": "sa"
     },
-    "services":{
-        "gacha":"https://gachamicroservice:5000",
-        "usersmicroservice":"https://usersmicroservice:5000",
-        "paymentsmicroservice": "https://paymentsmicroservice:5000",
-        "authmicroservice":"https://authmicroservice:5000"
-        
+    "gacha": {
+      "server": "gachadatabase",
+      "port": "1433",
+      "name": "gachadatabase",
+      "username": "sa"
     },
-    "system_settings":{
-        "convert_price":100},
-    "roll":{
-        "probability": {
-            "Common": 1.0,
-            "Rare": 1.5,
-            "Epic": 2.0,
-            "Legendary": 3.0
-        },
-        "price": {
-            "Common": 100,
-            "Rare": 200,
-            "Epic": 350,
-            "Legendary": 550
-        }
+    "payment": {
+      "server": "paymentdatabase",
+      "port": "1433",
+      "name": "paymentdatabase",
+      "username": "sa"
+    },
+    "auction": {
+      "server": "auctiondatabase",
+      "port": "1433",
+      "name": "auctiondatabase",
+      "username": "sa"
+    },
+    "transaction": {
+      "server": "transactiondatabase",
+      "port": "1433",
+      "name": "transactiondatabase",
+      "username": "sa"
     }
+  },
+  "dbmanagers": {
+    "user": "https://userdbmanager:5000",
+    "auction": "https://auctiondbmanager:5000",
+    "gacha": "https://gachadbmanager:5000",
+    "transaction": "https://transactiondbmanager:5000",
+    "payment": "https://paymentdbmanager:5000"
+  },
+  "services": {
+    "gacha": "https://gachamicroservice:5000",
+    "usersmicroservice": "https://usersmicroservice:5000",
+    "paymentsmicroservice": "https://paymentsmicroservice:5000",
+    "authmicroservice": "https://authmicroservice:5000",
+    "auction": "https://auctionmicroservice:5000",
+    "transaction": "https://transactionsmicroservice:5000"
+  },
+  "system_settings": {
+    "convert_price": 100
+  },
+  "roll": {
+    "probability": {
+      "Common": 1.0,
+      "Rare": 1.5,
+      "Epic": 2.0,
+      "Legendary": 3.0
+    },
+    "price": {
+      "Common": 100,
+      "Rare": 200,
+      "Epic": 350,
+      "Legendary": 550
+    }
+  }
 }
