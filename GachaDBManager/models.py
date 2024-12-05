@@ -92,8 +92,8 @@ gacha_items = [
     ]
 
     
-    def from_dict(data):
-        return GachaCollection(
+def from_dict(data):
+     return GachaCollection(
             gachaId=data['gachaId'],
             userId=data['userId'],
             timestamp=data['timestamp'],
