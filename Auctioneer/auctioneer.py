@@ -24,7 +24,7 @@ def checker():
             auth_res = requests.post(f"{config.services.authmicroservice}/api/admin/login", json={
                 "username": credentials.username,
                 "password": credentials.password
-            }, verify=False)
+            }, verify=False, timeout=config.timeout.medium)
 
             authenticated = True
         except Exception as e:
@@ -48,13 +48,13 @@ def checker():
         now : datetime = datetime.now()
         print(f"Current time: {now.strftime('%d/%m/%Y, %H:%M:%S')}")
 
-        response = requests.get(f"{config.dbmanagers.auction}/auction/status/ACTIVE", verify=False)
+        response = requests.get(f"{config.dbmanagers.auction}/auction/status/ACTIVE", verify=False, timeout=config.timeout.medium)
         print("CHECKING FOR ACTIVE AUCTIONS ", now)
         if response.status_code == 200:
             auctions = response.json()
             for auction in auctions:
                 if datetime.strptime(auction['auctionEnd'], "%a, %d %b %Y %H:%M:%S %Z") <= now and auction['status'] == 'ACTIVE':
-                    res = requests.put(f"{config.services.auction}/api/admin/auction/{auction["id"]}", headers=headers, json=body, verify=False)
+                    res = requests.put(f"{config.services.auction}/api/admin/auction/{auction["id"]}", headers=headers, json=body, verify=False, timeout=config.timeout.medium)
                     print(f"END AUCTION {auction["id"]} -> RESPONSE {res.status_code}")
         
         now = datetime.now()
