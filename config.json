@@ -70,5 +70,10 @@
       "Epic": 350,
       "Legendary": 550
     }
+  },
+  "timeout": {
+      "low": 3,
+      "medium": 6,
+      "high": 9
   }
 }

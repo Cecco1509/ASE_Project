@@ -148,12 +148,17 @@ def get_all_gachacollections():
 
 """Player Collection Endpoints"""
 
-@app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
+@app.route('/api/player/gacha/player-collection', methods=['GET'])
 @handle_errors
-def get_gacha_collection(userId):
+def get_gacha_collection():
     is_valid, message, status_code = mock_validate_token(request)
     if not is_valid:
         return make_response(jsonify({"message": message}), status_code)
+
+    # Get user id from token
+    auth_header = request.headers.get("Authorization")
+    token = auth_header.removeprefix("Bearer ").strip()
+    userId = extract_user_id_from_token(token)
 
     # get the player's gacha collection
     user_gacha_collection = [item for item in mock_gacha_collection_list if item['userId'] == userId]
@@ -172,12 +177,17 @@ def get_gacha_collection_details(collectionId):
         return make_response(jsonify({"message":"Gacha collection item not found"}), 404)
     return make_response(jsonify(gacha_collection_item), 200)
 
-@app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
+@app.route('/api/player/gacha/player-collection/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
-def get_gacha_details(userId, gachaId):
+def get_gacha_details(gachaId):
     is_valid, message, status_code = mock_validate_token(request)
     if not is_valid:
         return make_response(jsonify({"message": message}), status_code)
+    
+    # Get user id from token
+    auth_header = request.headers.get("Authorization")
+    token = auth_header.removeprefix("Bearer ").strip()
+    userId = extract_user_id_from_token(token)
 
     # get the player's gacha collection
     user_gacha_collection = [item for item in mock_gacha_collection_list if item['userId'] == userId]

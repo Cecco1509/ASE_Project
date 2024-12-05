@@ -132,7 +132,7 @@ def register_user():
             'profilePicture': json_data['profilePicture'],
             'registrationDate': datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
             'status': "ACTIVE"}
-            response = requests.post(f'{config.dbmanagers.user}/user', json=userData, verify=False)
+            response = requests.post(f'{config.dbmanagers.user}/user', json=userData, verify=False, timeout=config.timeout.medium)
             if response.status_code==200:
                 return make_response(jsonify(response.json()), response.status_code)
         return make_response(jsonify({"message":"User registration failed."}), 400)
@@ -180,7 +180,7 @@ def delete_account(user_id, user_info):
 @app.route('/api/player/UserInfo', methods=['POST'])
 @token_required("player")
 def userInfo(user_info):
-    response = requests.post(f'{config.dbmanagers.user}/user/auth/{user_info['userId']}', verify=False)
+    response = requests.post(f'{config.dbmanagers.user}/user/auth/{user_info['userId']}', verify=False, timeout=config.timeout.medium)
     if response.status_code==200:
         return make_response(jsonify(response.json()),200)
     return make_response(jsonify(response.json()),response.status_code)

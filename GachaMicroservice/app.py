@@ -11,6 +11,7 @@ builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 DB_MANAGER_GACHA_URL = config.dbmanagers.gacha
 DB_MANAGER_USER_URL = config.dbmanagers.user
+AUTH_MICROSERVICE_URL = config.services.authmicroservice
 ROLL_PRICE = config.roll.price
 ROLL_PROBABILITY = config.roll.probability
 
@@ -22,7 +23,7 @@ ROLL_PROBABILITY = config.roll.probability
 @validate_admin_token
 def get_all_gacha():
     """Fetch all gacha items."""
-    response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha', verify=False)
+    response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha', verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
         
@@ -32,7 +33,7 @@ def get_all_gacha():
 @validate_admin_token
 def get_single_gacha(gachaId):
     """Fetch a single gacha item by ID."""
-    response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}', verify=False)
+    response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}', verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -52,7 +53,7 @@ def create_gacha():
         return make_response(jsonify({"message": validation_message}), 400)
 
     # all data is valid, send to the DB manager
-    response = requests.post(DB_MANAGER_GACHA_URL + f'/gacha', json=json_data, verify=False)
+    response = requests.post(DB_MANAGER_GACHA_URL + f'/gacha', json=json_data, verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -97,7 +98,7 @@ def update_gacha(gachaId):
         return make_response(jsonify({"message": validation_message}), 400)
 
     # all data is valid, send to the DB manager
-    response = requests.put(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}', json=json_data, verify=False)
+    response = requests.put(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}', json=json_data, verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -106,7 +107,7 @@ def update_gacha(gachaId):
 @validate_admin_token
 def delete_gacha(gachaId):
     """Delete a gacha item."""
-    response = requests.delete(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}', verify=False)
+    response = requests.delete(DB_MANAGER_GACHA_URL + f'/gacha/{gachaId}', verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -115,7 +116,7 @@ def delete_gacha(gachaId):
 @validate_admin_token
 def get_all_gachacollections():
     """Fetch all gacha collections."""
-    response = requests.get(DB_MANAGER_GACHA_URL + f'/gachacollection', verify=False)
+    response = requests.get(DB_MANAGER_GACHA_URL + f'/gachacollection', verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -124,13 +125,12 @@ def get_all_gachacollections():
 """Player Collection Endpoints"""
 
 # Get player's gacha collection.
-@app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
+@app.route('/api/player/gacha/player-collection', methods=['GET'])
 @handle_errors
 @validate_player_token
-def get_gacha_collection(userId, auth_response=None):
-    print("Auth response:", auth_response.json(), flush=True)
-
-    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}', verify=False)
+def get_gacha_collection(auth_response=None):
+    userId = auth_response.json()['userId']
+    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}', verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -138,16 +138,17 @@ def get_gacha_collection(userId, auth_response=None):
 @app.route('/api/player/gacha/player-collection/item/<int:collectionId>', methods=['GET'])
 @handle_errors
 def get_gacha_collection_details(collectionId):
-    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/item/{collectionId}', verify=False)
+    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/item/{collectionId}', verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
 # Get player's gacha item details
-@app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
+@app.route('/api/player/gacha/player-collection/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
 @validate_player_token
-def get_gacha_details(userId, gachaId, auth_response=None):
-    user_gacha_collection_response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}', verify=False)
+def get_gacha_details(gachaId, auth_response=None):
+    userId = auth_response.json()['userId']
+    user_gacha_collection_response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}', verify=False, timeout=config.timeout.medium)
     user_gacha_collection_response.raise_for_status()
     user_gacha_collection = user_gacha_collection_response.json()
 
@@ -156,7 +157,7 @@ def get_gacha_details(userId, gachaId, auth_response=None):
         return make_response(jsonify({"message":"Gacha item not found in player's collection"}), 404)
     
     # the gacha item is in the player's collection, get the details
-    gacha_item_response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha/{gachaId}', verify=False)
+    gacha_item_response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha/{gachaId}', verify=False, timeout=config.timeout.medium)
     gacha_item_response.raise_for_status()
     gacha_item = gacha_item_response.json()
 
@@ -169,7 +170,7 @@ def get_gacha_details(userId, gachaId, auth_response=None):
 @handle_errors
 @validate_player_token
 def get_system_gacha_collection(auth_response=None):
-    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha', verify=False)
+    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha', verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -178,7 +179,7 @@ def get_system_gacha_collection(auth_response=None):
 @handle_errors
 @validate_player_token
 def get_system_gacha_details(gachaId, auth_response=None):
-    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha/{gachaId}', verify=False)
+    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gacha/{gachaId}', verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
@@ -201,10 +202,7 @@ def roll_gacha(auth_response=None):
     rarity_level = json_data["rarity_level"]
 
     # Fetch user info to verify in-game currency
-    userId = auth_response.json()['userId']
-    user_response = requests.get(f'{DB_MANAGER_USER_URL}/user/{userId}', verify=False)
-
-    # Check if the user exists
+    user_response = requests.get(f'{AUTH_MICROSERVICE_URL}/api/player/UserInfo', headers=request.headers, verify=False, timeout=config.timeout.medium)
     if user_response.status_code == 404:
         return make_response(jsonify({"message": "User not found"}), 404)
     elif user_response.status_code != 200:
@@ -213,6 +211,7 @@ def roll_gacha(auth_response=None):
     # Get the user's in-game currency
     user = user_response.json()
     userIngameCurrency = user['ingameCurrency']
+    userId = user['userId']
 
     # Check if the user has enough ingame currency to roll
     roll_price = getattr(ROLL_PRICE,rarity_level)
@@ -220,7 +219,7 @@ def roll_gacha(auth_response=None):
         return make_response(jsonify({"message":"Insufficient in-game currency"}), 400)
     
     # Fetch all gacha items
-    gacha_response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha', verify=False)
+    gacha_response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha', verify=False, timeout=config.timeout.medium)
     if gacha_response.status_code != 200:
         return make_response(jsonify({"message": "Error retrieving gacha items"}), 500)
     gacha_items = gacha_response.json()
@@ -245,7 +244,8 @@ def roll_gacha(auth_response=None):
             "userId":userId,
             "source":"ROLL"
         },
-        verify=False
+        verify=False,
+        timeout=config.timeout.medium
     )
     create_gacha_collection_response.raise_for_status()
 
