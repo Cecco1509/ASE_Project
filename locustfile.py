@@ -51,8 +51,7 @@ class GachaMicroserviceTasks(HttpUser):
     @task
     def roll_gacha(self):
         if self.token:
-            payload = {"gacha_type": "premium", "rank": 1} 
             headers = {"Authorization": f"Bearer {self.token}"}
-            self.client.post("/api/player/gacha/roll", json=payload, headers=headers, verify=False)
+            self.client.post("/api/player/gacha/roll", headers=headers, verify=False)
 
 

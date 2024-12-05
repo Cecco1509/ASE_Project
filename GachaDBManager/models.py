@@ -44,6 +44,14 @@ class GachaCollection(db.Model):
             'source': self.source.name
         }
 
+    def from_dict(data):
+        return GachaCollection(
+            gachaId=data['gachaId'],
+            userId=data['userId'],
+            timestamp=data['timestamp'],
+            source=GachaSource(data['source'])
+        )
+
 gacha_items = [
     {"name": "Kuriboh", "description": "An adorable monster that defends you in battles.", 
      "image": "https://static.wikia.nocookie.net/yugioh/images/a/a4/Kuriboh.png", "rarityPercent": 24.75},
@@ -92,10 +100,4 @@ gacha_items = [
     ]
 
     
-    def from_dict(data):
-        return GachaCollection(
-            gachaId=data['gachaId'],
-            userId=data['userId'],
-            timestamp=data['timestamp'],
-            source=GachaSource(data['source'])
-        )
+
