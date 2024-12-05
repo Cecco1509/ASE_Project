@@ -1,12 +1,8 @@
 import functools
 from time import sleep
 import requests
-from celery import Celery
-from argparse import ArgumentParser
 from python_json_config import ConfigBuilder
 from datetime import datetime
-from worker import end_auction
-import pytz
 
 print = functools.partial(print, flush=True)
 

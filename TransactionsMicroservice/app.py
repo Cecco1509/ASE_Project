@@ -1,8 +1,6 @@
-import requests, time
+import requests
 
-from flask import Flask, request, make_response 
-from requests.exceptions import ConnectionError, HTTPError
-from werkzeug.exceptions import NotFound
+from flask import Flask, make_response 
 from handle_errors import handle_errors
 from auth_utils import *
 from python_json_config import ConfigBuilder
