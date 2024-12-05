@@ -64,7 +64,7 @@ def create_app():
 # Configuration for the database manager service
   # Replace with actual URL
 
-@app.route('/api/player/currency<int:user_id>', methods=['GET'])
+@app.route('/api/player/currency/<int:user_id>', methods=['GET'])
 def get_transaction_history(user_id):
     response = requests.get(config.services.paymentsmicroservice+f'/api/player/currency/transaction-history/{user_id}', headers=request.headers, verify=False)
     return make_response(jsonify(response.json()),response.status_code)
@@ -88,7 +88,7 @@ def increase_currency(user_id):
 @app.route('/api/player/profile/<int:user_id>', methods=['GET'])
 def getPlayerInformation(user_id):
     try:
-        response = requests.get(f'{config.services.usersmicroservice}/api/player/profile/{user_id}',verify=False)
+        response = requests.get(f'{config.services.usersmicroservice}/api/player/profile/{user_id}',headers=request.headers,verify=False)
         
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
@@ -99,17 +99,17 @@ def getPlayerInformation(user_id):
 
 @app.route('/api/player/update/<int:user_id>', methods=['PUT'])
 def updatePlayerInformation(user_id):
-    response=requests.put(f'{config.services.usersmicroservice}/api/player/update/{user_id}',json=sanitize_data(request.get_json()),verify=False)
+    response=requests.put(f'{config.services.usersmicroservice}/api/player/update/{user_id}',json=sanitize_data(request.get_json()),headers=request.headers,verify=False)
     return make_response(jsonify(response.json()),response.status_code)
 
 @app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
 def delete_player(user_id):
-    delete_response = requests.delete(f'{config.services.usersmicroservice}/api/player/delete/{user_id}',verify=False)
+    delete_response = requests.delete(f'{config.services.usersmicroservice}/api/player/delete/{user_id}',headers=request.headers,verify=False)
     return make_response(jsonify(delete_response.json()),delete_response.status_code)
     
 @app.route('/api/player/register', methods=['POST'])
 def register_user():
-    response = requests.post(f"{config.services.authmicroservice}/api/player/register", json=sanitize_data(request.get_json()), verify=False)
+    response = requests.post(f"{config.services.authmicroservice}/api/player/register", json=sanitize_data(request.get_json()),verify=False)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/player/login', methods=['POST'])

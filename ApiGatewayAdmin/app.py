@@ -62,7 +62,7 @@ def get_transaction_history_admin(user_id):
 @app.route('/api/admin/users', methods=['GET'])
 def get_players():
     try:
-        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users',verify=False)
+        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users',headers=request.headers,verify=False)
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
         else:
@@ -73,7 +73,7 @@ def get_players():
 @app.route('/api/admin/users/<int:user_id>', methods=['GET'])
 def get_player(user_id):
     try:
-        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',verify=False)
+        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',headers=request.headers,verify=False)
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
         else:
@@ -84,13 +84,13 @@ def get_player(user_id):
 @app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
 def update_player(user_id):
     payload=request.get_json()
-    response=requests.put(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',json=payload,verify=False)
+    response=requests.put(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',json=payload,headers=request.headers,verify=False)
     return make_response(response.json(),response.status_code)
 
 
 @app.route('/api/admin/users/ban/<int:user_id>', methods=['POST'])
 def ban_player(user_id):
-    response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=sanitize_data(request.get_json()),verify=False)
+    response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=sanitize_data(request.get_json()),headers=request.headers,verify=False)
     return make_response(response.json(),response.status_code)
 
 @app.route('/api/admin/register', methods=['POST'])
