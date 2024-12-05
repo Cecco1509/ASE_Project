@@ -125,10 +125,11 @@ def get_all_gachacollections():
 """Player Collection Endpoints"""
 
 # Get player's gacha collection.
-@app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
+@app.route('/api/player/gacha/player-collection', methods=['GET'])
 @handle_errors
 @validate_player_token
-def get_gacha_collection(userId, auth_response=None):
+def get_gacha_collection(auth_response=None):
+    userId = auth_response.json()['userId']
     response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}', verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
@@ -142,10 +143,11 @@ def get_gacha_collection_details(collectionId):
     return make_response(response.json(), response.status_code)
 
 # Get player's gacha item details
-@app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
+@app.route('/api/player/gacha/player-collection/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
 @validate_player_token
-def get_gacha_details(userId, gachaId, auth_response=None):
+def get_gacha_details(gachaId, auth_response=None):
+    userId = auth_response.json()['userId']
     user_gacha_collection_response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/{userId}', verify=False, timeout=config.timeout.medium)
     user_gacha_collection_response.raise_for_status()
     user_gacha_collection = user_gacha_collection_response.json()

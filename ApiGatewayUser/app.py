@@ -15,10 +15,10 @@ GACHA_MICROSERVICE = config.services.gacha
 
 """GatchasUser ENDPOINTS"""
 
-@app.route('/api/player/gacha/player-collection/<int:userId>', methods=['GET'])
+@app.route('/api/player/gacha/player-collection', methods=['GET'])
 @handle_errors
-def get_gacha_collection(userId):
-    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/{userId}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+def get_gacha_collection():
+    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection', headers=request.headers, verify=False, timeout=config.timeout.medium)
     return make_response(response.json(), response.status_code)
 
 # Get player's gacha collection item
@@ -29,10 +29,10 @@ def get_gacha_collection_details(collectionId):
     return make_response(response.json(), response.status_code)
 
 # Get player's gacha item details
-@app.route('/api/player/gacha/player-collection/<int:userId>/gacha/<int:gachaId>', methods=['GET'])
+@app.route('/api/player/gacha/player-collection/gacha/<int:gachaId>', methods=['GET'])
 @handle_errors
-def get_gacha_details(userId, gachaId):
-    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/{userId}/gacha/{gachaId}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+def get_gacha_details(gachaId):
+    response = requests.get(GACHA_MICROSERVICE + f'/api/player/gacha/player-collection/gacha/{gachaId}', headers=request.headers, verify=False, timeout=config.timeout.medium)
     return make_response(response.json(), response.status_code)
 
 """System Collection Endpoints"""
