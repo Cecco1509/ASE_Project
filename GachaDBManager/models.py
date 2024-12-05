@@ -43,6 +43,13 @@ class GachaCollection(db.Model):
             'timestamp': self.timestamp,
             'source': self.source.name
         }
+        def from_dict(data):
+        return GachaCollection(
+            gachaId=data['gachaId'],
+            userId=data['userId'],
+            timestamp=data['timestamp'],
+            source=GachaSource(data['source'])
+        )
 
 gacha_items = [
     {"name": "Kuriboh", "description": "An adorable monster that defends you in battles.", 
@@ -90,12 +97,3 @@ gacha_items = [
     {"name": "The Shadow Who Controls the Dark", "description": "A sinister shadow with hidden power.", 
      "image": "https://static.wikia.nocookie.net/yugioh/images/a/ac/ShadowWhoControlsDark.png", "rarityPercent": 0.025},
     ]
-
-    
-    def from_dict(data):
-        return GachaCollection(
-            gachaId=data['gachaId'],
-            userId=data['userId'],
-            timestamp=data['timestamp'],
-            source=GachaSource(data['source'])
-        )
