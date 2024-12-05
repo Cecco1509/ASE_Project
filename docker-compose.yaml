@@ -103,7 +103,7 @@ services:
       - admin_network
 
   authdatabase:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2017-latest
     environment:
       - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
@@ -123,7 +123,7 @@ services:
       - admin_network
 
   gachadatabase:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2017-latest
     environment:
       - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
@@ -143,7 +143,7 @@ services:
       - admin_network
 
   userdatabase:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2017-latest
     environment:
       - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
@@ -163,7 +163,7 @@ services:
       - admin_network
 
   auctiondatabase:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2017-latest
     environment:
       - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
@@ -246,7 +246,7 @@ services:
       - admin_network
 
   paymentdatabase:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2017-latest
     environment:
       - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
@@ -266,7 +266,7 @@ services:
       - admin_network
 
   transactiondatabase:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2017-latest
     environment:
       - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
       - ACCEPT_EULA=Y
