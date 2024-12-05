@@ -1,4 +1,2 @@
-requests
-python_json_config
-celery
-pytz
+requests==2.32.3
+python-json-config==1.2.3
