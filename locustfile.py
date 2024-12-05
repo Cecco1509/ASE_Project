@@ -9,7 +9,8 @@ class GachaMicroserviceTasks(TaskSet):
         registration_response = self.client.post("/api/player/register", json={
             "username": "test_user", 
             "password": "test_password"
-        })
+        },
+        verify=False)
         
         if registration_response.status_code == 200:
             print("User registered successfully.")
@@ -20,7 +21,8 @@ class GachaMicroserviceTasks(TaskSet):
         login_response = self.client.post("/login", json={
             "username": "test_user", 
             "password": "test_password"
-        })
+        },
+        verify=False)
         
         if login_response.status_code == 200:
             self.token = login_response.json().get("access_token")
@@ -34,37 +36,37 @@ class GachaMicroserviceTasks(TaskSet):
     def get_player_collection(self):
         if self.token:
             user_id = 1  # Fiksni ID
-            self.client.get(f"/api/player/gacha/player-collection/{user_id}")
+            self.client.get(f"/api/player/gacha/player-collection/{user_id}",verify=False)
 
     @task
     def get_collection_item_details(self):
         if self.token:
             collection_id = 1  # Fiksni ID
-            self.client.get(f"/api/player/gacha/player-collection/item/{collection_id}")
+            self.client.get(f"/api/player/gacha/player-collection/item/{collection_id}",verify=False)
 
     @task
     def get_gacha_details(self):
         if self.token:
             user_id = 1  # Fiksni ID
             gacha_id = 1  # Fiksni ID
-            self.client.get(f"/api/player/gacha/player-collection/{user_id}/gacha/{gacha_id}")
+            self.client.get(f"/api/player/gacha/player-collection/{user_id}/gacha/{gacha_id}",verify=False)
 
     @task
     def get_system_gacha_collection(self):
         if self.token:
-            self.client.get("/api/player/gacha/system-collection")
+            self.client.get("/api/player/gacha/system-collection",verify=False)
 
     @task
     def get_system_gacha_details(self):
         if self.token:
             gacha_id = 1  # Fiksni ID
-            self.client.get(f"/api/player/gacha/system-collection/{gacha_id}")
+            self.client.get(f"/api/player/gacha/system-collection/{gacha_id}", verify=False)
 
     @task
     def roll_gacha(self):
         if self.token:
             payload = {"gacha_type": "premium", "rank": 1}  # Rank je fiksno 1
-            self.client.post("/api/player/gacha/roll", json=payload)
+            self.client.post("/api/player/gacha/roll", json=payload, verify=False)
 
 
 class PaymentsMicroserviceTasks(TaskSet):
@@ -75,7 +77,7 @@ class PaymentsMicroserviceTasks(TaskSet):
         registration_response = self.client.post("/api/player/register", json={
             "username": "test_user", 
             "password": "test_password"
-        })
+        },verify=False)
         
         if registration_response.status_code == 200:
             print("User registered successfully.")
@@ -86,7 +88,7 @@ class PaymentsMicroserviceTasks(TaskSet):
         login_response = self.client.post("/login", json={
             "username": "test_user", 
             "password": "test_password"
-        })
+        },verify=False)
         
         if login_response.status_code == 200:
             self.token = login_response.json().get("access_token")
@@ -100,27 +102,27 @@ class PaymentsMicroserviceTasks(TaskSet):
     def get_transaction_history(self):
         if self.token:
             user_id = 1  # Fiksni ID
-            self.client.get(f"/api/player/currency{user_id}")
+            self.client.get(f"/api/player/currency{user_id}", verify=False)
 
     @task
     def purchase_currency(self):
         if self.token:
             payload = {"amount": 100, "currency": "USD", "rank": 1}  # Rank je fiksno 1
-            self.client.post("/api/player/currency/", json=payload)
+            self.client.post("/api/player/currency/", json=payload, verify=False)
 
     @task
     def decrease_currency(self):
         if self.token:
             user_id = 1  # Fiksni ID
             payload = {"amount": 50}
-            self.client.put(f"/api/player/decrease/{user_id}", json=payload)
+            self.client.put(f"/api/player/decrease/{user_id}", json=payload, verify=False)
 
     @task
     def increase_currency(self):
         if self.token:
             user_id = 1  # Fiksni ID
             payload = {"amount": 50}
-            self.client.put(f"/api/player/increase/{user_id}", json=payload)
+            self.client.put(f"/api/player/increase/{user_id}", json=payload,verify=False)
 
 
 class UsersMicroserviceTasks(TaskSet):
@@ -131,7 +133,7 @@ class UsersMicroserviceTasks(TaskSet):
         registration_response = self.client.post("/api/player/register", json={
             "username": "test_user", 
             "password": "test_password"
-        })
+        }, verify=False)
         
         if registration_response.status_code == 200:
             print("User registered successfully.")
@@ -142,7 +144,7 @@ class UsersMicroserviceTasks(TaskSet):
         login_response = self.client.post("/login", json={
             "username": "test_user", 
             "password": "test_password"
-        })
+        },verify=False)
         
         if login_response.status_code == 200:
             self.token = login_response.json().get("access_token")
@@ -156,20 +158,20 @@ class UsersMicroserviceTasks(TaskSet):
     def get_player_profile(self):
         if self.token:
             user_id = 1  # Fiksni ID
-            self.client.get(f"/api/player/profile/{user_id}")
+            self.client.get(f"/api/player/profile/{user_id}",verify=False)
 
     @task
     def update_player_profile(self):
         if self.token:
             user_id = 1  # Fiksni ID
             payload = {"name": "User 1"}
-            self.client.put(f"/api/player/update/{user_id}", json=payload)
+            self.client.put(f"/api/player/update/{user_id}", json=payload,verify=False)
 
     @task
     def delete_player(self):
         if self.token:
             user_id = 1  # Fiksni ID
-            self.client.delete(f"/api/player/delete/{user_id}")
+            self.client.delete(f"/api/player/delete/{user_id}",verify=False)
 
     @task
     def register_user(self):
@@ -179,12 +181,12 @@ class UsersMicroserviceTasks(TaskSet):
     @task
     def login_user(self):
         payload = {"username": "user_1", "password": "password123"}
-        self.client.post("/api/player/login", json=payload)
+        self.client.post("/api/player/login", json=payload,verify=False)
 
     @task
     def logout_user(self):
         if self.token:
-            self.client.post("/api/player/logout")
+            self.client.post("/api/player/logout",verify=False)
 
 
 class PlayerAppUser(HttpUser):
