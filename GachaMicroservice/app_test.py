@@ -148,9 +148,9 @@ def get_all_gachacollections():
 
 """Player Collection Endpoints"""
 
-@app.route('/api/player/gacha/player-collection/', methods=['GET'])
+@app.route('/api/player/gacha/player-collection', methods=['GET'])
 @handle_errors
-def get_gacha_collection(userId):
+def get_gacha_collection():
     is_valid, message, status_code = mock_validate_token(request)
     if not is_valid:
         return make_response(jsonify({"message": message}), status_code)

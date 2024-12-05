@@ -127,17 +127,10 @@ paths:
         '400':
           description: "Invalid input data"
 
-  /api/player/gacha/player-collection/{user_id}:
+  /api/player/gacha/player-collection:
     get:
       summary: "Get player's gacha collection"
       tags: ["GachaMicroservice"]
-      parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-          description: "ID of the player"
       responses:
         '200':
           description: "Player's gacha collection"
@@ -171,17 +164,11 @@ paths:
         '404':
           description: "Gacha collection item not found"
 
-  /api/player/gacha/player-collection/{user_id}/gacha/{gacha_id}:
+  /api/player/gacha/player-collection/gacha/{gacha_id}:
     get:
       summary: "Get specific gacha item details for a player"
       tags: ["GachaMicroservice"]
       parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-          description: "ID of the user"
         - in: path
           name: gacha_id
           required: true
