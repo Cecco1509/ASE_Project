@@ -6,77 +6,105 @@ on:
       - main
 
 jobs:
-  build:
+  unit-tests:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v4
-      
-    - name: Set up Node
-      uses: actions/setup-node@v4
-      with: 
-        node-version: '16'
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-    - name: Install Newman
-      run: |
-        npm install -g newman
-    
-    - name: Set up Docker buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "16"
 
-    - name: Build gacha microservice image
-      run: |
-        docker build -f ./GachaMicroservice/dockerfile_test -t gachams_test .
-    - name: Run gacha microservice image
-      run: |
-        docker run --rm --name gachams_test_ -d -p 5000:5000 gachams_test
-    - name: Run gacha microservice unit tests
-      run: |
-        cd docs/postman
-        newman run GachaMicroservice.postman_collection.json --insecure
-    - name: Stop gacha microservice image
-      run: |
-        docker stop gachams_test_
+      - name: Install Newman
+        run: |
+          npm install -g newman
 
-    - name: Build currency payment image
-      run: |
-        docker build -f ./PaymentsMicroservice/dockerfile_test -t paymentstest .
-    - name: Run payments image
-      run: |
-        docker run --rm --name paymentst -d -p 5000:5000 paymentstest
-    - name: Run payments unit tests
-      run: |
-        cd docs/postman
-        newman run PaymentsMicroservice_tests.postman_collection.json --insecure
-    - name: Stop payments image
-      run: |
-        docker stop paymentst
+      - name: Set up Docker buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Build user image
-      run: |
-        docker build -f ./UsersMicroservice/dockerfile_test -t userstest .
-    - name: Run user image
-      run: |
-        docker run --rm --name userst -d -p 5000:5000 userstest
-    - name: Run user unit tests
-      run: |
-        cd docs/postman
-        newman run UsersMicroservice.postman_collection.json --insecure
-    - name: Stop user image
-      run: |
-        docker stop userst
-        
-    - name: Build auth image
-      run: |
-        docker build -f ./AuthMicroservice/dockerfile_test -t authtest .
-    - name: Run auth image
-      run: |
-        docker run --rm --name autht -d -p 5000:5000 authtest
-    - name: Run auth unit tests
-      run: |
-        cd docs/postman
-        newman run AuthMicroservice.postman_collection.json --insecure
-    - name: Stop auth image
-      run: |
-        docker stop autht
+      - name: Build Auctions image
+        run: |
+          docker build -f ./AuctionsMicroservice/dockerfile_test -t auctionstest .
+      - name: Run Auctions image
+        run: |
+          docker run --rm --name auctionst -d -p 5000:5000 -p 5001:5000 auctionstest
+      - name: Run Auctions unit tests
+        run: |
+          cd docs/postman
+          newman run AuctionMicroservice.postman_collection.json --insecure
+      - name: Stop Auctions image
+        run: |
+          docker stop auctionst
+
+      - name: Build Transactions image
+        run: |
+          docker build -f ./TransactionsMicroservice/dockerfile_test -t transactionstest .
+      - name: Run Transactions image
+        run: |
+          docker run --rm --name transactionst -d -p 5000:5000 -p 5001:5000 transactionstest
+      - name: Run Transactions unit tests
+        run: |
+          cd docs/postman
+          newman run TransactionsMicroservice.postman_collection.json --insecure
+      - name: Stop Transactions image
+        run: |
+          docker stop transactionst
+
+      - name: Build gacha microservice image
+        run: |
+          docker build -f ./GachaMicroservice/dockerfile_test -t gachams_test .
+      - name: Run gacha microservice image
+        run: |
+          docker run --rm --name gachams_test_ -d -p 5000:5000 gachams_test
+      - name: Run gacha microservice unit tests
+        run: |
+          cd docs/postman
+          newman run GachaMicroservice.postman_collection.json --insecure
+      - name: Stop gacha microservice image
+        run: |
+          docker stop gachams_test_
+
+      - name: Build currency payment image
+        run: |
+          docker build -f ./PaymentsMicroservice/dockerfile_test -t paymentstest .
+      - name: Run payments image
+        run: |
+          docker run --rm --name paymentst -d -p 5000:5000 paymentstest
+      - name: Run payments unit tests
+        run: |
+          cd docs/postman
+          newman run PaymentsMicroservice_tests.postman_collection.json --insecure
+      - name: Stop payments image
+        run: |
+          docker stop paymentst
+
+      - name: Build user image
+        run: |
+          docker build -f ./UsersMicroservice/dockerfile_test -t userstest .
+      - name: Run user image
+        run: |
+          docker run --rm --name userst -d -p 5000:5000 userstest
+      - name: Run user unit tests
+        run: |
+          cd docs/postman
+          newman run UsersMicroservice.postman_collection.json --insecure
+      - name: Stop user image
+        run: |
+          docker stop userst
+
+      - name: Build auth image
+        run: |
+          docker build -f ./AuthMicroservice/dockerfile_test -t authtest .
+      - name: Run auth image
+        run: |
+          docker run --rm --name autht -d -p 5000:5000 authtest
+      - name: Run auth unit tests
+        run: |
+          cd docs/postman
+          newman run AuthMicroservice.postman_collection.json --insecure
+      - name: Stop auth image
+        run: |
+          docker stop autht

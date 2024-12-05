@@ -11,7 +11,7 @@ def validate_player_token(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # Call the auth service to validate the token
-        auth_response = requests.get(AUTH_MICROSERVICE_URL + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
+        auth_response = requests.get(AUTH_MICROSERVICE_URL + '/helloPlayer', headers=request.headers, verify=False)
         
         # If the authentication fails, return Unauthorized response
         if auth_response.status_code != 200:
@@ -30,7 +30,7 @@ def validate_admin_token(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # Call the auth service to validate the admin's token
-        auth_response = requests.get(AUTH_MICROSERVICE_URL + '/helloAdmin', headers=request.headers, verify=False, timeout=config.timeout.medium)
+        auth_response = requests.get(AUTH_MICROSERVICE_URL + '/helloAdmin', headers=request.headers, verify=False)
         
         # If the authentication fails, return Unauthorized response
         if auth_response.status_code != 200:

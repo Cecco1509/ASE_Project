@@ -1,5 +1,7 @@
 from app import app
 from app import db
+import sys
+sys.path.append('/app')
 from models import *
 from flask import Flask, request, make_response, jsonify
 from sqlalchemy import func

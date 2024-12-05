@@ -127,17 +127,10 @@ paths:
         '400':
           description: "Invalid input data"
 
-  /api/player/gacha/player-collection/{user_id}:
+  /api/player/gacha/player-collection:
     get:
       summary: "Get player's gacha collection"
       tags: ["GachaMicroservice"]
-      parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-          description: "ID of the player"
       responses:
         '200':
           description: "Player's gacha collection"
@@ -171,17 +164,11 @@ paths:
         '404':
           description: "Gacha collection item not found"
 
-  /api/player/gacha/player-collection/{user_id}/gacha/{gacha_id}:
+  /api/player/gacha/player-collection/gacha/{gacha_id}:
     get:
       summary: "Get specific gacha item details for a player"
       tags: ["GachaMicroservice"]
       parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-          description: "ID of the user"
         - in: path
           name: gacha_id
           required: true
@@ -262,17 +249,10 @@ paths:
           description: "User not found"
         '400':
           description: "Rolling failed, for example the user's in-game balance is not sufficient"
-  /api/player/currency/{user_id}:
+  /api/player/currency:
     get:
       summary: "Get player's transaction history"
       tags: ["PaymentsMicroservice"]
-      parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-          description: "ID of the user"
       security:
         - bearerAuth: []
       responses:
@@ -382,19 +362,12 @@ paths:
         '500':
           description: "Failed to retrieve transaction history"
     
-  /api/player/profile/{user_id}:
+  /api/player/profile:
     get:
       summary: "Get player's profile information"
       tags: ["UsersMicroservice"]
       security:
         - bearerAuth: []
-      parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-          description: "ID of the user"
       responses:
         '200':
           description: "Player profile retrieved successfully"
@@ -406,19 +379,12 @@ paths:
           description: "Player not found"
         '500':
           description: "Internal server error"
-  /api/player/update/{user_id}:
+  /api/player/update:
     put:
       summary: "Update player's profile picture"
       tags: ["UsersMicroservice"]
       security:
         - bearerAuth: []
-      parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-          description: "ID of the user"
       requestBody:
         required: true
         content:
@@ -434,19 +400,12 @@ paths:
           description: "Player not found"
         '500':
           description: "Failed to update the player's profile"
-  /api/player/delete/{user_id}:
+  /api/player/delete:
     delete:
       summary: "Delete a player account"
       tags: ["UsersMicroservice"]
       security:
         - bearerAuth: []
-      parameters:
-        - in: path
-          name: user_id
-          required: true
-          schema:
-            type: integer
-          description: "ID of the user"
       responses:
         '200':
           description: "Player deleted successfully"
@@ -1971,7 +1930,235 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'        
+                $ref: '#/components/schemas/ErrorResponse'
+                
+                
+  /player/auction/market:
+    get:
+      summary: Get active auctions
+      description: Retrieve all active auctions.
+      tags: [AuctionMicroservice]
+      responses:
+        "200":
+          description: List of active auctions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuctionItem"
+        "500":
+          description: Internal Server Error
+
+  /player/auction/create:
+    post:
+      summary: Create a new auction
+      description: Create a new auction listing for a gacha item.
+      tags:
+        - Player
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gachaCollectionId:
+                  type: integer
+                auctionStart:
+                  type: string
+                  format: date-time
+                auctionEnd:
+                  type: string
+                  format: date-time
+                minimumBid:
+                  type: number
+              required:
+                - gachaCollectionId
+                - auctionStart
+                - auctionEnd
+                - minimumBid
+      responses:
+        "201":
+          description: Auction created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auctionId:
+                    type: integer
+        "400":
+          description: Invalid input data
+        "500":
+          description: Internal Server Error
+
+  /player/auction/bid/{auction_id}:
+    post:
+      summary: Place a bid on an auction
+      description: Place a bid on an active auction.
+      tags:
+        - Player
+      parameters:
+        - name: auction_id
+          in: path
+          required: true
+          description: ID of the auction
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bidAmount:
+                  type: number
+              required:
+                - bidAmount
+      responses:
+        "200":
+          description: Bid placed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bidId:
+                    type: integer
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal Server Error
+
+  /admin/auction:
+    get:
+      summary: Get all auctions
+      description: Retrieve all auctions.
+      tags:
+        - Admin
+      responses:
+        "200":
+          description: List of active auctions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuctionItem"
+        "500":
+          description: Internal Server Error
+
+  /admin/auction/{auction_id}:
+    get:
+      summary: Get specific auction
+      description: Retrieve details of a specific auction.
+      tags:
+        - Admin
+      parameters:
+        - name: auction_id
+          in: path
+          required: true
+          description: ID of the auction
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Auction details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuctionItem"
+        "500":
+          description: Internal Server Error
+    put:
+      summary: Update an auction
+      description: Modify details of a specific auction.
+      tags:
+        - Admin
+      parameters:
+        - name: auction_id
+          in: path
+          required: true
+          description: ID of the auction
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auctionStart:
+                  type: string
+                  format: date-time
+                auctionEnd:
+                  type: string
+                  format: date-time
+                gachaCollectionId:
+                  type: integer
+                minimumBid:
+                  type: number
+              required:
+                - auctionStart
+                - auctionEnd
+      responses:
+        "200":
+          description: Auction updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuctionItem"
+        "400":
+          description: Invalid auction data
+        "500":
+          description: Internal Server Error
+
+  /admin/auction/history:
+    get:
+      summary: Get auction history
+      description: Retrieve market history of auctions.
+      tags:
+        - Admin
+      responses:
+        "200":
+          description: Auction history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuctionItem"
+        "500":
+          description: Internal Server Error
+
+  /admin/auction/history/{user_id}:
+    get:
+      summary: Get user's auction history
+      description: Retrieve the auction history for a specific user.
+      tags:
+        - Admin
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: ID of the user
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User's auction history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuctionItem"
+        "500":
+          description: Internal Server Error
+
           
 components:  
   securitySchemes:
@@ -2662,6 +2849,61 @@ components:
       type: object
       properties:
         message:
-          type: string      
+          type: string   
+    AuctionItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the auction.
+        gachaCollectionId:
+          type: integer
+          description: Identifier for the associated Gacha collection.
+        userId:
+          type: integer
+          description: Identifier for the user associated with the auction.
+        auctionStart:
+          type: string
+          format: date-time
+          description: Start date and time of the auction.
+        auctionEnd:
+          type: string
+          format: date-time
+          description: End date and time of the auction.
+        minimumBid:
+          type: number
+          format: float
+          description: Minimum bid amount required for the auction.
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp for when the auction was created or updated.
+        status:
+          type: string
+          description: Current status of the auction.
+          enum:
+            - ACTIVE
+            - PASSED
+            - UNKNOWN
+    AuctionBid:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the auction bid.
+        userId:
+          type: integer
+          description: Identifier for the user who placed the bid.
+        bidAmount:
+          type: number
+          format: float
+          description: Amount of the bid.
+        auctionId:
+          type: integer
+          description: Identifier for the associated auction.
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp for when the bid was placed.
 security:
   - bearerAuth: []

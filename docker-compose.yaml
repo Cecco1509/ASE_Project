@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   apigatewayuser:
     build:
@@ -7,8 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: apigatewayuser
     depends_on:
-      - auctionsadmin
-      - auctionsuser
+      - auctionmicroservice
       - authmicroservice
       - auctiondbmanager
       - userdbmanager
@@ -17,8 +14,7 @@ services:
       - paymentdbmanager
       - gachamicroservice
       - paymentsmicroservice
-      - transactionsadmin
-      - transactionsuser
+      - transactionsmicroservice
     ports:
       - "5000:5000"
     volumes:
@@ -40,8 +36,7 @@ services:
       dockerfile: Dockerfile
     container_name: apigatewayadmin
     depends_on:
-      - auctionsadmin
-      - auctionsuser
+      - auctionmicroservice
       - authmicroservice
       - auctiondbmanager
       - userdbmanager
@@ -50,8 +45,7 @@ services:
       - paymentdbmanager
       - gachamicroservice
       - paymentsmicroservice
-      - transactionsadmin
-      - transactionsuser
+      - transactionsmicroservice
     ports:
       - "5001:5000"
     volumes:
@@ -67,21 +61,23 @@ services:
     networks:
       - admin_network
 
-
-  auctionsadmin:
+  auctionmicroservice:
     build:
-      context: ./AuctionsAdmin
-      dockerfile: Dockerfile
-    container_name: auctionsadmin
-    networks:
-      - user_network
-      - admin_network
-
-  auctionsuser:
-    build:
-      context: ./AuctionsUser
-      dockerfile: Dockerfile
-    container_name: auctionsuser
+      context: ./AuctionsMicroservice
+      dockerfile: dockerfile
+    container_name: auctionmicroservice
+    depends_on:
+      - auctiondbmanager
+    volumes:
+      - ./config.json:/app/config.json
+      - .:/AuctionsMicroservice
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./AuctionsMicroservice/app.py
+    secrets:
+      - auction_ms_cert
+      - auction_ms_key
     networks:
       - user_network
       - admin_network
@@ -95,15 +91,17 @@ services:
       - authdatabase
     volumes:
       - ./config.json:/app/config.json
+      - ./AuthMicroservice:/AuthMicroservice
     secrets:
       - token_secret
       - auth_cert
       - auth_cert_key
       - db_password
+      - auctioneer_credentials
     networks:
       - user_network
       - admin_network
-  
+
   authdatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
     environment:
@@ -202,7 +200,7 @@ services:
       context: ./PaymentsMicroservice
       dockerfile: Dockerfile
     container_name: paymentsmicroservice
-    volumes: 
+    volumes:
       - ./config.json:/app/config.json
     secrets:
       - payments_cert
@@ -211,20 +209,16 @@ services:
       - user_network
       - admin_network
 
-  transactionsadmin:
+  transactionsmicroservice:
     build:
-      context: ./TransactionsAdmin
+      context: ./TransactionsMicroservice
       dockerfile: Dockerfile
-    container_name: transactionsadmin
-    networks:
-      - user_network
-      - admin_network
-
-  transactionsuser:
-    build:
-      context: ./TransactionsUser
-      dockerfile: Dockerfile
-    container_name: transactionsuser
+    container_name: transactionsmicroservice
+    volumes:
+      - ./config.json:/app/config.json # Mounts config.json into the container
+    secrets:
+      - transactions_ms_cert
+      - transactions_ms_key
     networks:
       - user_network
       - admin_network
@@ -235,7 +229,7 @@ services:
       dockerfile: Dockerfile
     container_name: usersmicroservice
     volumes:
-      - ./config.json:/app/config.json  # Mounts config.json into the container
+      - ./config.json:/app/config.json # Mounts config.json into the container
     secrets:
       - users_cert
       - users_cert_key
@@ -260,7 +254,7 @@ services:
     networks:
       - user_network
       - admin_network
-  
+
   transactiondatabase:
     image: mcr.microsoft.com/mssql/server:2017-latest
     environment:
@@ -278,7 +272,7 @@ services:
     networks:
       - user_network
       - admin_network
-   
+
   auctiondbmanager:
     build:
       context: ./AuctionDBManager
@@ -364,17 +358,34 @@ services:
       - user_network
       - admin_network
 
+  auctioneer:
+    build:
+      context: ./Auctioneer
+      dockerfile: dockerfile
+    container_name: auctioneer
+    depends_on:
+      - auctiondbmanager
+      - auctionmicroservice
+      - authmicroservice
+    volumes:
+      - ./config.json:/app/config.json
+      - ./Auctioneer:/Auctioneer
+    secrets:
+      - auctioneer_credentials
+    networks:
+      - admin_network
+
 secrets:
   token_secret:
     file: ./secrets/token_secret.env
   users_cert:
     file: ./secrets/users_cert.pem
   users_cert_key:
-    file: ./secrets/users_key.pem 
+    file: ./secrets/users_key.pem
   auth_cert:
     file: ./secrets/auth_cert.pem
   auth_cert_key:
-    file: ./secrets/auth_key.pem  
+    file: ./secrets/auth_key.pem
   db_password:
     file: ./secrets/db_password.txt
   auth_db_cert:
@@ -424,11 +435,11 @@ secrets:
   gateway_user_cert:
     file: ./secrets/gateway_user_cert.pem
   gateway_user_key:
-    file: ./secrets/gateway_user_key.pem  
+    file: ./secrets/gateway_user_key.pem
   payments_cert:
     file: ./secrets/payments_cert.pem
   payments_cert_key:
-    file: ./secrets/payments_key.pem 
+    file: ./secrets/payments_key.pem
   gacha_ms_cert:
     file: ./secrets/gacha_ms_cert.pem
   gacha_ms_cert_key:
@@ -437,7 +448,27 @@ secrets:
     file: ./secrets/gateway_admin_cert.pem
   gateway_admin_key:
     file: ./secrets/gateway_admin_key.pem
+  auction_ms_cert:
+    file: ./secrets/auction_ms_cert.pem
+  auction_ms_key:
+    file: ./secrets/auction_ms_key.pem
+  transactions_ms_cert:
+    file: ./secrets/transactions_ms_cert.pem
+  transactions_ms_key:
+    file: ./secrets/transactions_ms_key.pem
+  auctioneer_credentials:
+    file: ./secrets/auctioneer_credentials.json
 
 networks:
   user_network:
   admin_network:
+
+volumes:
+  uservolume:
+    driver: local
+  gachavolume:
+    driver: local
+  auctionsvolume:
+    driver: local
+  transactionsvolume:
+    driver: local
