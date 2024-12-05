@@ -62,7 +62,7 @@ with app.app_context():
         hashed_password = bcrypt.generate_password_hash(auctioneer_credentials.password + str(salt)).decode('utf-8')
         
         # Add the user
-        new_user = Admin(username=auctioneer_credentials.username, password=hashed_password, salt=salt)
+        new_user = Admin(username=auctioneer_credentials.username, password=hashed_password, salt=str(salt))
         db.session.add(new_user)
         db.session.commit()
         print("Auctioneer account user created.", flush=True)
@@ -122,7 +122,7 @@ def register_user():
         auth_data = {
             'username': json_data['username'],
             'password': hashed_password,
-            'salt': salt
+            'salt': str(salt)
         }
         response = create_account(auth_data)
         if response != None:
@@ -146,7 +146,7 @@ def login():
         if response==None:
             return make_response(jsonify({"message":"Username or password incorrect."}), 401)
         role ="player"
-        if bcrypt.check_password_hash(response['password'] + response['salt'], json_data['password']):
+        if bcrypt.check_password_hash(response['password'], json_data['password'] + response['salt']):
             token_data ={
                 "iss":"ASE Project",
                 "exp_time":str(datetime.now(timezone.utc)+timedelta(hours=5)) ,
@@ -213,7 +213,7 @@ def register_admin():
         auth_data = {
             'username': json_data['username'],
             'password': hashed_password,
-            'salt': salt
+            'salt': str(salt)
         }
         response = create_admin(auth_data)
         if response != None:
@@ -229,7 +229,7 @@ def admin_login():
         if response==None:
             return make_response(jsonify({"message":"Username or password incorrect."}), 401)
         role = "admin"
-        if bcrypt.check_password_hash(response['password'] + response['salt'], json_data['password']):
+        if bcrypt.check_password_hash(response['password'], json_data['password'] + response['salt']):
             token_data ={
                 "iss":"ASE Project",
                 "exp_time":str(datetime.now(timezone.utc)+timedelta(hours=5)) ,
