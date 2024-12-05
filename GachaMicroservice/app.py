@@ -203,9 +203,12 @@ def roll_gacha(auth_response=None):
     if not is_valid:
         return make_response(jsonify({"message": validation_message}), 400)
     rarity_level = json_data["rarity_level"]
+    print("rarity_level", rarity_level,flush=True)
 
     # Fetch user info to verify in-game currency
-    user_response = requests.get(f'{AUTH_MICROSERVICE_URL}/api/player/UserInfo', headers=request.headers, verify=False, timeout=config.timeout.medium)
+    userId = auth_response.json()['userId']
+    user_response = requests.get(f'{DB_MANAGER_USER_URL}/user/{userId}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+    print("user_response", user_response,flush=True)
     if user_response.status_code == 404:
         return make_response(jsonify({"message": "User not found"}), 404)
     elif user_response.status_code != 200:
@@ -223,12 +226,14 @@ def roll_gacha(auth_response=None):
     
     # Fetch all gacha items
     gacha_response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha', verify=False, timeout=config.timeout.medium)
+    print("gacha_response", gacha_response,flush=True)
     if gacha_response.status_code != 200:
         return make_response(jsonify({"message": "Error retrieving gacha items"}), 500)
     gacha_items = gacha_response.json()
 
     # Randomly select a gacha item
     selected_gacha = select_gacha(gacha_items, rarity_level)
+    print("selected_gacha", selected_gacha,flush=True)
 
     # Deduct the roll cost from the user's in-game currency
     userIngameCurrency -= roll_price
@@ -236,8 +241,10 @@ def roll_gacha(auth_response=None):
     update_user_response = requests.patch(
         f'{DB_MANAGER_USER_URL}/user/{userId}', 
         json={"ingameCurrency":userIngameCurrency},
-        verify=False
+        verify=False,
+        timeout=config.timeout.medium
     )
+    print("update_user_response", update_user_response,flush=True)
     if update_user_response.status_code != 200:
         return make_response(jsonify({"message": "Error updating the user's in-game currency balance"}), 500)
 
@@ -256,7 +263,10 @@ def roll_gacha(auth_response=None):
 
     # TODO: handle failures, rollback changes if necessary
 
-    return make_response(create_gacha_collection_response.json(), create_gacha_collection_response.status_code)
+    if create_gacha_collection_response.status_code != 200:
+        return make_response(jsonify({"message": "Error adding gacha item to player's collection"}), 500)
+
+    return make_response(selected_gacha, 200)
 
 def select_gacha(gacha_items, rarity_level):
     """
@@ -265,15 +275,25 @@ def select_gacha(gacha_items, rarity_level):
     # Retrieve probability for the selected level
     rarity_probability = getattr(ROLL_PROBABILITY,rarity_level)
 
-    # Create a weighted list where higher rarityPercent means lower chance of selection
-    weighted_gacha_list = []
-    for gacha in gacha_items:
-        # Rarity Distribution: Lower rarityPercent means the item is more common, while higher rarityPercent means the item is rarer.
-        weight = (101 - gacha["rarityPercent"]) * rarity_probability
-        weighted_gacha_list.extend([gacha] * int(weight))
+    # Calculate weighted probabilities for each gacha item
+    weighted_items = []
+    for item in gacha_items:
+        # Higher rarityPercent means more common, so we use rarityPercent directly
+        adjusted_probability = item["rarityPercent"] * rarity_probability
+        weighted_items.append((item, adjusted_probability))
 
-    # Randomly select an item from the weighted list
-    return random.choice(weighted_gacha_list)
+    # Normalize probabilities to sum to 1
+    total_weight = sum(weight for _, weight in weighted_items)
+    normalized_weights = [weight / total_weight for _, weight in weighted_items]
+
+    # Perform the selection based on weighted probabilities
+    selected_item = random.choices(
+        population=[item for item, _ in weighted_items], 
+        weights=normalized_weights, 
+        k=1  # Only one selection
+    )[0]
+
+    return selected_item
 
 def is_valid_roll_data(data):
     required_fields = {
