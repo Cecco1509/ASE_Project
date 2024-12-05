@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from datetime import datetime
 from app import db
@@ -15,6 +15,7 @@ class Auction(db.Model):
     __tablename__ = 'auction'
     id: Mapped[int] = mapped_column(primary_key=True)
     gachaCollectionId: Mapped[int]
+    userId: Mapped[int]
     auctionStart: Mapped[datetime]
     auctionEnd: Mapped[datetime]
     minimumBid: Mapped[float]
@@ -24,6 +25,7 @@ class Auction(db.Model):
         return {
             'id': self.id,
             'gachaCollectionId': self.gachaCollectionId,
+            'userId': self.userId,
             'auctionStart': self.auctionStart,
             'auctionEnd': self.auctionEnd,
             'minimumBid': self.minimumBid,

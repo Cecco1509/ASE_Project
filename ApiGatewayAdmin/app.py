@@ -62,7 +62,7 @@ def get_transaction_history_admin(user_id):
 @app.route('/api/admin/users', methods=['GET'])
 def get_players():
     try:
-        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users',verify=False, timeout=config.timeout.medium)
+        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users',headers=request.headers,verify=False, timeout=config.timeout.medium)
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
         else:
@@ -73,7 +73,7 @@ def get_players():
 @app.route('/api/admin/users/<int:user_id>', methods=['GET'])
 def get_player(user_id):
     try:
-        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',verify=False, timeout=config.timeout.medium)
+        response = requests.get(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',headers=request.headers,verify=False, timeout=config.timeout.medium)
         if response.status_code == 200:
             return make_response(jsonify(response.json()), 200)
         else:
@@ -84,13 +84,13 @@ def get_player(user_id):
 @app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
 def update_player(user_id):
     payload=request.get_json()
-    response=requests.put(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',json=payload,verify=False, timeout=config.timeout.medium)
+    response=requests.put(f'{config.services.usersmicroservice}/api/admin/users/{user_id}',json=payload,headers=request.headers,verify=False, timeout=config.timeout.medium)
     return make_response(response.json(),response.status_code)
 
 
 @app.route('/api/admin/users/ban/<int:user_id>', methods=['POST'])
 def ban_player(user_id):
-    response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=sanitize_data(request.get_json()),verify=False, timeout=config.timeout.medium)
+    response=requests.post(f'{config.services.usersmicroservice}/api/admin/users/ban/{user_id}',json=sanitize_data(request.get_json()),headers=request.headers,verify=False, timeout=config.timeout.medium)
     return make_response(response.json(),response.status_code)
 
 @app.route('/api/admin/register', methods=['POST'])
@@ -106,4 +106,82 @@ def admin_login():
 @app.route('/api/admin/logout', methods=['POST'])
 def admin_logout():
     response = requests.post(f"{config.services.authmicroservice}/api/admin/logout", headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/auction', methods=['GET'])
+@handle_errors
+def admin_auctions():
+    response = requests.get(config.services.auction + '/api/admin/auction', headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+
+# GET /api/admin/auction/{auction_id}: View specific auction details.
+@app.route('/api/admin/auction/<int:auctionId>', methods=['GET'])
+@handle_errors
+def get_single_auction(auctionId):
+    response = requests.get(config.services.auction + f'/api/admin/auction/{auctionId}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+    
+
+# PUT /api/admin/auction/{auction_id}: Modify a specific auction.
+@app.route('/api/admin/auction/<int:auctionId>', methods=['PUT'])
+@handle_errors
+def modify_auction(auctionId):
+    response = requests.put(f"{config.services.auction}/api/admin/auction/{auctionId}", json=sanitize_data(request.get_json()), headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/auction/history', methods=['GET'])
+@handle_errors
+def auction_history():
+    response = requests.get(f"{config.services.auction}/api/admin/auction/history", headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/auction/history/<int:userId>', methods=['GET'])
+@handle_errors
+def admin_auction_user_history(userId):
+    response = requests.get(config.services.auction + f'/api/admin/history/{userId}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/market-transaction/<int:user_id>', methods=['GET'])
+@handle_errors
+def admin_market_transaction(user_id):
+    response = requests.get(f"{config.services.transaction}/api/admin/market-transaction/{user_id}", headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/auction', methods=['GET'])
+@handle_errors
+def admin_auctions():
+    response = requests.get(config.services.auction + '/api/admin/auction', headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+
+# GET /api/admin/auction/{auction_id}: View specific auction details.
+@app.route('/api/admin/auction/<int:auctionId>', methods=['GET'])
+@handle_errors
+def get_single_auction(auctionId):
+    response = requests.get(config.services.auction + f'/api/admin/auction/{auctionId}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+    
+
+# PUT /api/admin/auction/{auction_id}: Modify a specific auction.
+@app.route('/api/admin/auction/<int:auctionId>', methods=['PUT'])
+@handle_errors
+def modify_auction(auctionId):
+    response = requests.put(f"{config.services.auction}/api/admin/auction/{auctionId}", json=sanitize_data(request.get_json()), headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/auction/history', methods=['GET'])
+@handle_errors
+def auction_history():
+    response = requests.get(f"{config.services.auction}/api/admin/auction/history", headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/auction/history/<int:userId>', methods=['GET'])
+@handle_errors
+def admin_auction_user_history(userId):
+    response = requests.get(config.services.auction + f'/api/admin/history/{userId}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/market-transaction/<int:user_id>', methods=['GET'])
+@handle_errors
+def admin_market_transaction(user_id):
+    response = requests.get(f"{config.services.transaction}/api/admin/market-transaction/{user_id}", headers=request.headers, verify=False, timeout=config.timeout.medium)
     return make_response(jsonify(response.json()), response.status_code)
