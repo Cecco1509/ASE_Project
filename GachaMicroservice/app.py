@@ -272,15 +272,25 @@ def select_gacha(gacha_items, rarity_level):
     # Retrieve probability for the selected level
     rarity_probability = getattr(ROLL_PROBABILITY,rarity_level)
 
-    # Create a weighted list where higher rarityPercent means lower chance of selection
-    weighted_gacha_list = []
-    for gacha in gacha_items:
-        # Rarity Distribution: Lower rarityPercent means the item is more common, while higher rarityPercent means the item is rarer.
-        weight = (101 - gacha["rarityPercent"]) * rarity_probability
-        weighted_gacha_list.extend([gacha] * int(weight))
+    # Calculate weighted probabilities for each gacha item
+    weighted_items = []
+    for item in gacha_items:
+        # Higher rarityPercent means more common, so we use rarityPercent directly
+        adjusted_probability = item["rarityPercent"] * rarity_probability
+        weighted_items.append((item, adjusted_probability))
 
-    # Randomly select an item from the weighted list
-    return random.choice(weighted_gacha_list)
+    # Normalize probabilities to sum to 1
+    total_weight = sum(weight for _, weight in weighted_items)
+    normalized_weights = [weight / total_weight for _, weight in weighted_items]
+
+    # Perform the selection based on weighted probabilities
+    selected_item = random.choices(
+        population=[item for item, _ in weighted_items], 
+        weights=normalized_weights, 
+        k=1  # Only one selection
+    )[0]
+
+    return selected_item
 
 def is_valid_roll_data(data):
     required_fields = {
