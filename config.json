@@ -54,7 +54,8 @@
         
     },
     "system_settings":{
-        "convert_price":100},
+        "convert_price":100
+    },
     "roll":{
         "probability": {
             "Common": 1.0,
@@ -68,5 +69,10 @@
             "Epic": 350,
             "Legendary": 550
         }
+    },
+    "timeout": {
+        "low": 3,
+        "medium": 6,
+        "high": 9
     }
 }
