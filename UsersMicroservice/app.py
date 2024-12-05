@@ -12,22 +12,30 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 
 
 
-@app.route('/api/player/profile/<int:user_id>', methods=['GET'])
-def getPlayerInformation(user_id):
-    auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
+@app.route('/api/player/profile', methods=['GET'])
+def getPlayerInformation():
+    auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
     if auth_response.status_code != 200:
-        return make_response(auth_response.json(), auth_response.status_code) 
-    response = requests.get(f'{config.dbmanagers.user}/user/{user_id}', verify=False, timeout=config.timeout.medium)
+        return make_response(auth_response.json(), auth_response.status_code)  
+    user_info_response = requests.get(config.services.authmicroservice + '/api/player/UserInfo', headers=request.headers, verify=False)
+    if user_info_response.status_code != 200:
+        return make_response(user_info_response.json(), user_info_response.status_code)  
+    user_id=user_info_response['id']
+    response = requests.get(f'{config.dbmanagers.user}/user/{user_id}', verify=False)
     if response.status_code == 200:
         return make_response(jsonify(response.json()), 200)
     else:
         return make_response(jsonify({"error": "Player not found"}), response.status_code)
 
-@app.route('/api/player/update/<int:user_id>', methods=['PUT'])
-def updatePlayerInformation(user_id):
-    auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
+@app.route('/api/player/update', methods=['PUT'])
+def updatePlayerInformation():
+    auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
     if auth_response.status_code != 200:
         return make_response(auth_response.json(), auth_response.status_code) 
+    user_info_response = requests.get(config.services.authmicroservice + '/api/player/UserInfo', headers=request.headers, verify=False)
+    if user_info_response.status_code != 200:
+        return make_response(user_info_response.json(), user_info_response.status_code)  
+    user_id=user_info_response['id']
     if 'profilePicture' in request.get_json():
         payload = request.json['profilePicture']
         response = requests.get(f'{config.dbmanagers.user}/user/{user_id}', verify=False, timeout=config.timeout.medium)
@@ -47,12 +55,16 @@ def updatePlayerInformation(user_id):
 
 
 
-@app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
-def delete_player(user_id):
-    auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
+@app.route('/api/player/delete', methods=['DELETE'])
+def delete_player():
+    auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
     if auth_response.status_code != 200:
         return make_response(auth_response.json(), auth_response.status_code) 
-    delete_response = requests.delete(f'{config.dbmanagers.user}/user/{user_id}', verify=False, timeout=config.timeout.medium)  
+    user_info_response = requests.get(config.services.authmicroservice + '/api/player/UserInfo', headers=request.headers, verify=False)
+    if user_info_response.status_code != 200:
+        return make_response(user_info_response.json(), user_info_response.status_code)  
+    user_id=user_info_response['id']
+    delete_response = requests.delete(f'{config.dbmanagers.user}/user/{user_id}', verify=False)  
     if delete_response.status_code == 200:
         delete_response = requests.delete(f'{config.services.authmicroservice}/api/player/{user_id}', verify=False, timeout=config.timeout.medium)  
         if delete_response.status_code ==200:
@@ -129,8 +141,8 @@ def ban_player(user_id):
                 'ingameCurrency':ingameCurrency_data,
                 'profilePicture':profilePicture_data
             }
-            update_response = requests.put(f'{config.dbmanagers.user}/user/{user_id}', json=update_data, verify=False, timeout=config.timeout.medium)
-            return make_response(jsonify(update_response.json()),update_response.status_cod)
+            update_response = requests.put(f'{config.dbmanagers.user}/user/{user_id}', json=update_data, verify=False)
+            return make_response(jsonify(update_response.json()),update_response.status_code)
         return make_response(jsonify({"error":"User not found."}),404)
     return make_response(jsonify({"error": "No status provided"}), 400)
 
