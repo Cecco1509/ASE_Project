@@ -42,3 +42,7 @@ import GachaCollectionEndpoints
 
 with app.app_context():
     db.create_all()
+    for gacha in models.gacha_items:
+        gacha_obj = models.Gacha(name=gacha['name'], image=gacha['image'], rarityPercent=gacha['rarityPercent'], description=gacha['description'])
+        db.session.add(gacha_obj)
+    db.session.commit()
