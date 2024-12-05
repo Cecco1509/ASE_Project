@@ -6,6 +6,8 @@ from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
 from utils import *
 
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
@@ -55,7 +57,12 @@ def get_system_gacha_details(gachaId):
 @app.route('/api/player/gacha/roll', methods=['POST'])
 @handle_errors
 def roll_gacha():
-    response = requests.post(GACHA_MICROSERVICE + f'/api/player/gacha/roll', headers=request.headers, json=sanitize_data(request.get_json()), verify=False, timeout=config.timeout.high)
+    try:
+        response = requests.post(GACHA_MICROSERVICE + f'/api/player/gacha/roll', headers=request.headers, json=sanitize_data(request.get_json()), verify=False, timeout=config.timeout.high)
+        print(response, flush=True)
+    except Exception as e:
+        print(f"An error occurred: {e}", flush=True)
+        return make_response(jsonify({"error": "WTF error occurred"}), 500)
     return make_response(response.json(), response.status_code)
 
 def create_app():

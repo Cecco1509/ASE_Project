@@ -5,6 +5,9 @@ import random
 from handle_errors import handle_errors
 from auth_utils import validate_player_token, validate_admin_token
 
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
 builder = ConfigBuilder()
@@ -211,7 +214,7 @@ def roll_gacha(auth_response=None):
     # Get the user's in-game currency
     user = user_response.json()
     userIngameCurrency = user['ingameCurrency']
-    userId = user['userId']
+    userId = user['id']
 
     # Check if the user has enough ingame currency to roll
     roll_price = getattr(ROLL_PRICE,rarity_level)
@@ -228,10 +231,12 @@ def roll_gacha(auth_response=None):
     selected_gacha = select_gacha(gacha_items, rarity_level)
 
     # Deduct the roll cost from the user's in-game currency
-    userIngameCurrency -= ROLL_PRICE
+    userIngameCurrency -= roll_price
+    print(userIngameCurrency, flush=True)
     update_user_response = requests.patch(
         f'{DB_MANAGER_USER_URL}/user/{userId}', 
-        json={"ingameCurrency":userIngameCurrency}
+        json={"ingameCurrency":userIngameCurrency},
+        verify=False
     )
     if update_user_response.status_code != 200:
         return make_response(jsonify({"message": "Error updating the user's in-game currency balance"}), 500)

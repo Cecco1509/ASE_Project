@@ -6,6 +6,9 @@ from werkzeug.exceptions import NotFound
 from python_json_config import ConfigBuilder
 from datetime import datetime
 
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')
 

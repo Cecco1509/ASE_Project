@@ -4,7 +4,8 @@ from flask import Flask, request, make_response, jsonify
 from requests.exceptions import ConnectionError, HTTPError
 from werkzeug.exceptions import NotFound
 
-
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 builder = ConfigBuilder()
 config = builder.parse_config('/app/config.json')

@@ -72,14 +72,7 @@ def patch_user(userId):
     if json_data:
         user = db.get_or_404(User, userId)
         if 'ingameCurrency' in json_data:
-            res = db.session.query(User.ingameCurrency).with_for_update().filter_by(id=userId).first()
-            money = float(res[0])
-            amount = float(json_data['ingameCurrency'])
-            if money + amount > 0:
-                print("(", money, " + (",amount,") = ", money + amount, flush=True)
-                user.ingameCurrency = money + amount
-            else:
-                return make_response(jsonify({"message":"Not enough money"}), 400)
+            user.ingameCurrency = json_data['ingameCurrency']
         if 'profilePicture' in json_data:
             user.profilePicture = json_data['profilePicture']
         if 'status' in json_data:

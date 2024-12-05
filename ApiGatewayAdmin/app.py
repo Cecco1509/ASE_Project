@@ -6,6 +6,9 @@ from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
 from utils import *
 
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
