@@ -1,11 +1,18 @@
 from app import app
 from app import db
-from models import *
 from flask import Flask, request, make_response, jsonify
+from models import AuctionBid
 
 @app.route('/auctionbid', methods=['GET'])
 def get_all_auction_bids():
     bids = db.session.execute(db.select(AuctionBid)).scalars()
+    if bids:
+        return make_response(jsonify([bid.to_dict() for bid in bids]), 200)
+    return make_response(jsonify({"message":"Auction bids not found"}), 404)
+
+@app.route('/auctionbid/auction/<int:auctionId>', methods=['GET'])
+def get_auctionbids_for_auction(auctionId):
+    bids = db.session.execute(db.select(AuctionBid).where(AuctionBid.auctionId==auctionId)).scalars()
     if bids:
         return make_response(jsonify([bid.to_dict() for bid in bids]), 200)
     return make_response(jsonify({"message":"Auction bids not found"}), 404)
@@ -16,8 +23,15 @@ def get_single_auctiontbid(bidId):
     return make_response(jsonify(bid.to_dict()), 200)
 
 @app.route('/auctionbid/user/<int:userId>', methods=['GET'])
-def get_auctionbids_for_user(userId):
+def get_bids_for_user(userId):
     bids = db.session.execute(db.select(AuctionBid).where(AuctionBid.userId==userId)).scalars()
+    if bids:
+        return make_response(jsonify([bid.to_dict() for bid in bids]), 200)
+    return make_response(jsonify({"message":"Auction bids not found"}), 404)
+
+@app.route('/auctionbid/user/<int:userId>/<int:auctionId>', methods=['GET'])
+def get_auctionbids_for_user(userId, auctionId):
+    bids = db.session.execute(db.select(AuctionBid).where(AuctionBid.userId==userId, AuctionBid.auctionId==auctionId)).scalars()
     if bids:
         return make_response(jsonify([bid.to_dict() for bid in bids]), 200)
     return make_response(jsonify({"message":"Auction bids not found"}), 404)

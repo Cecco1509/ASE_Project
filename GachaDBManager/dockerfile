@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM amd64/python:3.12.0b1-slim-buster
 
 WORKDIR /GachaDBManager
 ADD * /GachaDBManager
@@ -15,7 +15,6 @@ RUN curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt
 
 RUN apt-get update 
 
-#&& apt-get install -y curl gnupg2 ca-certificates lsb-release
 RUN ACCEPT_EULA=Y apt-get install -y unixodbc-dev msodbcsql17
 
 EXPOSE 5000

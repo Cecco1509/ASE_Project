@@ -107,3 +107,42 @@ def admin_login():
 def admin_logout():
     response = requests.post(f"{config.services.authmicroservice}/api/admin/logout", headers=request.headers, verify =False)
     return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/auction', methods=['GET'])
+@handle_errors
+def admin_auctions():
+    response = requests.get(config.services.auction + '/api/admin/auction', headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
+
+# GET /api/admin/auction/{auction_id}: View specific auction details.
+@app.route('/api/admin/auction/<int:auctionId>', methods=['GET'])
+@handle_errors
+def get_single_auction(auctionId):
+    response = requests.get(config.services.auction + f'/api/admin/auction/{auctionId}', headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
+    
+
+# PUT /api/admin/auction/{auction_id}: Modify a specific auction.
+@app.route('/api/admin/auction/<int:auctionId>', methods=['PUT'])
+@handle_errors
+def modify_auction(auctionId):
+    response = requests.put(f"{config.services.auction}/api/admin/auction/{auctionId}", json=sanitize_data(request.get_json()), headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/auction/history', methods=['GET'])
+@handle_errors
+def auction_history():
+    response = requests.get(f"{config.services.auction}/api/admin/auction/history", headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/auction/history/<int:userId>', methods=['GET'])
+@handle_errors
+def admin_auction_user_history(userId):
+    response = requests.get(config.services.auction + f'/api/admin/history/{userId}', headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
+
+@app.route('/api/admin/market-transaction/<int:user_id>', methods=['GET'])
+@handle_errors
+def admin_market_transaction(user_id):
+    response = requests.get(f"{config.services.transaction}/api/admin/market-transaction/{user_id}", headers=request.headers, verify=False)
+    return make_response(jsonify(response.json()), response.status_code)
