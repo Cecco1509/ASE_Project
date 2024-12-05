@@ -137,7 +137,7 @@ def get_gacha_collection(userId, auth_response=None):
 @app.route('/api/player/gacha/player-collection/item/<int:collectionId>', methods=['GET'])
 @handle_errors
 def get_gacha_collection_details(collectionId):
-    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/item/{collectionId}', verify=False)
+    response = requests.get(f'{DB_MANAGER_GACHA_URL}/gachacollection/item/{collectionId}', verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(response.json(), response.status_code)
 
