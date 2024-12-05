@@ -142,7 +142,7 @@ def ban_player(user_id):
                 'profilePicture':profilePicture_data
             }
             update_response = requests.put(f'{config.dbmanagers.user}/user/{user_id}', json=update_data, verify=False)
-            return make_response(jsonify(update_response.json()),update_response.status_cod)
+            return make_response(jsonify(update_response.json()),update_response.status_code)
         return make_response(jsonify({"error":"User not found."}),404)
     return make_response(jsonify({"error": "No status provided"}), 400)
 
