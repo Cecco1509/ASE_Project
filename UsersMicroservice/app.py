@@ -15,14 +15,14 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 
 @app.route('/api/player/profile', methods=['GET'])
 def getPlayerInformation():
-    auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
+    auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
     if auth_response.status_code != 200:
         return make_response(auth_response.json(), auth_response.status_code)  
-    user_info_response = requests.get(config.services.authmicroservice + '/api/player/UserInfo', headers=request.headers, verify=False)
+    user_info_response = requests.get(config.services.authmicroservice + '/api/player/UserInfo', headers=request.headers, verify=False, timeout=config.timeout.medium)
     if user_info_response.status_code != 200:
         return make_response(user_info_response.json(), user_info_response.status_code)  
-    user_id=user_info_response['id']
-    response = requests.get(f'{config.dbmanagers.user}/user/{user_id}', verify=False)
+    user_id=user_info_response.json()['id']
+    response = requests.get(f'{config.dbmanagers.user}/user/{user_id}', verify=False, timeout=config.timeout.medium)
     if response.status_code == 200:
         return make_response(jsonify(response.json()), 200)
     else:
@@ -30,13 +30,13 @@ def getPlayerInformation():
 
 @app.route('/api/player/update', methods=['PUT'])
 def updatePlayerInformation():
-    auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
+    auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
     if auth_response.status_code != 200:
         return make_response(auth_response.json(), auth_response.status_code) 
-    user_info_response = requests.get(config.services.authmicroservice + '/api/player/UserInfo', headers=request.headers, verify=False)
+    user_info_response = requests.get(config.services.authmicroservice + '/api/player/UserInfo', headers=request.headers, verify=False, timeout=config.timeout.medium)
     if user_info_response.status_code != 200:
         return make_response(user_info_response.json(), user_info_response.status_code)  
-    user_id=user_info_response['id']
+    user_id=user_info_response.json()['id']
     if 'profilePicture' in request.get_json():
         payload = request.json['profilePicture']
         response = requests.get(f'{config.dbmanagers.user}/user/{user_id}', verify=False, timeout=config.timeout.medium)
@@ -60,11 +60,11 @@ def updatePlayerInformation():
 def delete_player():
     auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False)
     if auth_response.status_code != 200:
-        return make_response(auth_response.json(), auth_response.status_code) 
+        return make_response(jsonify(auth_response.json()), auth_response.status_code) 
     user_info_response = requests.get(config.services.authmicroservice + '/api/player/UserInfo', headers=request.headers, verify=False)
     if user_info_response.status_code != 200:
-        return make_response(user_info_response.json(), user_info_response.status_code)  
-    user_id=user_info_response['id']
+        return make_response(jsonify(user_info_response.json()), user_info_response.status_code)  
+    user_id=user_info_response.json()['id']
     delete_response = requests.delete(f'{config.dbmanagers.user}/user/{user_id}', verify=False)  
     if delete_response.status_code == 200:
         delete_response = requests.delete(f'{config.services.authmicroservice}/api/player/{user_id}', verify=False, timeout=config.timeout.medium)  

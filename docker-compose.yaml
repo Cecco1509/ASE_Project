@@ -88,7 +88,8 @@ services:
       dockerfile: Dockerfile
     container_name: authmicroservice
     depends_on:
-      - authdatabase
+      authdatabase:
+        condition: service_healthy
     volumes:
       - ./config.json:/app/config.json
       - ./AuthMicroservice:/AuthMicroservice
@@ -111,6 +112,12 @@ services:
       - MSSQL_TLS_KEY=/run/secrets/auth_db_key
       - MSSQL_TLS_PROTOCOLS=1.2
       - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
     container_name: authdatabase
     secrets:
       - db_password
@@ -129,6 +136,12 @@ services:
       - MSSQL_TLS_KEY=/run/secrets/gacha_db_key
       - MSSQL_TLS_PROTOCOLS=1.2
       - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
     container_name: gachadatabase
     secrets:
       - db_password
@@ -147,6 +160,12 @@ services:
       - MSSQL_TLS_KEY=/run/secrets/user_db_key
       - MSSQL_TLS_PROTOCOLS=1.2
       - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
     container_name: userdatabase
     secrets:
       - db_password
@@ -165,6 +184,12 @@ services:
       - MSSQL_TLS_KEY=/run/secrets/auction_db_key
       - MSSQL_TLS_PROTOCOLS=1.2
       - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
     container_name: auctiondatabase
     secrets:
       - db_password
@@ -202,6 +227,8 @@ services:
     container_name: paymentsmicroservice
     volumes:
       - ./config.json:/app/config.json
+    depends_on:
+      - paymentdbmanager
     secrets:
       - payments_cert
       - payments_cert_key
@@ -216,6 +243,8 @@ services:
     container_name: transactionsmicroservice
     volumes:
       - ./config.json:/app/config.json # Mounts config.json into the container
+    depends_on:
+      - transactiondbmanager
     secrets:
       - transactions_ms_cert
       - transactions_ms_key
@@ -230,6 +259,8 @@ services:
     container_name: usersmicroservice
     volumes:
       - ./config.json:/app/config.json # Mounts config.json into the container
+    depends_on:
+      - userdbmanager
     secrets:
       - users_cert
       - users_cert_key
@@ -246,6 +277,12 @@ services:
       - MSSQL_TLS_KEY=/run/secrets/payment_db_key
       - MSSQL_TLS_PROTOCOLS=1.2
       - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
     container_name: paymentdatabase
     secrets:
       - db_password
@@ -264,6 +301,12 @@ services:
       - MSSQL_TLS_KEY=/run/secrets/transaction_db_key
       - MSSQL_TLS_PROTOCOLS=1.2
       - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
     container_name: transactiondatabase
     secrets:
       - db_password
@@ -279,7 +322,8 @@ services:
       dockerfile: Dockerfile
     container_name: auctiondbmanager
     depends_on:
-      - auctiondatabase
+      auctiondatabase:
+        condition: service_healthy
     volumes:
       - ./config.json:/app/config.json
     secrets:
@@ -296,7 +340,8 @@ services:
       dockerfile: Dockerfile
     container_name: gachadbmanager
     depends_on:
-      - gachadatabase
+      gachadatabase:
+        condition: service_healthy
     volumes:
       - ./config.json:/app/config.json
     secrets:
@@ -313,7 +358,8 @@ services:
       dockerfile: Dockerfile
     container_name: paymentdbmanager
     depends_on:
-      - paymentdatabase
+      paymentdatabase:
+        condition: service_healthy
     volumes:
       - ./config.json:/app/config.json
     secrets:
@@ -330,7 +376,8 @@ services:
       dockerfile: Dockerfile
     container_name: transactiondbmanager
     depends_on:
-      - transactiondatabase
+      transactiondatabase:
+        condition: service_healthy
     volumes:
       - ./config.json:/app/config.json
     secrets:
@@ -347,7 +394,8 @@ services:
       dockerfile: Dockerfile
     container_name: userdbmanager
     depends_on:
-      - userdatabase
+      userdatabase:
+        condition: service_healthy
     volumes:
       - ./config.json:/app/config.json
     secrets:

@@ -20,22 +20,25 @@ def create_app():
 
 # Configuration for the database manager service
 
-@app.route('/api/player/currency/transaction-history/<int:userId>', methods=['GET'])
-def get_transaction_history(userId):
+@app.route('/api/player/currency/transaction-history', methods=['GET'])
+def get_transaction_history():
     try:
         auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
         if auth_response.status_code != 200:
             return make_response(auth_response.json(), auth_response.status_code) 
-
+        user_info_response = requests.get(config.services.authmicroservice + '/api/player/UserInfo', headers=request.headers, verify=False)
+        if user_info_response.status_code != 200:
+            return make_response(jsonify(user_info_response.json()), user_info_response.status_code)  
+        userId=user_info_response.json()['id']
         # Send a GET request to the database manager service to fetch transaction history
-        response = requests.get(config.dbamangers.payment+ f'/currencytransaction/{userId}', verify=False, timeout=config.timeout.medium)
+        response = requests.get(config.dbmanagers.payment+ f'/currencytransaction/{userId}', verify=False, timeout=config.timeout.medium)
         
         # Check if the request was successful
-        if response.status_code == 200:
+        if response.status_code == 200 and response.json():
             transaction_history = response.json()
-            return jsonify(transaction_history)
+            return make_response(jsonify(transaction_history), 200)
 
-        elif response.status_code == 404:
+        elif response.status_code == 200 and not response.json():
             return make_response(jsonify({'error': 'Transactions not found'}), 404)
 
         elif response.status_code == 500:
@@ -83,8 +86,8 @@ def purchase_in_game_currency():
         # Define the payload to send to the database manager service
         payload = {
             'userId': user_id,
-            'timeStamp':  datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
-            'ingameCurrency': in_game_currency,
+            'timestamp':  datetime.now().strftime('%m/%d/%Y %H:%M:%S'),
+            'ingameAmount': in_game_currency,
             'realAmount': real_amount
         }
 
@@ -93,7 +96,16 @@ def purchase_in_game_currency():
         
         # Check if the request was successful
         if response.status_code == 200:  # Assuming 200 for successful creation
-            return make_response(jsonify({'message': 'Purchase successful', 'transaction': response.json()}), 200)
+            payload = {
+            'profilePicture': user_response.json()['profilePicture'],
+            'ingameCurrency': user_response.json()['ingameCurrency']+in_game_currency,
+            'status': user_response.json()['status']
+            }
+            response_user = requests.put(config.dbmanagers.user+f'/user/{user_id}', json=payload, verify=False, timeout=config.timeout.medium)
+            if response_user.status_code==200:
+                return make_response(jsonify({'message': 'Purchase successful', 'transaction': response.json()['transactionId']}), 200)
+            else:
+                return make_response(jsonify({'error': 'Error making purchase'}), 400)
 
         elif response.status_code == 400:
             return make_response(jsonify({'error': 'Invalid purchase request'}), 400)
@@ -209,7 +221,7 @@ def increase_currency(userId):
         
         # Parse the balance data from the response
         user_data = balance_response.json()
-        in_game_amount = user_data.get('ingameAmount')
+        in_game_amount = user_data.get('ingameCurrency')
         profile_picture= user_data.get('profilePicture')
         status=user_data.get('status')
 
@@ -217,11 +229,12 @@ def increase_currency(userId):
         payload = {
             'status': status,
             'profilePicture': profile_picture,
-            'ingameAmount': in_game_amount+amount
+            'ingameCurrency': in_game_amount+amount
         }
 
         # Make a POST request to the database manager's /transactions endpoint
         response = requests.put(config.dbmanagers.user+f'/user/{userId}', json=payload, verify=False, timeout=config.timeout.medium)
+        return make_response(jsonify(response.json()), response.status_code)
     except Exception as e:
         return make_response(jsonify({'error': str(e)}), 500)
 
