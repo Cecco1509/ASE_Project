@@ -1,0 +1,2777 @@
+{
+	"info": {
+		"_postman_id": "08013510-4c25-4d6d-bc45-dbbd1079d70d",
+		"name": "Integration tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39660017"
+	},
+	"item": [
+		{
+			"name": "Registration successful test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration success test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ \"userId\": 1 });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"protocolVersion": "http1"
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user123\",\r\n    \"password\":\"password1\",\r\n    \"profilePicture\":\"link to picture\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registration username taken test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration username taken test\", function(){\r",
+							"pm.response.to.have.status(409);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ \"message\":\"Username taken.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user123\",\r\n    \"password\":\"password1\",\r\n    \"profilePicture\":\"link to picture\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Registration invalid data test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration invalid data test\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Invalid data.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"password\":\"pass123\",\r\n    \"profilePicture\":\" \"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login successful test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login succesful test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.have.property(\"Access token\");\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"user_auth_token\", jsonData[\"Access token\"]);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user123\",\r\n    \"password\":\"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"login"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login wrong credentials test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login unsuccesful test\", function(){\r",
+							"pm.response.to.have.status(401);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Username or password incorrect.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user1\",\r\n    \"password\":\"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login invalid data test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login unsuccesful test\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Invalid data.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"user1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transaction not found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Transaction not found\", function(){\r",
+							"pm.response.to.have.status(404);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ 'error': 'Transactions not found' });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/currency",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Successful create of purchase",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful create of purchase\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ \r",
+							"        'message': 'Purchase successful',\r",
+							"        'transaction': 1});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"ingameAmount\":1000}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/currency",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid in game currency",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Invalid in game currency\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({'error': 'in game currency must be greater than zero'});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"ingameAmount\":-100,\"status\": \"ACTIVE\",\"profilePicture\": \"picture1\",\"userId\":2}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/currency",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player roll a new gacha using in-game currency 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Existing user with enough in-game currency\r",
+							"pm.test(\"Existing user with enough in-game currency\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.environment.set(\"gacha_id\", jsonData[\"id\"]);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"rarity_level\": \"Common\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/roll",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"roll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player roll a new gacha using in-game currency 400",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Gacha Roll - Non-Existent Rarity Level\r",
+							"pm.test(\"Gacha Roll - Non-Existent Rarity Level\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"rarity_level\": \"Default\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/roll",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"roll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player roll a new gacha using in-game currency 401",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Missing Authorization header\r",
+							"pm.test(\"Missing Authorization Header\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"rarity_level\": \"Common\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/roll",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"roll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get full system gacha collection 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 for valid request\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an(\"array\");\r",
+							"\r",
+							"    // Check that each item in the array has the required properties\r",
+							"    jsonData.forEach(item => {\r",
+							"        pm.expect(item).to.have.property(\"description\");\r",
+							"        pm.expect(item).to.have.property(\"id\");\r",
+							"        pm.expect(item).to.have.property(\"image\");\r",
+							"        pm.expect(item).to.have.property(\"name\");\r",
+							"        pm.expect(item).to.have.property(\"rarityPercent\");\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/system-collection",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"system-collection"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get system gacha item details 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test if the response contains the expected fields\r",
+							"pm.test(\"Response has the expected structure\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('name');\r",
+							"    pm.expect(jsonData).to.have.property('description');\r",
+							"    pm.expect(jsonData).to.have.property('image');\r",
+							"    pm.expect(jsonData).to.have.property('rarityPercent');\r",
+							"});\r",
+							"\r",
+							"// Test if the 'id' is 1 (based on the URL passed)\r",
+							"pm.test(\"ID should be 1\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(1);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/system-collection/1",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"system-collection",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get system gacha item details 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Invalid ID (non-existent ID)\r",
+							"pm.test(\"Expect 404 for non-existent gacha item\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/system-collection/999",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"system-collection",
+						"999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get player collection 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 for valid request\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an(\"array\");\r",
+							"\r",
+							"    // Check that each item in the array has the required properties\r",
+							"    jsonData.forEach(item => {\r",
+							"        pm.expect(item).to.have.property(\"gachaId\");\r",
+							"        pm.expect(item).to.have.property(\"id\");\r",
+							"        pm.expect(item).to.have.property(\"source\");\r",
+							"        pm.expect(item).to.have.property(\"timestamp\");\r",
+							"        pm.expect(item).to.have.property(\"userId\");\r",
+							"    });\r",
+							"    pm.environment.set(\"collection_id\", jsonData[0].id);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/player-collection",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"player-collection"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get player collection item 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response status code is 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test if the response contains the expected fields\r",
+							"pm.test(\"Response has the expected structure\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('gachaId');\r",
+							"    pm.expect(jsonData).to.have.property('source');\r",
+							"    pm.expect(jsonData).to.have.property('timestamp');\r",
+							"    pm.expect(jsonData).to.have.property('userId');\r",
+							"});\r",
+							"\r",
+							"// Test if the 'id' is 1 (based on the URL passed)\r",
+							"pm.test(\"ID should be 1\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(pm.environment.get(\"collection_id\"));\r",
+							"    pm.environment.set(\"gacha_id\", jsonData[\"gachaId\"]);\r",
+							"});\r",
+							"\r",
+							"// Test if the 'source' field is one of the valid values (\"ROLL\", \"AUCTION\", \"UNKNOWN\")\r",
+							"pm.test(\"Source should be one of 'ROLL', 'AUCTION', or 'UNKNOWN'\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    var validSources = ['ROLL', 'AUCTION', 'UNKNOWN'];\r",
+							"    pm.expect(validSources).to.include(jsonData.source);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/player-collection/item/{{collection_id}}",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"player-collection",
+						"item",
+						"{{collection_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get player collection item 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Invalid ID (non-existent ID)\r",
+							"pm.test(\"Expect 404 for non-existent gacha collection item\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/player-collection/item/999",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"player-collection",
+						"item",
+						"999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get player gacha item 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if the response contains the expected fields\r",
+							"pm.test(\"Response has the expected structure\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('name');\r",
+							"    pm.expect(jsonData).to.have.property('description');\r",
+							"    pm.expect(jsonData).to.have.property('image');\r",
+							"    pm.expect(jsonData).to.have.property('rarityPercent');\r",
+							"});\r",
+							"\r",
+							"// Test if the 'id' is 1 (based on the URL passed)\r",
+							"pm.test(\"ID should be 1\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(pm.environment.get(\"gacha_id\"));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/player-collection/gacha/{{gacha_id}}",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"player-collection",
+						"gacha",
+						"{{gacha_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get player gacha item 404",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// TEST CASE: Invalid ID (non-existent ID)\r",
+							"pm.test(\"Expect 404 for non-existent gacha item\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/gacha/player-collection/gacha/999",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"gacha",
+						"player-collection",
+						"gacha",
+						"999"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post auction 400 invalid dates",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var current = new Date();",
+							"var before1day = new Date();",
+							"",
+							"before1day.setDate(before1day.getDate() -1);",
+							"",
+							"var body = {",
+							"    \"gachaCollectionId\" : pm.environment.get(\"collection_id\"),",
+							"    \"userId\" : pm.environment.get(\"user_id\"),",
+							"    \"auctionStart\" : current.toISOString(),",
+							"    \"auctionEnd\" :   before1day.toISOString(),",
+							"    \"minimumBid\" : 30,    ",
+							"    \"status\" : \"ACTIVE\"",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5000/api/player/auction/create",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post auction 201",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var current = new Date();",
+							"var after1day = new Date();",
+							"",
+							"after1day.setMinutes(current.getMinutes() + 10)",
+							"",
+							"var body = {",
+							"    \"gachaCollectionId\" : pm.environment.get(\"collection_id\"),",
+							"    \"userId\" : pm.environment.get(\"user_id\"),",
+							"    \"auctionStart\" : current.toISOString(),",
+							"    \"auctionEnd\" :   after1day.toISOString(),",
+							"    \"minimumBid\" : 30,    ",
+							"    \"status\" : \"ACTIVE\"",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 201\", function () {",
+							"    pm.response.to.have.status(201);  // Expecting status 201 for successful creation",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('auctionId');  // Check if auctionId is returned",
+							"    pm.expect(jsonData.auctionId).to.be.a('number');  // Check if auctionId is a number",
+							"    pm.environment.set(\"auction_id\", jsonData['auctionId']);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5000/api/player/auction/create",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get active auctions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Active Auctions - Status 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the expected structure\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData[\"market\"]).to.be.an(\"array\"); // Expect response to be an array",
+							"    ",
+							"    // Check that each item in the array has the required properties",
+							"    jsonData[\"market\"].forEach(item => {",
+							"        pm.expect(item).to.have.property(\"gachaCollectionId\");",
+							"        pm.expect(item).to.have.property(\"id\");",
+							"        pm.expect(item).to.have.property(\"auctionStart\");",
+							"        pm.expect(item).to.have.property(\"auctionEnd\");",
+							"        pm.expect(item).to.have.property(\"timestamp\");",
+							"        pm.expect(item).to.have.property(\"userId\");",
+							"        pm.expect(item).to.have.property(\"minimumBid\");",
+							"        pm.expect(item).to.have.property(\"status\");",
+							"",
+							"        pm.expect(item[\"status\"]).be.eq(\"ACTIVE\")",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://127.0.0.1:5000/api/player/auction/market",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"market"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post auction 400 already active",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var current = new Date();",
+							"var after1day = new Date();",
+							"",
+							"after1day.setDate(after1day.getDate() +1);",
+							"",
+							"var body = {",
+							"    \"gachaCollectionId\" : pm.environment.get(\"collection_id\"),",
+							"    \"userId\" : pm.environment.get(\"user_id\"),",
+							"    \"auctionStart\" : current.toISOString(),",
+							"    \"auctionEnd\" :   after1day.toISOString(),",
+							"    \"minimumBid\" : 30,    ",
+							"    \"status\" : \"ACTIVE\"",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5000/api/player/auction/create",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post auction 400 invalid gacha",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var current = new Date();",
+							"var after1day = new Date();",
+							"",
+							"after1day.setDate(after1day.getDate() +1);",
+							"",
+							"var body = {",
+							"    \"gachaCollectionId\" : 9,",
+							"    \"userId\" : pm.environment.get(\"user_id\"),",
+							"    \"auctionStart\" : current.toISOString(),",
+							"    \"auctionEnd\" :   after1day.toISOString(),",
+							"    \"minimumBid\" : 30,    ",
+							"    \"status\" : \"ACTIVE\"",
+							"}",
+							"",
+							"var body_str = JSON.stringify(body);",
+							"pm.environment.set('request_body', body_str);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{request_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5000/api/player/auction/create",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post bid 400 bid owned auction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bidAmount\" : 100\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5000/api/player/auction/bid/{{auction_id}}",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"bid",
+						"{{auction_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPlayerInformation200OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get player information\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('authId');\r",
+							"    pm.expect(jsonData).to.have.property('id');\r",
+							"    pm.expect(jsonData).to.have.property('ingameCurrency');\r",
+							"    pm.expect(jsonData).to.have.property('profilePicture');\r",
+							"    pm.expect(jsonData).to.have.property('registrationDate');\r",
+							"    pm.expect(jsonData).to.have.property('status');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/profile",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPlayerInformation401UNA",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get player information\", function(){\r",
+							"pm.response.to.have.status(401);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({'message': 'Token is missing!'});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/profile",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdatePlayerInformation200OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Update player information\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"User sucessfully updated.\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"profilePicture\":\"slika.jpg\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/update",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdatePlayerInformation401UNA",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Update player information\", function(){\r",
+							"pm.response.to.have.status(401);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({'message': 'Token is missing!'});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"profilePicture\":\"slika.jpg\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/update",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdatePlayerInformation400NOPFP",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Update player information\", function(){\r",
+							"pm.response.to.have.status(400);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"error\": \"No profile picture provided\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"data\":\"some data\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/update",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Successful get transaction history",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful get transaction history\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"    jsonData.forEach(item => {\r",
+							"        pm.expect(item).to.have.property('id');\r",
+							"        pm.expect(item).to.have.property('ingameAmount');\r",
+							"        pm.expect(item).to.have.property('realAmount');\r",
+							"        pm.expect(item).to.have.property('timestamp');\r",
+							"        pm.expect(item).to.have.property('userId'); \r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/currency",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeletePlayerInformation200OK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Delete player\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({\"message\":\"Player successfully deleted\"});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{user_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/delete",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeletePlayerInformation401UNA",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Delete player\", function(){\r",
+							"pm.response.to.have.status(401);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({'message': 'Token is missing!'});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/delete",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register second user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration success test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ \"userId\": 2 });\r",
+							"pm.environment.set(\"user_id\", jsonData[\"userId\"]);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"protocolVersion": "http1"
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"second_user\",\r\n    \"password\":\"second_password\",\r\n    \"profilePicture\":\"link to picture\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login second user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login succesful test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.have.property(\"Access token\");\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"second_user_token\", jsonData[\"Access token\"]);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"second_user\",\r\n    \"password\":\"second_password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"login"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post bid 400 not enough bidAmount",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{second_user_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bidAmount\" : 54\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5000/api/player/auction/bid/{{auction_id}}",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"bid",
+						"{{auction_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Purchase ingame currency second user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful create of purchase\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.eql({ \r",
+							"        'message': 'Purchase successful',\r",
+							"        'transaction': 2});\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{second_user_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"ingameAmount\":300}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5000/api/player/currency",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"currency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post bid 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 200\", function () {",
+							"    pm.response.to.have.status(200);  // Expecting status 200 for successful creation",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData[\"bid\"]).to.have.property('id');  // Check if auctionId is returned",
+							"    pm.expect(jsonData.bid.id).to.be.a('number');  // Check if auctionId is a number",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{second_user_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bidAmount\" : 70\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5000/api/player/auction/bid/{{auction_id}}",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"bid",
+						"{{auction_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post bid 400 two bid in a row",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{second_user_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bidAmount\" : 100\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5000/api/player/auction/bid/{{auction_id}}",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"bid",
+						"{{auction_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player post bid 400 bid old auction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"POST Auction - Status 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{second_user_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"bidAmount\" : 100\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://127.0.0.1:5000/api/player/auction/bid/{{auction_id}}",
+					"protocol": "https",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"bid",
+						"{{auction_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Registration success test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"protocolVersion": "http1"
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"admin123\",\r\n    \"password\":\"password123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5001/api/admin/register",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login succesful test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"var jsonData = pm.response.json();\r",
+							"pm.expect(jsonData).to.have.property(\"Access token\");\r",
+							"pm.environment.set(\"admin_auth_token\", jsonData[\"Access token\"]);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"admin123\",\r\n    \"password\":\"password123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5001/api/admin/login",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"login"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Close auction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login succesful test\", function(){\r",
+							"pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{admin_auth_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"auctionStart\" : null,\r\n    \"auctionEnd\" :   null,\r\n    \"status\" : \"PASSED\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:5001/api/admin/auction/{{auction_id}}",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"auction",
+						"{{auction_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get auction history 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Passed Auctions - Status 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has the expected structure\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData[\"history\"]).to.be.an(\"array\"); // Expect response to be an array",
+							"    ",
+							"    // Check that each item in the array has the required properties",
+							"    jsonData[\"history\"].forEach(item => {",
+							"        pm.expect(item).to.have.property(\"gachaCollectionId\");",
+							"        pm.expect(item).to.have.property(\"id\");",
+							"        pm.expect(item).to.have.property(\"auctionStart\");",
+							"        pm.expect(item).to.have.property(\"auctionEnd\");",
+							"        pm.expect(item).to.have.property(\"timestamp\");",
+							"        pm.expect(item).to.have.property(\"userId\");",
+							"        pm.expect(item).to.have.property(\"minimumBid\");",
+							"        pm.expect(item).to.have.property(\"status\");",
+							"",
+							"        pm.expect(item[\"status\"]).be.eq(\"PASSED\");",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{second_user_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/auction/history",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get auction history 401",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get Passed Auctions - Status 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/auction/history",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"auction",
+						"history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get market history 200",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response should be a JSON array\", function () {",
+							"    pm.response.to.be.json;",
+							"    pm.expect(pm.response.json()).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Check if the transactions are correctly filtered by 1\", function () { // Extract user_id from URL",
+							"    const responseJson = pm.response.json();",
+							"    ",
+							"    // Check if all transactions in the response match the user_id as either seller or buyer",
+							"    responseJson.forEach(transaction => {",
+							"        const temp = transaction.sellerId == pm.environment.get(\"user_id\") || transaction.buyerId == pm.environment.get(\"user_id\");",
+							"        pm.expect(temp).to.eql(true);",
+							"    });",
+							"});",
+							"",
+							"pm.test(\"Check if response is empty for a user with no matching transactions\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.length).to.be.at.least(0); // Ensures the response is an empty array when no matching transactions",
+							"});",
+							"",
+							"pm.test(\"Check if error message is handled correctly\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    if (responseJson.message) {",
+							"        pm.expect(responseJson.message).to.not.be.empty;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{second_user_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/market-transaction",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"market-transaction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "player get market history 401",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status is 200\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:5000/api/player/market-transaction",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"player",
+						"market-transaction"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
