@@ -20,7 +20,7 @@ def getPlayerInformation():
     user_info_response=getID()
     if user_info_response['status']!= 200:
         return make_response(jsonify("Player not found"), user_info_response['status']) 
-    user_id=user_info_response.json()['data']
+    user_id=user_info_response['data']
     response=getPlayer(user_id)
     if response['status']==200:
         return  make_response(jsonify(response.json(),200))
@@ -36,7 +36,7 @@ def updatePlayerInformation():
     user_info_response=getID()
     if user_info_response['status']!= 200:
         return make_response(jsonify("Player not found"), user_info_response['status']) 
-    user_id=user_info_response.json()['data']
+    user_id=user_info_response['data']
     if 'profilePicture' in request.get_json():
         payload = request.json['profilePicture']
         response = getPlayer(user_id)
@@ -64,7 +64,7 @@ def delete_player():
     user_info_response=getID()
     if user_info_response['status']!= 200:
         return make_response(jsonify("Player not found"), user_info_response['status'])
-    user_id=user_info_response.json()['data']
+    user_id=user_info_response['data']
     delete_response = deletePlayer(user_id)
     delete_response_status=delete_response['status']
     if delete_response_status == 200:
