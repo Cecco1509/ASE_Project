@@ -1,0 +1,1813 @@
+openapi: 3.0.3
+info:
+  title: "ASE Project API"
+  version: "1.0.0"
+  description: "API documentation for ASE Project microservices"
+servers:
+  - url: "http://localhost:5050"
+paths:
+  /api/player/register:
+    post:
+      summary: "Register a new player"
+      tags: ["AuthMicroservice"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterPlayerRequest"
+      responses:
+        "200":
+          description: "Player registered successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerResponse"
+        "400":
+          description: "Invalid input or registration failed"
+        "409":
+          description: "Username already taken"
+
+  /api/player/login:
+    post:
+      summary: "Login a player"
+      tags: ["AuthMicroservice"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          description: "Invalid username or password"
+        "401":
+          description: "Unauthorized access"
+
+  /api/player/logout:
+    post:
+      summary: "Log out a player"
+      tags: ["AuthMicroservice"]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Player successfully logged out"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "400":
+          description: "Error during logout"
+        "401":
+          description: "Unauthorized access"
+
+  /api/admin/logout:
+    post:
+      summary: "Log out an admin"
+      tags: ["AuthMicroservice"]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Admin successfully logged out"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "400":
+          description: "Error during logout"
+        "401":
+          description: "Unauthorized access"
+
+  /api/player/UserInfo:
+    post:
+      summary: "Retrieve player info"
+      tags: ["AuthMicroservice"]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Successfully retrieved player info"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerInfoResponse"
+        "400":
+          description: "Error retrieving player info"
+        "403":
+          description: "Unauthorized role"
+
+  /helloPlayer:
+    get:
+      summary: "Verify player token"
+      tags: ["AuthMicroservice"]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Successfully verified player token"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+        "500":
+          description: "Internal server error"
+
+  /helloAdmin:
+    get:
+      summary: "Verify admin token"
+      tags: ["AuthMicroservice"]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Successfully verified admin token"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  adminId:
+                    type: integer
+        "500":
+          description: "Internal server error"
+
+  /api/admin/register:
+    post:
+      summary: "Register a new player"
+      tags: ["AuthMicroservice"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterPlayerRequest"
+      responses:
+        "200":
+          description: "Player registered successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlayerResponse"
+        "400":
+          description: "Invalid input or registration failed"
+        "409":
+          description: "Username already taken"
+
+  /api/admin/login:
+    post:
+      summary: "Login a player"
+      tags: ["AuthMicroservice"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          description: "Invalid username or password"
+        "401":
+          description: "Unauthorized access"
+
+  /api/admin/gacha:
+    get:
+      summary: "Get all gacha items"
+      tags: ["GachaMicroservice"]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "List of all gacha items"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GachaItem"
+        "404":
+          description: "Resource not found"
+    post:
+      summary: "Add new gacha item"
+      tags: ["GachaMicroservice"]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GachaItemInput"
+      responses:
+        "200":
+          description: "Gacha item created successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gachaId:
+                    type: integer
+                    description: "ID of the newly created gacha item"
+        "400":
+          description: "Invalid input data"
+
+  /api/admin/gacha/{gacha_id}:
+    get:
+      summary: "Get specific gacha item"
+      tags: ["GachaMicroservice"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item to retrieve"
+      responses:
+        "200":
+          description: "Details of the gacha item"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GachaItem"
+        "404":
+          description: "Resource not found"
+    delete:
+      summary: "Delete a gacha item"
+      tags: ["GachaMicroservice"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item to delete"
+      responses:
+        "200":
+          description: "Gacha item deleted successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Gacha item successfully deleted."
+        "404":
+          description: "Resource not found"
+    put:
+      summary: "Update gacha item details"
+      tags: ["GachaMicroservice"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item to update"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GachaItemInput"
+      responses:
+        "200":
+          description: "Gacha item updated successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Gacha item successfully updated."
+        "400":
+          description: "Invalid input data"
+
+  /api/player/gacha/player-collection:
+    get:
+      summary: "Get player's gacha collection"
+      tags: ["GachaMicroservice"]
+      responses:
+        "200":
+          description: "Player's gacha collection"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GachaCollectionItem"
+        "404":
+          description: "User not found"
+
+  /api/player/gacha/player-gacha/item/{gacha_id}:
+    get:
+      summary: "Get specific gacha collection item for a player"
+      tags: ["GachaMicroservice"]
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha collection item"
+      responses:
+        "200":
+          description: "Details of the specific gacha collection item for a player"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GachaCollectionItem"
+        "404":
+          description: "Gacha collection item not found"
+
+  /api/player/gacha/player-collection/gacha/{gacha_id}:
+    get:
+      summary: "Get specific gacha item details for a player"
+      tags: ["GachaMicroservice"]
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item"
+      responses:
+        "200":
+          description: "Details of the specific gacha item for a player"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GachaItem"
+        "404":
+          description: "Gacha item not found"
+
+  /api/player/gacha/system-collection:
+    get:
+      summary: "Get full system gacha collection"
+      tags: ["GachaMicroservice"]
+      responses:
+        "200":
+          description: "Full system gacha collection"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GachaItem"
+
+  /api/player/gacha/system-gacha/{gacha_id}:
+    get:
+      summary: "Get details of a specific system gacha item"
+      tags: ["GachaMicroservice"]
+      parameters:
+        - in: path
+          name: gacha_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the gacha item"
+      responses:
+        "200":
+          description: "Details of the specified system gacha item"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GachaItem"
+        "404":
+          description: "Gacha item not found"
+
+  /api/player/gacha/roll:
+    post:
+      summary: "Roll a new gacha item"
+      tags: ["GachaMicroservice"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  description: "ID of the user rolling the gacha"
+      responses:
+        "200":
+          description: "Roll successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collectionId:
+                    type: integer
+                    description: "ID of the added item in user's collection"
+        "404":
+          description: "User not found"
+        "400":
+          description: "Rolling failed, for example the user's in-game balance is not sufficient"
+  /api/player/currency/transaction-history:
+    get:
+      summary: "Get player's transaction history"
+      tags: ["PaymentsMicroservice"]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Transaction history retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        "404":
+          description: "Transactions not found"
+        "500":
+          description: "Internal server error"
+
+  /api/player/currency/purchase:
+    post:
+      tags: ["PaymentsMicroservice"]
+      summary: Purchase in-game currency
+      description: Processes a player's purchase of in-game currency and updates their profile.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: Unique identifier of the user making the purchase.
+                  example: "12345"
+                ingameAmount:
+                  type: number
+                  format: float
+                  description: Amount of in-game currency to purchase.
+                  example: 100
+              required:
+                - userId
+                - ingameAmount
+      responses:
+        "200":
+          description: Purchase was successful, and the user's profile was updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message.
+                    example: "Purchase successful"
+                  transaction:
+                    type: string
+                    description: Transaction ID for the purchase.
+                    example: "txn_abcdef123456"
+        "400":
+          description: Invalid request due to missing or invalid input.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message explaining the issue.
+                    example: "in_game_currency and user_id are required"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message indicating the user was not found.
+                    example: "User not found"
+        "500":
+          description: Internal server error or failure in a dependent service.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message explaining the server failure.
+                    example: "Failed to connect to the database manager service"
+                  details:
+                    type: string
+                    description: Additional details about the error.
+                    example: "Timeout error"
+
+      security:
+        - bearerAuth: []
+  /api/player/decrease/{user_id}:
+    put:
+      summary: "Decrease player's in-game currency"
+      tags: ["PaymentsMicroservice"]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CurrencyChange"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Currency decreased successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  transaction:
+                    $ref: "#/components/schemas/Transaction"
+        "400":
+          description: "Invalid decrease request or insufficient balance"
+        "404":
+          description: "User not found"
+        "500":
+          description: "Internal server error"
+
+  /api/player/increase/{user_id}:
+    put:
+      summary: "Increase player's in-game currency"
+      tags: ["PaymentsMicroservice"]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CurrencyChange"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Currency decreased successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  transaction:
+                    $ref: "#/components/schemas/Transaction"
+        "400":
+          description: "Invalid decrease request or insufficient balance"
+        "404":
+          description: "User not found"
+        "500":
+          description: "Internal server error"
+
+  /api/admin/currency/{user_id}:
+    get:
+      summary: "Get transaction history for a user (Admin)"
+      tags: ["PaymentsMicroservice"]
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Transaction history retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+        "404":
+          description: "User not found"
+        "500":
+          description: "Failed to retrieve transaction history"
+
+  /api/player/profile:
+    get:
+      summary: "Get player's profile information"
+      tags: ["UserMicroservice"]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Player profile retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "404":
+          description: "Player not found"
+        "500":
+          description: "Internal server error"
+  /api/player/update:
+    put:
+      summary: "Update player's profile picture"
+      tags: ["UserMicroservice"]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+      responses:
+        "200":
+          description: "Player profile updated successfully"
+        "400":
+          description: "Invalid input or no profile picture provided"
+        "404":
+          description: "Player not found"
+        "500":
+          description: "Failed to update the player's profile"
+  /api/player/delete:
+    delete:
+      summary: "Delete a player account"
+      tags: ["UserMicroservice"]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Player deleted successfully"
+        "404":
+          description: "Player not found"
+        "500":
+          description: "Failed to delete the player"
+  /api/admin/users:
+    get:
+      summary: "Retrieve a list of all players"
+      tags: ["UserMicroservice"]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: "Players retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserProfile"
+        "404":
+          description: "No players found"
+        "500":
+          description: "Internal server error"
+  /api/admin/users/{user_id}:
+    get:
+      summary: "Retrieve a player's profile"
+      tags: ["UserMicroservice"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+      responses:
+        "200":
+          description: "Player profile retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "404":
+          description: "Player not found"
+        "500":
+          description: "Internal server error"
+    put:
+      summary: "Update a player's profile picture (admin)"
+      tags: ["UserMicroservice"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+      responses:
+        "200":
+          description: "Player profile updated successfully"
+        "400":
+          description: "Invalid input or no profile picture provided"
+        "404":
+          description: "Player not found"
+        "500":
+          description: "Failed to update the player's profile"
+  /api/admin/users/ban/{user_id}:
+    post:
+      summary: "Ban a player"
+      tags: ["UserMicroservice"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BanRequest"
+      responses:
+        "200":
+          description: "Player banned successfully"
+        "400":
+          description: "Invalid input or no status provided"
+        "404":
+          description: "Player not found"
+        "500":
+          description: "Failed to ban the player"
+  /player/auction/market:
+    get:
+      summary: Get active auctions
+      description: Retrieve all active auctions.
+      tags:
+        - AuctionMicroservice
+      responses:
+        "200":
+          description: List of active auctions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuctionItem"
+        "500":
+          description: Internal Server Error
+
+  /player/auction/create:
+    post:
+      summary: Create a new auction
+      description: Create a new auction listing for a gacha item.
+      tags:
+        - AuctionMicroservice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                gachaCollectionId:
+                  type: integer
+                auctionStart:
+                  type: string
+                  format: date-time
+                auctionEnd:
+                  type: string
+                  format: date-time
+                minimumBid:
+                  type: number
+              required:
+                - gachaCollectionId
+                - auctionStart
+                - auctionEnd
+                - minimumBid
+      responses:
+        "201":
+          description: Auction created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auctionId:
+                    type: integer
+        "400":
+          description: Invalid input data
+        "500":
+          description: Internal Server Error
+
+  /player/auction/bid/{auction_id}:
+    post:
+      summary: Place a bid on an auction
+      description: Place a bid on an active auction.
+      tags:
+        - AuctionMicroservice
+      parameters:
+        - name: auction_id
+          in: path
+          required: true
+          description: ID of the auction
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bidAmount:
+                  type: number
+              required:
+                - bidAmount
+      responses:
+        "200":
+          description: Bid placed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bidId:
+                    type: integer
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal Server Error
+
+  /admin/auction:
+    get:
+      summary: Get all auctions
+      description: Retrieve all auctions.
+      tags:
+        - AuctionMicroservice
+      responses:
+        "200":
+          description: List of active auctions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuctionItem"
+        "500":
+          description: Internal Server Error
+
+  /admin/auction/{auction_id}:
+    get:
+      summary: Get specific auction
+      description: Retrieve details of a specific auction.
+      tags:
+        - AuctionMicroservice
+      parameters:
+        - name: auction_id
+          in: path
+          required: true
+          description: ID of the auction
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Auction details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuctionItem"
+        "500":
+          description: Internal Server Error
+    put:
+      summary: Update an auction
+      description: Modify details of a specific auction.
+      tags:
+        - AuctionMicroservice
+      parameters:
+        - name: auction_id
+          in: path
+          required: true
+          description: ID of the auction
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auctionStart:
+                  type: string
+                  format: date-time
+                auctionEnd:
+                  type: string
+                  format: date-time
+                gachaCollectionId:
+                  type: integer
+                minimumBid:
+                  type: number
+              required:
+                - auctionStart
+                - auctionEnd
+      responses:
+        "200":
+          description: Auction updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuctionItem"
+        "400":
+          description: Invalid auction data
+        "500":
+          description: Internal Server Error
+
+  /admin/auction/history:
+    get:
+      summary: Get auction history
+      description: Retrieve market history of auctions.
+      tags:
+        - AuctionMicroservice
+      responses:
+        "200":
+          description: Auction history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuctionItem"
+        "500":
+          description: Internal Server Error
+
+  /admin/auction/history/{user_id}:
+    get:
+      summary: Get user's auction history
+      description: Retrieve the auction history for a specific user.
+      tags:
+        - AuctionMicroservice
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: ID of the user
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User's auction history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuctionItem"
+        "500":
+          description: Internal Server Error
+
+  /api/player/market-transaction:
+    get:
+      tags: ["TransactionsMicroservice"]
+      summary: Get player's market transaction history
+      description: Retrieves the market transaction history for the currently authenticated player. Requires player authorization.
+      responses:
+        "200":
+          description: Successfully retrieved the player's transaction history.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    transactionId:
+                      type: string
+                      description: Unique identifier for the transaction.
+                      example: "txn_123abc"
+                    item:
+                      type: string
+                      description: Item involved in the transaction.
+                      example: "Epic Sword"
+                    amount:
+                      type: number
+                      description: Amount spent or earned.
+                      example: 150
+                    timestamp:
+                      type: string
+                      format: date-time
+                      description: Time of the transaction.
+                      example: "2024-12-06T12:34:56Z"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Details about the error.
+                    example: "An unexpected error occurred."
+      security:
+        - bearerAuth: []
+
+  /api/admin/market-transaction/{user_id}:
+    get:
+      tags: ["TransactionsMicroservice"]
+      summary: Get a user's market transaction history (Admin)
+      description: Retrieves the market transaction history for a specific user by their ID. Requires admin authorization.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: Unique identifier of the user whose transaction history is to be retrieved.
+          schema:
+            type: integer
+            example: 12345
+      responses:
+        "200":
+          description: Successfully retrieved the user's transaction history.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    transactionId:
+                      type: string
+                      description: Unique identifier for the transaction.
+                      example: "txn_123abc"
+                    item:
+                      type: string
+                      description: Item involved in the transaction.
+                      example: "Epic Sword"
+                    amount:
+                      type: number
+                      description: Amount spent or earned.
+                      example: 150
+                    timestamp:
+                      type: string
+                      format: date-time
+                      description: Time of the transaction.
+                      example: "2024-12-06T12:34:56Z"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Details about the error.
+                    example: "An unexpected error occurred."
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    GachaItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "ID of the gacha item"
+        name:
+          type: string
+          description: "Name of the gacha item"
+        description:
+          type: string
+          description: "Description of the gacha item"
+        image:
+          type: string
+          description: "URL to the gacha item's image"
+        rarityPercent:
+          type: number
+          format: float
+          description: "Rarity percentage of the gacha item"
+    GachaItemInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Name of the gacha item"
+        description:
+          type: string
+          description: "Description of the gacha item"
+        image:
+          type: string
+          description: "URL to the gacha item's image"
+        rarityPercent:
+          type: number
+          format: float
+          description: "Rarity percentage of the gacha item"
+      required:
+        - name
+        - description
+        - image
+        - rarityPercent
+    GachaCollectionItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Name of the gacha item"
+        gachaId:
+          type: string
+          description: "Description of the gacha item"
+        userId:
+          type: string
+          description: "URL to the gacha item's image"
+        source:
+          type: number
+          format: float
+          description: "Rarity percentage of the gacha item"
+        timestamp:
+          type: string
+          description: "Creation timestamp"
+
+    CurrencyPurchase:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: float
+          description: "Amount of currency to purchase"
+      required:
+        - amount
+    CurrencyChange:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: float
+          description: "Amount to add or subtract"
+      required:
+        - amount
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Transaction ID"
+        userId:
+          type: integer
+          description: "User ID for the transaction"
+        amount:
+          type: number
+          format: float
+          description: "Transaction amount"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Transaction timestamp"
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Unique user ID"
+        name:
+          type: string
+          description: "Name of the player"
+        email:
+          type: string
+          description: "Email address"
+        balance:
+          type: number
+          format: float
+          description: "In-game currency balance"
+        profilePicture:
+          type: string
+          description: "Profile picture URL"
+        status:
+          type: string
+          description: "Account status"
+    UpdateProfileRequest:
+      type: object
+      properties:
+        profilePicture:
+          type: string
+          description: "New profile picture URL"
+    BanRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          description: "New player status (e.g., 'banned')"
+    AuctionBid:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Unique ID of the auction bid"
+        userId:
+          type: integer
+          description: "ID of the user who placed the bid"
+        auctionId:
+          type: integer
+          description: "ID of the auction"
+        bidAmount:
+          type: number
+          format: float
+          description: "Amount of the bid"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of when the bid was placed"
+    CreateAuctionBidRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: "ID of the user placing the bid"
+        auctionId:
+          type: integer
+          description: "ID of the auction"
+        bidAmount:
+          type: number
+          format: float
+          description: "Amount of the bid"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of when the bid is placed"
+    UpdateAuctionBidRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: "ID of the user placing the bid"
+        auctionId:
+          type: integer
+          description: "ID of the auction"
+        bidAmount:
+          type: number
+          format: float
+          description: "Updated amount of the bid"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Updated timestamp of the bid"
+    Auction:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Unique ID of the auction"
+        gachaCollectionId:
+          type: integer
+          description: "ID of the associated gacha collection"
+        auctionStart:
+          type: string
+          format: date-time
+          description: "Start time of the auction"
+        auctionEnd:
+          type: string
+          format: date-time
+          description: "End time of the auction"
+        minimumBid:
+          type: number
+          format: float
+          description: "Minimum bid amount for the auction"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of the auction creation"
+        status:
+          type: string
+          description: "Current status of the auction"
+    CreateAuctionRequest:
+      type: object
+      properties:
+        gachaCollectionId:
+          type: integer
+          description: "ID of the associated gacha collection"
+        auctionStart:
+          type: string
+          format: date-time
+          description: "Start time of the auction"
+        auctionEnd:
+          type: string
+          format: date-time
+          description: "End time of the auction"
+        minimumBid:
+          type: number
+          format: float
+          description: "Minimum bid amount for the auction"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of the auction creation"
+        status:
+          type: string
+          description: "Status of the auction (e.g., 'open', 'closed')"
+    UpdateAuctionRequest:
+      type: object
+      properties:
+        gachaCollectionId:
+          type: integer
+          description: "ID of the associated gacha collection"
+        auctionStart:
+          type: string
+          format: date-time
+          description: "Start time of the auction"
+        auctionEnd:
+          type: string
+          format: date-time
+          description: "End time of the auction"
+        minimumBid:
+          type: number
+          format: float
+          description: "Minimum bid amount for the auction"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of the auction update"
+        status:
+          type: string
+          description: "Updated status of the auction"
+    GachaCollection:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Unique ID of the gacha collection"
+        gachaId:
+          type: integer
+          description: "ID of the associated gacha"
+        userId:
+          type: integer
+          description: "ID of the user owning the gacha collection"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of when the gacha collection was created"
+        source:
+          type: string
+          description: "Source of the gacha collection"
+    CreateGachaCollectionRequest:
+      type: object
+      properties:
+        gachaId:
+          type: integer
+          description: "ID of the associated gacha"
+        userId:
+          type: integer
+          description: "ID of the user owning the gacha collection"
+        source:
+          type: string
+          description: "Source of the gacha collection"
+    UpdateGachaCollectionRequest:
+      type: object
+      properties:
+        gachaId:
+          type: integer
+          description: "ID of the associated gacha"
+        userId:
+          type: integer
+          description: "ID of the user owning the gacha collection"
+        source:
+          type: string
+          description: "Updated source of the gacha collection"
+    Gacha:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Unique ID of the gacha"
+        name:
+          type: string
+          description: "Name of the gacha"
+        image:
+          type: string
+          description: "URL of the gacha's image"
+        rarityPercent:
+          type: number
+          format: float
+          description: "Rarity percentage of the gacha"
+        description:
+          type: string
+          description: "Description of the gacha"
+    CreateGachaRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Name of the gacha"
+        image:
+          type: string
+          description: "URL of the gacha's image"
+        rarityPercent:
+          type: number
+          format: float
+          description: "Rarity percentage of the gacha"
+        description:
+          type: string
+          description: "Description of the gacha"
+    UpdateGachaRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Updated name of the gacha"
+        image:
+          type: string
+          description: "Updated URL of the gacha's image"
+        rarityPercent:
+          type: number
+          format: float
+          description: "Updated rarity percentage of the gacha"
+        description:
+          type: string
+          description: "Updated description of the gacha"
+    CurrencyTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Unique ID of the transaction"
+        userId:
+          type: integer
+          description: "ID of the user associated with the transaction"
+        realAmount:
+          type: number
+          format: float
+          description: "The real amount in currency"
+        ingameAmount:
+          type: number
+          format: float
+          description: "The ingame amount of currency"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of the transaction"
+    CreateCurrencyTransactionRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: "ID of the user associated with the transaction"
+        realAmount:
+          type: number
+          format: float
+          description: "The real amount in currency"
+        ingameAmount:
+          type: number
+          format: float
+          description: "The ingame amount of currency"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of the transaction"
+    AuctionTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Unique ID of the transaction"
+        sellerId:
+          type: integer
+          description: "ID of the seller in the transaction"
+        buyerId:
+          type: integer
+          description: "ID of the buyer in the transaction"
+        auctionBidId:
+          type: integer
+          description: "ID of the auction bid associated with the transaction"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of the transaction"
+    CreateAuctionTransactionRequest:
+      type: object
+      properties:
+        sellerId:
+          type: integer
+          description: "ID of the seller in the transaction"
+        buyerId:
+          type: integer
+          description: "ID of the buyer in the transaction"
+        auctionBidId:
+          type: integer
+          description: "ID of the auction bid associated with the transaction"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of the transaction"
+    UpdateAuctionTransactionRequest:
+      type: object
+      properties:
+        sellerId:
+          type: integer
+          description: "ID of the seller in the transaction"
+        buyerId:
+          type: integer
+          description: "ID of the buyer in the transaction"
+        auctionBidId:
+          type: integer
+          description: "ID of the auction bid associated with the transaction"
+        timestamp:
+          type: string
+          format: date-time
+          description: "Timestamp of the transaction"
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: "Unique ID of the user"
+        authId:
+          type: integer
+          description: "Authentication ID of the user"
+        profilePicture:
+          type: string
+          description: "URL of the user's profile picture"
+        ingameCurrency:
+          type: integer
+          description: "Amount of in-game currency the user has"
+        registrationDate:
+          type: string
+          format: date-time
+          description: "Registration date of the user"
+        status:
+          type: string
+          description: "Status of the user (e.g., ACTIVE, INACTIVE)"
+    CreateUserRequest:
+      type: object
+      properties:
+        authId:
+          type: integer
+          description: "Authentication ID of the user"
+        profilePicture:
+          type: string
+          description: "URL of the user's profile picture"
+        ingameCurrency:
+          type: integer
+          description: "Amount of in-game currency"
+    UpdateUserRequest:
+      type: object
+      properties:
+        ingameCurrency:
+          type: integer
+          description: "Updated in-game currency for the user"
+        profilePicture:
+          type: string
+          description: "Updated profile picture URL"
+        status:
+          type: string
+          description: "Updated status of the user"
+    RegisterPlayerRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        profilePicture:
+          type: string
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+
+    PlayerResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+
+    PlayerInfoResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+        profilePicture:
+          type: string
+        status:
+          type: string
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+        salt:
+          type: string
+    AccountInput:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        salt:
+          type: string
+    Admin:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+        salt:
+          type: string
+    AdminInput:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        salt:
+          type: string
+    AuctionListResponse:
+      type: object
+      properties:
+        market:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuctionA"
+    AuctionResponse:
+      type: object
+      properties:
+        auction:
+          $ref: "#/components/schemas/AuctionA"
+    AuctionCreateRequest:
+      type: object
+      properties:
+        gachaCollectionId:
+          type: integer
+        userId:
+          type: integer
+        auctionStart:
+          type: string
+        auctionEnd:
+          type: string
+        minimumBid:
+          type: number
+        status:
+          type: string
+    AuctionHistoryResponse:
+      type: object
+      properties:
+        auctions:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuctionA"
+    AuctionUpdateRequest:
+      type: object
+      properties:
+        gachaCollectionId:
+          type: integer
+        auctionStart:
+          type: string
+        auctionEnd:
+          type: string
+        status:
+          type: string
+    AuctionA:
+      type: object
+      properties:
+        auctionId:
+          type: integer
+        gachaCollectionId:
+          type: integer
+        auctionStart:
+          type: string
+        auctionEnd:
+          type: string
+        status:
+          type: string
+    BidRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+        bidAmount:
+          type: number
+    BidResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        bidAmount:
+          type: number
+        auctionId:
+          type: integer
+        timestamp:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    AuctionItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the auction.
+        gachaCollectionId:
+          type: integer
+          description: Identifier for the associated Gacha collection.
+        userId:
+          type: integer
+          description: Identifier for the user associated with the auction.
+        auctionStart:
+          type: string
+          format: date-time
+          description: Start date and time of the auction.
+        auctionEnd:
+          type: string
+          format: date-time
+          description: End date and time of the auction.
+        minimumBid:
+          type: number
+          format: float
+          description: Minimum bid amount required for the auction.
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp for when the auction was created or updated.
+        status:
+          type: string
+          description: Current status of the auction.
+          enum:
+            - ACTIVE
+            - PASSED
+            - UNKNOWN
+security:
+  - bearerAuth: []
