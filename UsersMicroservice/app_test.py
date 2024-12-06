@@ -12,18 +12,31 @@ app = Flask(__name__, instance_relative_config=True) #instance_relative_config=T
 
 
 
-@app.route('/api/player/profile/<int:user_id>', methods=['GET'])
-def getPlayerInformation(user_id):
-    response = getPlayer(user_id)
-    if response:
-        if  response['status'] == 200:
-            return make_response(jsonify(response['data']), response['status'])
-        else:
-            return make_response(jsonify({"error": "Player not found"}), response['status'])
-    return make_response(jsonify({"error": "No data available"}), response['status'])
+@app.route('/api/player/profile', methods=['GET'])
+def getPlayerInformation():
+    auth_response = check_validation(request.headers)
+    if auth_response==False:
+        return make_response(jsonify({'error': 'Token required'}), 401)
+    user_info_response=getID()
+    if user_info_response['status']!= 200:
+        return make_response(jsonify("Player not found"), user_info_response['status']) 
+    user_id=user_info_response.json()['data']
+    response=getPlayer(user_id)
+    if response['status']==200:
+        return  make_response(jsonify(response.json(),200))
+    else:
+        return make_response(jsonify({"error": "Player not found"}), response['status'])
 
-@app.route('/api/player/update/<int:user_id>', methods=['PUT'])
-def updatePlayerInformation(user_id):
+
+@app.route('/api/player/update', methods=['PUT'])
+def updatePlayerInformation():
+    auth_response = check_validation(request.headers)
+    if auth_response==False:
+        return make_response(jsonify({'error': 'Token required'}), 401)
+    user_info_response=getID()
+    if user_info_response['status']!= 200:
+        return make_response(jsonify("Player not found"), user_info_response['status']) 
+    user_id=user_info_response.json()['data']
     if 'profilePicture' in request.get_json():
         payload = request.json['profilePicture']
         response = getPlayer(user_id)
@@ -42,20 +55,31 @@ def updatePlayerInformation(user_id):
     return make_response(jsonify({"error": "No profile picture provided"}), 400)
 
 
-@app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
-def delete_player(user_id):
+
+@app.route('/api/player/delete', methods=['DELETE'])
+def delete_player():
+    auth_response = check_validation(request.headers)
+    if auth_response==False:
+        return make_response(jsonify({'error': 'Token required'}), 401)
+    user_info_response=getID()
+    if user_info_response['status']!= 200:
+        return make_response(jsonify("Player not found"), user_info_response['status'])
+    user_id=user_info_response.json()['data']
     delete_response = deletePlayer(user_id)
     delete_response_status=delete_response['status']
     if delete_response_status == 200:
-        return make_response(jsonify(delete_response['data']), 200)
+        return make_response(jsonify({"message": "Player successfully deleted"}), 200)
     elif delete_response_status == 500:
-        return make_response(jsonify(delete_response['data']), 500)
+        return make_response(jsonify({"error": "Failed to delete player"}), 500)
     elif delete_response_status == 404:
-        return make_response(jsonify(delete_response['data']), 404)
-    
+        return make_response(jsonify({"error": "Player not found"}), 404)
+
 
 @app.route('/api/admin/users', methods=['GET'])
 def get_players():
+    auth_response = check_validation(request.headers)
+    if auth_response==False:
+        return make_response(jsonify({'error': 'Token required'}), 401)
     response = getPlayers()
     if  response['status'] == 200:
         return make_response(jsonify(response['data']), response['status'])
@@ -66,6 +90,9 @@ def get_players():
 
 @app.route('/api/admin/users/<int:user_id>', methods=['GET'])
 def get_player(user_id):
+    auth_response = check_validation(request.headers)
+    if auth_response==False:
+        return make_response(jsonify({'error': 'Token required'}), 401)
     response = getPlayer(user_id)
     if  response['status'] == 200:
         return make_response(jsonify(response['data']), response['status'])
@@ -75,6 +102,9 @@ def get_player(user_id):
 
 @app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
 def update_player(user_id):
+    auth_response = check_validation(request.headers)
+    if auth_response==False:
+        return make_response(jsonify({'error': 'Token required'}), 401)
     if 'profilePicture' in request.get_json():
         payload = request.json['profilePicture']
         response = getPlayer(user_id)
@@ -95,8 +125,12 @@ def update_player(user_id):
 
 
 
+
 @app.route('/api/admin/users/ban/<int:user_id>', methods=['POST'])
 def ban_player(user_id):
+    auth_response = check_validation(request.headers)
+    if auth_response==False:
+        return make_response(jsonify({'error': 'Token required'}), 401)
     if 'status' in request.get_json():
         payload = request.json['status']
         response = getPlayer(user_id)
@@ -110,11 +144,9 @@ def ban_player(user_id):
                 'profilePicture': profilePicture_data
             }
             update_response = banPlayer(user_id)
-            return make_response(jsonify(update_response['data']),update_response['status'])
-        return make_response(jsonify({"error":"Unsuccessful data retrieval from the database manager/User ID non existent"}),response['status'])
+            return make_response(jsonify(update_response),update_response['status'])
+        return make_response(jsonify({"error":"User not found"}),response['status'])
     return make_response(jsonify({"error": "No status provided"}), 400)
-
-
-
+    
 def create_app():
     return app
