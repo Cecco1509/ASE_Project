@@ -192,7 +192,7 @@ def bid_on_auction(auction_id, auth_response=None):
                 ## This could raise an exception if the user has not enough ingameCurrency
                 res.raise_for_status()
             except Exception as e:
-                return make_response(jsonify({"message": "Error decreasing player currency"}), 500)
+                return make_response(jsonify({"message": "Error decreasing user currency"}), 400)
 
             ## Giving money back to the last bidder
             if userBidId is not None:
