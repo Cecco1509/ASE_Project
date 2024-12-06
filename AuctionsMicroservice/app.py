@@ -326,7 +326,7 @@ def close_auction(auction, headers) -> bool:
         json={
             "gachaId": auction['id'],
             "userId": winningBid['userId'],
-            "source": f"{auction['id']}"
+            "source": "AUCTION"
         }, timeout=config.timeout.medium, verify=False
     )
 

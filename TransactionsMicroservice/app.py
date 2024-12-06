@@ -31,7 +31,7 @@ def get_player_transaction_history_admin(user_id, auth_response=None):
 @validate_player_token
 def get_player_transaction_history(auth_response=None):
     try:
-        response = requests.get(config.dbmanagers.transaction + f"/auctiontransaction/user/{auth_response["userId"]}", timeout=config.timeout.medium,verify=False)
+        response = requests.get(config.dbmanagers.transaction + f"/auctiontransaction/user/{auth_response.json()["userId"]}", timeout=config.timeout.medium,verify=False)
         response.raise_for_status()
 
         return make_response(response.json(), 200)

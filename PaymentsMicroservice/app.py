@@ -58,10 +58,13 @@ def purchase_in_game_currency():
         auth_response = requests.get(config.services.authmicroservice + '/helloPlayer', headers=request.headers, verify=False, timeout=config.timeout.medium)
         if auth_response.status_code != 200:
             return make_response(auth_response.json(), auth_response.status_code)
+        user_info_response = requests.get(config.services.authmicroservice + '/api/player/UserInfo', headers=request.headers, verify=False, timeout=config.timeout.medium)
+        if user_info_response.status_code != 200:
+            return make_response(user_info_response.json(), user_info_response.status_code)  
         # Extract data from request body
         data = request.get_json()
         in_game_currency = data.get('ingameAmount')
-        user_id = data.get('userId')
+        user_id = user_info_response.json().get('id')
         
 
         # Check if required fields are present
