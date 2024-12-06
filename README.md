@@ -104,7 +104,7 @@ docker build -t gachams_test -f ./GachaMicroservice/dockerfile_test .
 docker run --rm --name gachams_test_ -p 5000:5000 gachams_test
 ```
 
-  2. **Run Postman Tests:** Use the Postman collections in the "doc" folder to run unit tests for each microservice and its endpoints.
+  2. **Run Postman Tests:** Use the Postman collections in the "doc/postman" folder to run unit tests for each microservice and its endpoints.
 
 Example: Open Postman and import the appropriate collection (e.g., GachaMicroservice.postman_collection.json) and run the collection in the Postman runner.
 
@@ -116,8 +116,8 @@ Example: Open Postman and import the appropriate collection (e.g., GachaMicroser
   docker compose up --build
   ```
 
--   **Postman Collection**: Use the included Postman collection Integration_tests.postman_collection.json to run all the integration tests.
-  ### Running Locust Tests
+-   **Postman Collection**: Use the included Postman collection `Integration_tests.postman_collection.json`, which is included in the "docs/postman" folder, to run all the integration tests.
+  ### Running Performance Tests
 
 - Run the real microservices with bottle necks scaled up using this command:
   ```
