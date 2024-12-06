@@ -99,7 +99,7 @@ docker run -p 5000:5000 gachadmin_test
   
   ```
   docker compose up --build
-  ``
+  ```
 
 -   **Postman Collection**: Use the included Postman collection Integration_tests.postman_collection.json to run all the integration tests.
   ### Running Locust Tests
