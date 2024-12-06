@@ -64,7 +64,7 @@ def delete_user(userId):
     user = db.get_or_404(User, userId)
     db.session.delete(user)
     db.session.commit()
-    return make_response(jsonify({"messgae":"User sucessfully deleted."}), 200)
+    return make_response(jsonify({"message":"User sucessfully deleted."}), 200)
 
 @app.route('/user/<int:userId>', methods=['PATCH'])
 def patch_user(userId):
