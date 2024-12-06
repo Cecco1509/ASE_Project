@@ -51,7 +51,7 @@ import models
 from AccountDBMethods import *
 from AdminDBMethods import *
 
-valid_tokens = dict()
+invalid_tokens = set()
 bcrypt = Bcrypt(app)
 
 with app.app_context():
@@ -75,11 +75,19 @@ with app.app_context():
 def parse_json(data):
     return json.loads(json.dumps(data))
 
+def clear_expired_tokens():
+    for token in invalid_tokens:
+        expiration_str = token[1]
+        if expiration_str:
+            expiration = datetime.fromisoformat(expiration_str)
+            if expiration < datetime.now(timezone.utc):
+                invalid_tokens.Remove(token)
+
 def token_required(role=None):
     def decorator(func):
         @wraps(func)
         def decorated(*args, **kwargs):
-
+            clear_expired_tokens()
             ## Read the token from authorization header
             auth_header = request.headers.get('Authorization')
             if not auth_header:
@@ -99,10 +107,10 @@ def token_required(role=None):
                 if role and str(data['roles']) != role:
                     return jsonify({'message': 'Unauthorized role!'}), 403
                 
-                valid_token = valid_tokens.get(data['username'])
-                if not valid_token:
-                    return jsonify({'message':'Invalid token!'}),403
-                user = {"username":data['username'],"userId":data['userId'], "role":data['roles'], "token":token}
+                for token in invalid_tokens:
+                    if token[2]:
+                        return jsonify({'message':'Invalid token!'}),403
+                user = {"username":data['username'],"userId":data['userId'], "role":data['roles'], "token":token, "expr":data['exp_time']}
 
             except Exception as e:
                 print('Error decoding token: ', str(e))
@@ -158,7 +166,6 @@ def login():
                 "userId":response['id']
             }
             jwt_encoded = jwt.encode(token_data, app.config['SECRET_KEY'], algorithm="HS256")
-            valid_tokens[json_data['username']]=jwt_encoded
             return make_response({"Access token":jwt_encoded}, 200)
         else:
             return make_response(jsonify({"message":f"Username or password incorrect."}), 401)
@@ -167,10 +174,8 @@ def login():
 @app.route('/api/player/logout', methods=['POST'])
 @token_required("player")
 def logout(user_info):
-    token = valid_tokens.pop(user_info['username'])
-    if token:
-        return make_response(jsonify({"message":"User succesfully logged out."}),200)
-    return make_response(jsonify({"message":"Error while log out."}),400)
+    invalid_tokens.Add((user_info['expr'], user_info['token']))
+    return make_response(jsonify({"message":"User succesfully logged out."}),200)
 
 @app.route('/api/player/<int:user_id>', methods=['DELETE'])
 @token_required("player")
@@ -244,7 +249,6 @@ def admin_login():
                 "userId":response['id']
             }
             jwt_encoded = jwt.encode(token_data, app.config['SECRET_KEY'], algorithm="HS256")
-            valid_tokens[json_data['username']]=jwt_encoded
             return make_response({"Access token":jwt_encoded}, 200)
         else:
             return make_response(jsonify({"message":f"Username or password incorrect."}), 401)
@@ -253,7 +257,5 @@ def admin_login():
 @app.route('/api/admin/logout', methods=['POST'])
 @token_required("admin")
 def admin_logout(user_info):
-    token = valid_tokens.pop(user_info['username'])
-    if token:
-        return make_response(jsonify({"message":"Admin succesfully logged out."}),200)
-    return make_response(jsonify({"message":"Error while log out."}),400)
+    invalid_tokens.Add((user_info['expr'], user_info['token']))
+    return make_response(jsonify({"message":"Admin succesfully logged out."}),200)

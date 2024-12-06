@@ -212,9 +212,13 @@ def roll_gacha(auth_response=None):
         return make_response(jsonify({"message": "User not found"}), 404)
     elif user_response.status_code != 200:
         return make_response(jsonify({"message": "Error retrieving user info"}), 500)
-    
-    # Get the user's in-game currency
+
+    # Check the user's status and make sure they are active
     user = user_response.json()
+    if user['status'] != 'ACTIVE':
+        return make_response(jsonify({"message":"User is not active"}), 403)
+
+    # Get the user's in-game currency
     userIngameCurrency = user['ingameCurrency']
     userId = user['id']
 
