@@ -51,11 +51,7 @@ def get_transaction_history():
     except requests.RequestException as e:
         # Handle errors that may occur during the HTTP request (e.g., network issues)
         return make_response(jsonify({'error': 'Failed to connect to the database manager service', 'details': str(e)}), 500)
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
+    
 @app.route('/api/player/currency/purchase', methods=['POST'])
 def purchase_in_game_currency():
     try:
