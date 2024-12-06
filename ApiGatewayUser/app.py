@@ -6,6 +6,8 @@ from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
 from utils import *
 
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
@@ -55,7 +57,12 @@ def get_system_gacha_details(gachaId):
 @app.route('/api/player/gacha/roll', methods=['POST'])
 @handle_errors
 def roll_gacha():
-    response = requests.post(GACHA_MICROSERVICE + f'/api/player/gacha/roll', headers=request.headers, json=sanitize_data(request.get_json()), verify=False, timeout=config.timeout.high)
+    try:
+        response = requests.post(GACHA_MICROSERVICE + f'/api/player/gacha/roll', headers=request.headers, json=sanitize_data(request.get_json()), verify=False, timeout=config.timeout.high)
+        print(response, flush=True)
+    except Exception as e:
+        print(f"An error occurred: {e}", flush=True)
+        return make_response(jsonify({"error": "WTF error occurred"}), 500)
     return make_response(response.json(), response.status_code)
 
 def create_app():
@@ -64,9 +71,9 @@ def create_app():
 # Configuration for the database manager service
   # Replace with actual URL
 
-@app.route('/api/player/currency/<int:user_id>', methods=['GET'])
-def get_transaction_history(user_id):
-    response = requests.get(config.services.paymentsmicroservice+f'/api/player/currency/transaction-history/{user_id}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+@app.route('/api/player/currency', methods=['GET'])
+def get_transaction_history():
+    response = requests.get(config.services.paymentsmicroservice+f'/api/player/currency/transaction-history', headers=request.headers, verify=False, timeout=config.timeout.medium)
     return make_response(jsonify(response.json()),response.status_code)
 
 
@@ -85,26 +92,22 @@ def increase_currency(user_id):
     response = requests.put(config.services.paymentsmicroservice+ f'/api/player/currency/increase/{user_id}', json=sanitize_data(request.get_json()), headers=request.headers, verify=False, timeout=config.timeout.medium)
     return make_response(jsonify(response.json()),response.status_code) 
 
-@app.route('/api/player/profile/<int:user_id>', methods=['GET'])
-def getPlayerInformation(user_id):
+@app.route('/api/player/profile', methods=['GET'])
+def getPlayerInformation():
     try:
-        response = requests.get(f'{config.services.usersmicroservice}/api/player/profile/{user_id}',headers=request.headers,verify=False, timeout=config.timeout.medium)
-        
-        if response.status_code == 200:
-            return make_response(jsonify(response.json()), 200)
-        else:
-            return make_response(jsonify({"error": "Player not found"}), response.status_code)
+        response = requests.get(f'{config.services.usersmicroservice}/api/player/profile',headers=request.headers,verify=False, timeout=config.timeout.medium)
+        return make_response(jsonify(response.json()), response.status_code)
     except requests.RequestException as e:
         return make_response(jsonify({"error": "Failed to connect to database API", "details": str(e)}), 500)
 
-@app.route('/api/player/update/<int:user_id>', methods=['PUT'])
-def updatePlayerInformation(user_id):
-    response=requests.put(f'{config.services.usersmicroservice}/api/player/update/{user_id}',json=sanitize_data(request.get_json()),headers=request.headers,verify=False, timeout=config.timeout.medium)
+@app.route('/api/player/update', methods=['PUT'])
+def updatePlayerInformation():
+    response=requests.put(f'{config.services.usersmicroservice}/api/player/update',json=sanitize_data(request.get_json()),headers=request.headers,verify=False, timeout=config.timeout.medium)
     return make_response(jsonify(response.json()),response.status_code)
 
-@app.route('/api/player/delete/<int:user_id>', methods=['DELETE'])
-def delete_player(user_id):
-    delete_response = requests.delete(f'{config.services.usersmicroservice}/api/player/delete/{user_id}',headers=request.headers,verify=False, timeout=config.timeout.medium)
+@app.route('/api/player/delete', methods=['DELETE'])
+def delete_player():
+    delete_response = requests.delete(f'{config.services.usersmicroservice}/api/player/delete',headers=request.headers,verify=False, timeout=config.timeout.medium)
     return make_response(jsonify(delete_response.json()),delete_response.status_code)
     
 @app.route('/api/player/register', methods=['POST'])
@@ -126,7 +129,6 @@ def user_logout():
 @app.route('/api/player/auction/market', methods=['GET'])
 @handle_errors
 def auction_market():
-    """GET auction history."""
     response = requests.get(config.services.auction + f'/api/player/auction/market', headers=request.headers, verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
@@ -142,10 +144,10 @@ def create_bid(auction_id):
     response = requests.post(config.services.auction + f'/api/player/auction/bid/{auction_id}', json=sanitize_data(request.get_json()), headers=request.headers, verify=False, timeout=config.timeout.medium)
     return make_response(response.json(), response.status_code)
 
-@app.route('/api/player/auction', methods=['GET'])
+@app.route('/api/player/auction/history', methods=['GET'])
 @handle_errors
 def user_auction_history():
-    response = requests.post(config.services.auction + f'/api/player/auction/history' , headers=request.headers, verify=False, timeout=config.timeout.medium)
+    response = requests.get(config.services.auction + f'/api/player/auction/history' , headers=request.headers, verify=False, timeout=config.timeout.medium)
     return make_response(response.json(), response.status_code)
 
 

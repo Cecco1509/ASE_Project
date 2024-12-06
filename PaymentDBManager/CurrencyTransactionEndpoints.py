@@ -32,4 +32,4 @@ def delete_currency_transaction(transactionId):
     transaction = db.get_or_404(CurrencyTransaction, transactionId)
     db.session.delete(transaction)
     db.session.commit()
-    return make_response(jsonify({"messgae":"Transaction sucessfully deleted."}), 200)
+    return make_response(jsonify({"message":"Transaction sucessfully deleted."}), 200)

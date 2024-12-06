@@ -13,6 +13,9 @@ import json
 from flask_bcrypt import Bcrypt 
 from dotenv import load_dotenv
 
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 load_dotenv()
 app.config['SECRET_KEY']=str(os.getenv("SECRET_KEY"))
@@ -177,13 +180,16 @@ def delete_account(user_id, user_info):
         return make_response(jsonify({"message":"Account succesfully delted."}),200)
     return make_response(jsonify({"message":"Account not found."}),404)
 
-@app.route('/api/player/UserInfo', methods=['POST'])
+@app.route('/api/player/UserInfo', methods=['GET'])
 @token_required("player")
-def userInfo(user_info):
-    response = requests.post(f'{config.dbmanagers.user}/user/auth/{user_info['userId']}', verify=False, timeout=config.timeout.medium)
-    if response.status_code==200:
+def userInfo(user_info=None):
+    try:
+        response = requests.get(f'{config.dbmanagers.user}/user/auth/{user_info['userId']}', verify=False, timeout=config.timeout.medium)
+        response.raise_for_status()
         return make_response(jsonify(response.json()),200)
-    return make_response(jsonify(response.json()),response.status_code)
+    except Exception as e:
+        print("Error"+str(e), flush=True)
+        return make_response(jsonify({"error" : str(e)}), 500)
 
 @app.route('/helloPlayer', methods=['GET'])
 @token_required("player")

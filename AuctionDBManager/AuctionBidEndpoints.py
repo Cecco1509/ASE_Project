@@ -65,4 +65,4 @@ def delete_bid(bidId):
     bid = db.get_or_404(AuctionBid, bidId)
     db.session.delete(bid)
     db.session.commit()
-    return make_response(jsonify({"messgae":"Auction bid sucessfully deleted."}), 200)
+    return make_response(jsonify({"message":"Auction bid sucessfully deleted."}), 200)

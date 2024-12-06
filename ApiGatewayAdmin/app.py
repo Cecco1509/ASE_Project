@@ -6,6 +6,9 @@ from python_json_config import ConfigBuilder
 from handle_errors import handle_errors
 from utils import *
 
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
 
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
@@ -95,7 +98,7 @@ def ban_player(user_id):
 
 @app.route('/api/admin/register', methods=['POST'])
 def register_admin():
-    response = requests.post(f"{config.services.authmicroservice}/api/admin/register", json=sanitize_data(request.get_json(), verify=False, timeout=config.timeout.medium))
+    response = requests.post(f"{config.services.authmicroservice}/api/admin/register", json=sanitize_data(request.get_json()), verify=False, timeout=config.timeout.medium)
     return make_response(jsonify(response.json()), response.status_code)
 
 @app.route('/api/admin/login', methods=['POST'])

@@ -56,7 +56,7 @@ def update_user(userId):
         user.status=json_data['status']
         user.verified = True
         db.session.commit()
-        return make_response(jsonify({"messgae":"User sucessfully updated."}), 200)
+        return make_response(jsonify({"message":"User sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid user data"}), 400)
 
 @app.route('/user/<int:userId>', methods=['DELETE'])
@@ -64,7 +64,7 @@ def delete_user(userId):
     user = db.get_or_404(User, userId)
     db.session.delete(user)
     db.session.commit()
-    return make_response(jsonify({"messgae":"User sucessfully deleted."}), 200)
+    return make_response(jsonify({"message":"User sucessfully deleted."}), 200)
 
 @app.route('/user/<int:userId>', methods=['PATCH'])
 def patch_user(userId):
@@ -72,18 +72,11 @@ def patch_user(userId):
     if json_data:
         user = db.get_or_404(User, userId)
         if 'ingameCurrency' in json_data:
-            res = db.session.query(User.ingameCurrency).with_for_update().filter_by(id=userId).first()
-            money = float(res[0])
-            amount = float(json_data['ingameCurrency'])
-            if money + amount > 0:
-                print("(", money, " + (",amount,") = ", money + amount, flush=True)
-                user.ingameCurrency = money + amount
-            else:
-                return make_response(jsonify({"message":"Not enough money"}), 400)
+            user.ingameCurrency = json_data['ingameCurrency']
         if 'profilePicture' in json_data:
             user.profilePicture = json_data['profilePicture']
         if 'status' in json_data:
             user.status = json_data['status']
         db.session.commit()
-        return make_response(jsonify({"messgae":"User sucessfully updated."}), 200)
+        return make_response(jsonify({"message":"User sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid user data"}), 400)

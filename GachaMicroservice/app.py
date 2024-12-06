@@ -5,6 +5,9 @@ import random
 from handle_errors import handle_errors
 from auth_utils import validate_player_token, validate_admin_token
 
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ? 
 
 builder = ConfigBuilder()
@@ -200,7 +203,6 @@ def roll_gacha(auth_response=None):
     if not is_valid:
         return make_response(jsonify({"message": validation_message}), 400)
     rarity_level = json_data["rarity_level"]
-    print("rarity_level", rarity_level,flush=True)
 
     # Fetch user info to verify in-game currency
     userId = auth_response.json()['userId']
@@ -214,6 +216,7 @@ def roll_gacha(auth_response=None):
     # Get the user's in-game currency
     user = user_response.json()
     userIngameCurrency = user['ingameCurrency']
+    userId = user['id']
 
     # Check if the user has enough ingame currency to roll
     roll_price = getattr(ROLL_PRICE,rarity_level)
@@ -222,26 +225,21 @@ def roll_gacha(auth_response=None):
     
     # Fetch all gacha items
     gacha_response = requests.get(DB_MANAGER_GACHA_URL + f'/gacha', verify=False, timeout=config.timeout.medium)
-    print("gacha_response", gacha_response,flush=True)
     if gacha_response.status_code != 200:
         return make_response(jsonify({"message": "Error retrieving gacha items"}), 500)
     gacha_items = gacha_response.json()
 
     # Randomly select a gacha item
     selected_gacha = select_gacha(gacha_items, rarity_level)
-    print("selected_gacha", selected_gacha,flush=True)
 
     # Deduct the roll cost from the user's in-game currency
     userIngameCurrency -= roll_price
-    print("roll_price", roll_price,flush=True)
-    print("userIngameCurrency", userIngameCurrency,flush=True)
     update_user_response = requests.patch(
         f'{DB_MANAGER_USER_URL}/user/{userId}', 
         json={"ingameCurrency":userIngameCurrency},
         verify=False,
         timeout=config.timeout.medium
     )
-    print("update_user_response", update_user_response,flush=True)
     if update_user_response.status_code != 200:
         return make_response(jsonify({"message": "Error updating the user's in-game currency balance"}), 500)
 

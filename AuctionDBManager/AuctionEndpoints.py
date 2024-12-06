@@ -70,4 +70,4 @@ def delete_auction(auctionId):
     auction = db.get_or_404(Auction, auctionId)
     db.session.delete(auction)
     db.session.commit()
-    return make_response(jsonify({"messgae":"Auction sucessfully deleted."}), 200)
+    return make_response(jsonify({"message":"Auction sucessfully deleted."}), 200)
