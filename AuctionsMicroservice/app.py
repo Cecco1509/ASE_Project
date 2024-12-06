@@ -7,6 +7,9 @@ from flask import Flask, request, make_response, jsonify
 from auth_utils import *
 from handle_errors import *
 
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
 app = Flask(__name__, instance_relative_config=True) #instance_relative_config=True ?
 
 builder = ConfigBuilder()
@@ -38,14 +41,17 @@ def create_auction(auth_response=None):
             not 'auctionEnd' in data or
             not 'minimumBid' in data) :
 
+            print("Invalid data", flush=True)
             return make_response(jsonify({"message": "Invalid data"}), 400);
 
         if int(data["minimumBid"]) <= 0:
+            print("Invalid amount", flush=True)
             return make_response(jsonify({"message": "Minimum bid must be a positive integer, greater than 0"}), 400);
         try:
             gacha_res = requests.get(f"{config.dbmanagers.gacha}/gachacollection/item/{data["gachaCollectionId"]}", timeout=config.timeout.medium, verify=False)
             gacha_res.raise_for_status()
             if gacha_res.json()['userId'] != current_user_id :
+                print("Invalid user", flush=True)
                 return make_response(jsonify({"message": "Invalid user"}), 400);
         except Exception as e:
             return make_response(jsonify({"message": "Error invoking gacha dbmanager"}), 500);
@@ -58,12 +64,15 @@ def create_auction(auth_response=None):
         cmp_now = now.replace(second=0, microsecond=0)
 
         if (start < cmp_now):
+            print("Invalid start", flush=True)
             return make_response(jsonify({"message": "Auction start time must be in the future"}), 400);
     
         if end < cmp_now:
+            print("Invalid end", flush=True)
             return make_response(jsonify({"message": "Auction end time must be in the future"}), 400);
     
         if (start >= end):
+            print("Invalid both", flush=True)
             return make_response(jsonify({"message": "Auction start time must be before end time"}), 400);
         # check if user already has an active auction for this gachaCollection
         
@@ -76,6 +85,7 @@ def create_auction(auth_response=None):
                 i += 1
                 break
             if i > 0:
+                print("Invalid auction gacha collection", flush=True)
                 return make_response(jsonify({"message": f"User {current_user_id} already has an active auction for tha gachaCollection"}), 400);
         except Exception as e:
             print("EXPLODED " + str(e), flush=True)
@@ -113,6 +123,8 @@ def bid_on_auction(auction_id, auth_response=None):
             return make_response(jsonify({"message": "invalid payload"}), 400);
     
         response = requests.get(config.dbmanagers.auction + f'/auction/{auction_id}', timeout=config.timeout.medium, verify=False)
+        if response.status_code == 404:
+            return make_response(jsonify({"message": "Auction not found"}), 404);
         response.raise_for_status()
         auction = response.json()
         print(auction)
@@ -122,6 +134,9 @@ def bid_on_auction(auction_id, auth_response=None):
     
         if (datetime.strptime(auction["auctionStart"], "%a, %d %b %Y %H:%M:%S %Z")) > datetime.now():
             return make_response(jsonify({"message": "Auction has not started yet"}), 400);
+    
+        if (datetime.strptime(auction["auctionEnd"], "%a, %d %b %Y %H:%M:%S %Z")) < datetime.now():
+            return make_response(jsonify({"message": "Auction closed"}), 400);
 
         if (auction["userId"] == current_user_id):
             return make_response(jsonify({"message": "Can't bid on an owned auction"}), 400);
@@ -137,7 +152,7 @@ def bid_on_auction(auction_id, auth_response=None):
         if (auction_bids_resp.status_code == 200):
             auction_bids = auction_bids_resp.json()
 
-        print("auctionBids", auction_bids, flush=True)
+        #print("auctionBids", auction_bids, flush=True)
 
         auctionBidAmount = 0
 
@@ -145,18 +160,18 @@ def bid_on_auction(auction_id, auth_response=None):
             auction_bids.sort(key=lambda x: x['timestamp'], reverse=True)
             auctionBidAmount = auction_bids[0]['bidAmount']
             userBidId = auction_bids[0]['userId']
-        else:
-            print("NO BIDS FOR AUCTION " + str(auction_id), flush=True)
+        # else:
+        #     print("NO BIDS FOR AUCTION " + str(auction_id), flush=True)
 
         if (userBidId == current_user_id):
             return make_response(jsonify({"message": "Can't bid twice in a row"}), 400)
-        else:
-            print("LAST BID USER ID " + str(userBidId), flush=True)
+        # else:
+        #     print("LAST BID USER ID " + str(userBidId), flush=True)
     
         if auctionBidAmount > data["bidAmount"]: 
             return make_response(jsonify({"message": "Bid Amount inferior of previous one"}), 400)
-        else:
-            print("LAST BID AMOUNT " + str(auctionBidAmount), flush=True)
+        # else:
+        #     print("LAST BID AMOUNT " + str(auctionBidAmount), flush=True)
 
         bid = {
                 'userId': current_user_id,
@@ -217,7 +232,7 @@ def bid_on_auction(auction_id, auth_response=None):
 
         new_bid_id = result.json()['bidId']
         bid["id"] = new_bid_id
-        print("BID INSERTED", flush=True)
+        #print("BID INSERTED", flush=True)
 
 
         return make_response(jsonify({"bid": bid}), 200)
@@ -232,10 +247,11 @@ def bid_on_auction(auction_id, auth_response=None):
 @validate_player_token
 def auction_player_history(auth_response=None):
     try:
+        
         current_user_id = auth_response.json()["userId"]
-        data = request.get_json()
-        response = requests.get(config.dbmanagers.auction + f'/auction/{current_user_id}/2', timeout=config.timeout.medium, verify=False)
-        return make_response(response.json(), 200)
+        response = requests.get(config.dbmanagers.auction + f'/auction/user/{current_user_id}/2', timeout=config.timeout.medium, verify=False)
+        response.raise_for_status()
+        return make_response(jsonify({"history" : response.json()}), 200)
     except Exception as err:
         return make_response(jsonify({"message": str(err)}), 500)
 

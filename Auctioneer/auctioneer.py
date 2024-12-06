@@ -4,6 +4,9 @@ import requests
 from python_json_config import ConfigBuilder
 from datetime import datetime
 
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
 print = functools.partial(print, flush=True)
 
 builder = ConfigBuilder()

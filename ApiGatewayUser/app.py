@@ -133,7 +133,6 @@ def user_logout():
 @app.route('/api/player/auction/market', methods=['GET'])
 @handle_errors
 def auction_market():
-    """GET auction history."""
     response = requests.get(config.services.auction + f'/api/player/auction/market', headers=request.headers, verify=False, timeout=config.timeout.medium)
     response.raise_for_status()
     return make_response(jsonify(response.json()), response.status_code)
@@ -149,10 +148,10 @@ def create_bid(auction_id):
     response = requests.post(config.services.auction + f'/api/player/auction/bid/{auction_id}', json=sanitize_data(request.get_json()), headers=request.headers, verify=False, timeout=config.timeout.medium)
     return make_response(response.json(), response.status_code)
 
-@app.route('/api/player/auction', methods=['GET'])
+@app.route('/api/player/auction/history', methods=['GET'])
 @handle_errors
 def user_auction_history():
-    response = requests.post(config.services.auction + f'/api/player/auction/history' , headers=request.headers, verify=False, timeout=config.timeout.medium)
+    response = requests.get(config.services.auction + f'/api/player/auction/history' , headers=request.headers, verify=False, timeout=config.timeout.medium)
     return make_response(response.json(), response.status_code)
 
 
