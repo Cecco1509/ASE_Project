@@ -35,6 +35,19 @@ def get_auctions(auth_response=None):
 def create_auction(auth_response=None):
     try:
         current_user_id = auth_response.json()["userId"]
+
+        user_response = requests.get(f'{config.dbmanagers.user}/user/{current_user_id}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+        #print("user_response", user_response,flush=True)
+        if user_response.status_code == 404:
+            return make_response(jsonify({"message": "User not found"}), 404)
+        elif user_response.status_code != 200:
+            return make_response(jsonify({"message": "Error retrieving user info"}), 500)
+        # Check the user's status and make sure they are active
+        user = user_response.json()
+        if user['status'] != 'ACTIVE':
+            return make_response(jsonify({"message":"User is not active"}), 403)
+        
+
         data = request.get_json()
         if (not 'gachaCollectionId' in data or
             not 'auctionStart' in data or
@@ -117,6 +130,18 @@ def create_auction(auth_response=None):
 def bid_on_auction(auction_id, auth_response=None):
     try:
         current_user_id = auth_response.json()["userId"]
+
+        user_response = requests.get(f'{config.dbmanagers.user}/user/{current_user_id}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+        #print("user_response", user_response,flush=True)
+        if user_response.status_code == 404:
+            return make_response(jsonify({"message": "User not found"}), 404)
+        elif user_response.status_code != 200:
+            return make_response(jsonify({"message": "Error retrieving user info"}), 500)
+        # Check the user's status and make sure they are active
+        user = user_response.json()
+        if user['status'] != 'ACTIVE':
+            return make_response(jsonify({"message":"User is not active"}), 403)
+
         data = request.get_json()
 
         if ("bidAmount" not in data):
