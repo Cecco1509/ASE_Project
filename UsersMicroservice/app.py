@@ -67,7 +67,7 @@ def delete_player():
     user_id=user_info_response.json()['id']
     delete_response = requests.delete(f'{config.dbmanagers.user}/user/{user_id}', verify=False)  
     if delete_response.status_code == 200:
-        delete_response = requests.delete(f'{config.services.authmicroservice}/api/player/{user_id}', verify=False, timeout=config.timeout.medium)  
+        delete_response = requests.delete(f'{config.services.authmicroservice}/api/player/{user_id}',headers=request.headers, verify=False, timeout=config.timeout.medium)  
         if delete_response.status_code ==200:
             return make_response(jsonify({"message": "Player successfully deleted"}), 200)
         else:

@@ -56,7 +56,7 @@ def update_user(userId):
         user.status=json_data['status']
         user.verified = True
         db.session.commit()
-        return make_response(jsonify({"messgae":"User sucessfully updated."}), 200)
+        return make_response(jsonify({"message":"User sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid user data"}), 400)
 
 @app.route('/user/<int:userId>', methods=['DELETE'])
@@ -78,5 +78,5 @@ def patch_user(userId):
         if 'status' in json_data:
             user.status = json_data['status']
         db.session.commit()
-        return make_response(jsonify({"messgae":"User sucessfully updated."}), 200)
+        return make_response(jsonify({"message":"User sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid user data"}), 400)
