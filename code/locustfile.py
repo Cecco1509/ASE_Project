@@ -28,7 +28,7 @@ class GachaMicroserviceTasks(HttpUser):
             self.token = response.json().get("Access token")
             headers = {"Authorization": f"Bearer {self.token}"}
             print("Access token obtained successfully.")
-            res = self.client.put(f"/api/player/increase/{self.user_id}",json={"amount" : 40000000}, headers=headers ,verify=False)
+            res = self.client.post(f"/api/player/currency",json={"ingameAmount" : 40000000}, headers=headers ,verify=False)
             print(f"increase request status {res.status_code}, {res.text}")
         else:
             self.token = None
@@ -74,7 +74,7 @@ class GachaMicroserviceTasks(HttpUser):
             self.client.get(f"/api/player/gacha/system-collection/{gacha_id}", headers=headers, verify=False)
 
     @task
-    def roll_gacha_legendary(self):
+    def roll_gacha(self):
         if self.token:
             headers = {"Authorization": f"Bearer {self.token}"}
             for i in range(4):
