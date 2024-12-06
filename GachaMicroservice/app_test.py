@@ -281,22 +281,71 @@ def roll_gacha():
 
     return make_response(selected_gacha, 200)
 
-def select_gacha(gacha_items, rarity_level):
+def select_gacha(gacha_items, roll_type):
     """
-    Select a gacha item based on rarity distribution.
+    Select a gacha item based on rarity distribution with different probability adjustments
+    for each roll type (Common, Rare, Epic, Legendary).
     """
-    # Retrieve probability for the selected level
-    rarity_probability = getattr(ROLL_PROBABILITY,rarity_level)
+    
+    # Define rarity thresholds for categorizing items based on their rarityPercent
+    rarity_groups = {
+        "Common": lambda x: x >= 5,          # Common items have rarity >= 5
+        "Uncommon": lambda x: 1.5 <= x < 5,  # Uncommon items have rarity between 1.5 and 5
+        "Rare": lambda x: 0.5 <= x < 1.5,    # Rare items have rarity between 0.5 and 1.5
+        "Legendary": lambda x: x < 0.5       # Legendary items have rarity < 0.5
+    }
 
-    # Create a weighted list where higher rarityPercent means lower chance of selection
-    weighted_gacha_list = []
-    for gacha in gacha_items:
-        # Rarity Distribution: Lower rarityPercent means the item is more common, while higher rarityPercent means the item is rarer.
-        weight = (101 - gacha["rarityPercent"]) * rarity_probability
-        weighted_gacha_list.extend([gacha] * int(weight))
+    # Bias weights for each roll type: This dictates how likely each rarity group is to be selected
+    bias_table = {
+        "Common": {"Common": 50, "Uncommon": 30, "Rare": 15, "Legendary": 5}, # Common roll prefers common items
+        "Rare": {"Common": 25, "Uncommon": 35, "Rare": 30, "Legendary": 10}, # Rare roll gives more weight to rare items
+        "Epic": {"Common": 10, "Uncommon": 20, "Rare": 40, "Legendary": 30}, # Epic roll favors rare and legendary items
+        "Legendary": {"Common": 5, "Uncommon": 10, "Rare": 30, "Legendary": 55} # Legendary roll heavily favors legendary items
+    }
 
-    # Randomly select an item from the weighted list
-    return random.choice(weighted_gacha_list)
+    # Validate roll type
+    if roll_type not in bias_table:
+        # PS: this will never happen because we validate the data before calling this function
+        roll_type = "Common"
+
+    # Initialize an empty list to store the weighted items
+    weighted_items = []
+
+    if roll_type == "Common":
+        # For "Common" roll type, we use the original rarityPercent and normalize it
+        # The selection is purely based on the item rarity, without any dynamic adjustment
+        total_rarity = sum(item["rarityPercent"] for item in gacha_items)
+        for item in gacha_items:
+            # Normalize the rarityPercent to ensure total probabilities sum to 100
+            item["normalizedPercent"] = item["rarityPercent"] / total_rarity * 100
+            weighted_items.append((item, item["normalizedPercent"]))
+    else:
+        # For other roll types, adjust the weights based on rarity group and bias table
+        for item in gacha_items:
+            # Find which rarity group the item belongs to based on its rarityPercent
+            group = next((k for k, condition in rarity_groups.items() if condition(item["rarityPercent"])), None)
+            if group:
+                # Apply bias based on the group and the selected roll type
+                adjusted_weight = item["rarityPercent"] * bias_table[roll_type][group]
+                weighted_items.append((item, adjusted_weight))
+
+    # Normalize the total weights to ensure the probabilities sum to 1 (100%)
+    total_weight = sum(weight for _, weight in weighted_items)
+    normalized_weights = [weight / total_weight for _, weight in weighted_items]
+
+    print(f"Normalized weights: {normalized_weights}")
+
+    # Perform the selection based on the normalized probabilities
+    selected_item = random.choices(
+        population=[item for item, _ in weighted_items],
+        weights=normalized_weights,
+        k=1  # Only one selection
+    )[0]
+
+    # Remove the "normalizedPercent" field before returning the selected item
+    selected_item.pop("normalizedPercent", None)
+
+    return selected_item
 
 def is_valid_roll_data(data):
     required_fields = {
