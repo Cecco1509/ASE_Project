@@ -3,13 +3,13 @@ FROM python:3.12-slim
 ADD . /AuthMicroservice
 WORKDIR /AuthMicroservice
 
-COPY /config.json /app/
-COPY /secrets/auth_cert.pem /run/secrets/auth_cert
-COPY /secrets/auth_key.pem /run/secrets/auth_cert_key
+COPY /code/config.json /app/
+COPY /code/secrets/auth_cert.pem /run/secrets/auth_cert
+COPY /code/secrets/auth_key.pem /run/secrets/auth_cert_key
 
-RUN pip3 install -r ./AuthMicroservice/requirements.txt
+RUN pip3 install -r ./code/AuthMicroservice/requirements.txt
 
-ENV FLASK_APP=./AuthMicroservice/app_test.py
+ENV FLASK_APP=./code/AuthMicroservice/app_test.py
 
 EXPOSE 5000:5000
 

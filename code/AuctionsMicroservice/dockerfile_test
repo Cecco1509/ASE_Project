@@ -3,13 +3,13 @@ FROM python:3.12-slim
 ADD . /AuctionsMicroservice
 WORKDIR /AuctionsMicroservice
 
-COPY config.json /app/
-COPY /secrets/auction_ms_cert.pem /run/secrets/auction_ms_cert
-COPY /secrets/auction_ms_key.pem /run/secrets/auction_ms_key
+COPY /code/config.json /app/
+COPY /code/secrets/auction_ms_cert.pem /run/secrets/auction_ms_cert
+COPY /code/secrets/auction_ms_key.pem /run/secrets/auction_ms_key
 
-RUN pip3 install -r ./AuctionsMicroservice/requirements.txt
+RUN pip3 install -r ./code/AuctionsMicroservice/requirements.txt
 
-ENV FLASK_APP=./AuctionsMicroservice/app_test.py
+ENV FLASK_APP=./code/AuctionsMicroservice/app_test.py
 
 EXPOSE 5001:5000
 

@@ -3,13 +3,13 @@ FROM python:3.12-slim
 ADD . /GachaMicroservice
 WORKDIR /GachaMicroservice
 
-COPY config.json /app/
-COPY /secrets/gacha_ms_cert.pem /run/secrets/gacha_ms_cert
-COPY /secrets/gacha_ms_key.pem /run/secrets/gacha_ms_key
+COPY /codeconfig.json /app/
+COPY /code/secrets/gacha_ms_cert.pem /run/secrets/gacha_ms_cert
+COPY /code/secrets/gacha_ms_key.pem /run/secrets/gacha_ms_key
 
-RUN pip3 install -r ./GachaMicroservice/requirements.txt
+RUN pip3 install -r ./code/GachaMicroservice/requirements.txt
 
-ENV FLASK_APP=./GachaMicroservice/app_test.py
+ENV FLASK_APP=./code/GachaMicroservice/app_test.py
 
 EXPOSE 5000:5000
 
