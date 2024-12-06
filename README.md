@@ -9,6 +9,8 @@
   - [Prerequisites](#prerequisites)
   - [Installation and Execution](#installation-and-execution)
   - [Running Unit Tests](#running-unit-tests)
+  - [Running Integration Tests](#running-integration-tests)
+  - [Running Locust Tests](#running-locust-tests)
 - [API Documentation](#api-documentation)
 
 ---
@@ -32,20 +34,20 @@ The primary users of this backend are:
 
 ### Microservices Overview
 
--   **AdminGacha**: Manages the gacha collection, allowing administrators to add, update, and delete gacha items.
--   **PlayerGacha**: Provides functionalities for players to view and roll gacha items, as well as participate in the auction market.
-- **Admin Auth**: Admin registration, login, and logout.
-- **Player Auth**: Player registration, login, and logout.
-- **Admin Players**: Admin view and management of player profiles.
-- **Player Profile**: Player view and update of their profile.
-- **Admin Currency**: View player currency transaction history.
-- **Player Currency**: In-game currency purchase and viewing player transaction history.
-- **Admin Market**: Admin view and modification of auction details and market history.
-- **Player Market**: Player auction market for creating and bidding on auctions.
-- **Admin Gacha**: Admin view and management of the gacha collection.
-- **Player Gacha**: Player gacha collection management and item rolls.
-- **API Gateway**: Centralized entry point for all requests, routes requests to respective microservices.
-- **DB Managers**: Database management services for each microservice.
+- **ApiGatewayAdmin**: Handles all admin-related requests and routes them to the appropriate microservices.
+- **ApiGatewayPlayer**: Handles all player-related requests and routes them to the appropriate microservices.
+- **AuthMicroservice**: Handles authentication operations like registration, login, and logout, generating and validating access tokens for both admins and players.
+- **AuctionDBManager**: Manages the database for auctions, including creating, updating, and retrieving auction data.
+- **AuctionsMicroservice**: Handles auction operations for both admins and players, such as bidding and auction creation.
+- **Auctioneer**: Checks if there are any open auctions that need to be closed and sends a request to the AuctionsMicroservice to handle them.
+- **GachaDBManager**: Manages the database for gacha items, including item creation, updates, and retrieval.
+- **GachaMicroservice**: Provides player and admin functionalities for gacha operations, such as rolling and managing items.
+- **PaymentsDBManager**: Manages the database for in-game currency transactions, including purchases and refunds.
+- **PaymentsMicroservice**: Handles in-game currency transactions, including player purchases and refunds.
+- **TransactionsDBManager**: Manages the database for player transaction history and records of in-game activities.
+- **TransactionsMicroservice**: Handles player transaction records and ensures data consistency for all in-game activities.
+- **UsersDBManager**: Manages the database for player and admin profiles, including authentication and profile updates.
+- **UsersMicroservice**: Provides functionalities for player and admin account management, including registration and login.
 
 ## Quick Start
 
@@ -71,10 +73,18 @@ cd ASE-Project
     
  -  **Accessing the API**:
     
-The main API gateway should be accessible at `http://localhost:5000`.
-For example, to access the AdminGacha service:
-```        
-GET http://localhost:5000/api/admin/gacha
+The API gateways are accessible at the following ports:
+
+- **Player Gateway**: `https://localhost:5000`
+- **Admin Gateway**: `https://localhost:5001`
+
+For example:
+```
+# Player Gateway Example
+GET https://localhost:5000/api/player/gacha/system-collection
+
+# Admin Gateway Example
+GET https://localhost:5001/api/admin/gacha
 ```
         
  -  **Stopping the Application**:
@@ -85,14 +95,19 @@ To stop the application and remove containers, run:
     
 ### Running Unit Tests
 
- - Run the mock microservices: Each microservice has a test code and a test docker file that allows it to run the requests on mock data instead of real data from the database. For example, to run the admin gacha microservice in test mode, you have to run the following commands in the root folder "ASE_Project":
+ - Unit tests are automatically executed using a GitHub Actions workflow. This workflow is triggered each time changes are pushed to the `main` branch. The workflow runs tests for all microservices using Postman collections and mock data to ensure endpoint functionality.
+ - If you want to manually execute the unit tests in isolation, follow these steps:
+  1. **Run the mock microservices:** Each microservice includes a test Docker file and mock data. For example, to run the Gacha Microservice in test mode, just execute the following commands in the root folder "ASE_Project":
 
 ```
-docker build -t gachadmin_test -f ./GatchasAdmin/dockerfile_test .
-docker run -p 5000:5000 gachadmin_test
+docker build -t gachams_test -f ./GachaMicroservice/dockerfile_test .
+docker run --rm --name gachams_test_ -p 5000:5000 gachams_test
 ```
 
- -   **Postman Collection**: Use the included Postman collections in the "doc" folder to run unit tests for each microservice and each endpoint.
+  2. **Run Postman Tests:** Use the Postman collections in the "doc/postman" folder to run unit tests for each microservice and its endpoints.
+
+Example: Open Postman and import the appropriate collection (e.g., GachaMicroservice.postman_collection.json) and run the collection in the Postman runner.
+
 ### Running Integration Tests
 
 - Run the real microservices: All the microservices can be called using the docker compose command from the root folder "ASE_Project":
@@ -101,8 +116,8 @@ docker run -p 5000:5000 gachadmin_test
   docker compose up --build
   ```
 
--   **Postman Collection**: Use the included Postman collection Integration_tests.postman_collection.json to run all the integration tests.
-  ### Running Locust Tests
+-   **Postman Collection**: Use the included Postman collection `Integration_tests.postman_collection.json`, which is included in the "docs/postman" folder, to run all the integration tests.
+  ### Running Performance Tests
 
 - Run the real microservices with bottle necks scaled up using this command:
   ```
@@ -112,5 +127,9 @@ docker run -p 5000:5000 gachadmin_test
  
 ### API Documentation
 
-The API is documented using OpenAPI, with an `openapi.yaml` file located in the "doc" folder. You can view the documentation with tools like **Swagger UI**.
+- **Microservices OpenAPI Specifications**:
+  - `dbmanagers.openapi.yaml`
+  - `gateways.openapi.yaml`
+  - `services.openapi.yaml`
+- The documentation is available in the "doc" folder and can be visualized using tools like Swagger UI.  
 
