@@ -57,4 +57,4 @@ def delete_gacha(gachaId):
     gacha = db.get_or_404(Gacha, gachaId)
     db.session.delete(gacha)
     db.session.commit()
-    return make_response(jsonify({"messgae":"Gacha sucessfully deleted."}), 200)
+    return make_response(jsonify({"message":"Gacha sucessfully deleted."}), 200)

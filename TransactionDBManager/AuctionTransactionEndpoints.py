@@ -43,7 +43,7 @@ def update_transaction(transactionId):
         transaction.timestamp=json_data['timestamp']
         transaction.verified = True
         db.session.commit()
-        return make_response(jsonify({"messgae":"Transaction sucessfully updated."}), 200)
+        return make_response(jsonify({"message":"Transaction sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid transaction data"}), 400)
 
 @app.route('/transaction/<int:transactionId>', methods=['DELETE'])
@@ -51,4 +51,4 @@ def delete_transaction(transactionId):
     transaction = db.get_or_404(AuctionTransaction, transactionId)
     db.session.delete(transaction)
     db.session.commit()
-    return make_response(jsonify({"messgae":"Transaction sucessfully deleted."}), 200)
+    return make_response(jsonify({"message":"Transaction sucessfully deleted."}), 200)

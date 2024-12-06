@@ -96,10 +96,7 @@ def increase_currency(user_id):
 def getPlayerInformation():
     try:
         response = requests.get(f'{config.services.usersmicroservice}/api/player/profile',headers=request.headers,verify=False, timeout=config.timeout.medium)
-        if response.status_code == 200:
-            return make_response(jsonify(response.json()), 200)
-        else:
-            return make_response(jsonify({"error": "Player not found"}), response.status_code)
+        return make_response(jsonify(response.json()), response.status_code)
     except requests.RequestException as e:
         return make_response(jsonify({"error": "Failed to connect to database API", "details": str(e)}), 500)
 

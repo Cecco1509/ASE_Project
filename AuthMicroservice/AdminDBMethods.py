@@ -49,4 +49,4 @@ def delete_admin(adminId):
         return None
     db.session.delete(admin)
     db.session.commit()
-    return{"messgae":"Admin sucessfully deleted."}
+    return{"message":"Admin sucessfully deleted."}
