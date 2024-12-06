@@ -93,7 +93,23 @@ docker run -p 5000:5000 gachadmin_test
 ```
 
  -   **Postman Collection**: Use the included Postman collections in the "doc" folder to run unit tests for each microservice and each endpoint.
+### Running Integration Tests
 
+- Run the real microservices: All the microservices can be called using the docker compose command from the root folder "ASE_Project":
+  
+  ```
+  docker compose up --build
+  ``
+
+-   **Postman Collection**: Use the included Postman collection Integration_tests.postman_collection.json to run all the integration tests.
+  ### Running Locust Tests
+
+- Run the real microservices with bottle necks scaled up using this command:
+  ```
+  docker-compose up --scale authmicroservice=6 --scale paymentsmicroservice=3 --scale gachamicroservice=3 -d
+  ```
+ **Locust test**: Run the locust command in the docs folder where the locustfile.py tests are located.
+ 
 ### API Documentation
 
 The API is documented using OpenAPI, with an `openapi.yaml` file located in the "doc" folder. You can view the documentation with tools like **Swagger UI**.
