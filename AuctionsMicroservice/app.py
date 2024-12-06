@@ -54,7 +54,7 @@ def create_auction(auth_response=None):
                 print("Invalid user", flush=True)
                 return make_response(jsonify({"message": "Invalid user"}), 400);
         except Exception as e:
-            return make_response(jsonify({"message": "Error invoking gacha dbmanager"}), 500);
+            return make_response(jsonify({"message": "Invalid gacha provided"}), 400);
 
         start = datetime.strptime(data['auctionStart'], '%Y-%m-%dT%H:%M:%S.%fZ')
         end = datetime.strptime(data['auctionEnd'], '%Y-%m-%dT%H:%M:%S.%fZ')
