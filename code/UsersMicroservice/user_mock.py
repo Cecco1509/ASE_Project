@@ -1,4 +1,10 @@
-
+def check_validation(headers):
+    if 'Authorization' in headers:
+        return True
+    else:
+        return False
+def getID():
+    return {"status":200,"data":1}
 def getPlayer(user_id):
     user={
         'id': 1,
