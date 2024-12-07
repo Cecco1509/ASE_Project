@@ -232,7 +232,7 @@ def bid_on_auction(auction_id, auth_response=None):
                     res2 = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/increase/{current_user_id}",
                         json={"amount": float(data['bidAmount'])},
                         headers=request.headers,
-                        timeout=config.timeout.medium, verify=False
+                        timeout=config.timeout.medium, verify=False 
                     )
                     res1.raise_for_status()
             
@@ -309,14 +309,7 @@ def close_auction(auction, headers) -> bool:
     auction['auctionEnd'] = end.strftime("%Y-%m-%dT%H:%M:%SZ")
     auction['timestamp'] = timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    print(auction, flush=True)
-    print("START AFTER STRF"+start.strftime("%Y-%m-%dT%H:%M:%SZ"), flush=True)
-
-    print("TRY SET TO PASSED", flush=True)
-
     requests.put(f"{config.dbmanagers.auction}/auction/{auction["id"]}", json=auction, headers=headers, timeout=config.timeout.medium, verify=False)
-
-    print("SET TO PASSED", flush=True)
 
     # Get all bids for the auction
     bids = requests.get(f"{config.dbmanagers.auction}/auctionbid/auction/{auction["id"]}", headers=headers, timeout=config.timeout.medium, verify=False).json()
@@ -339,24 +332,39 @@ def close_auction(auction, headers) -> bool:
     if resp.status_code != 200:
         return False
 
-    resp = requests.put(f"{config.services.paymentsmicroservice}/api/player/currency/increase/{auction['userId']}",
-                        json={"amount": float(winningBid['bidAmount'])},
-                        headers=headers,
-                        timeout=config.timeout.medium, verify=False
-                    )
+    try:
+        user_response = requests.get(f'{config.dbmanagers.user}/user/{auction["userId"]}', headers=request.headers, verify=False, timeout=config.timeout.medium)
+
+        userIngameCurrency = user_response.json()["ingameCurrency"] + winningBid['bidAmount']
+        update_user_response = requests.patch(
+            f'{config.dbmanagers.user}/user/{auction["userId"]}', 
+            json={"ingameCurrency":userIngameCurrency},
+            verify=False,
+            timeout=config.timeout.medium
+        )
+    except Exception as e:
+        print(f"Error updating user's ingame currency: {str(e)}", flush=True)
+        return False
 
     # Assign Gacha to the winning bidder
-    requests.post(
-        f"{config.dbmanagers.gacha}/gachacollection",
-        json={
-            "gachaId": auction['id'],
-            "userId": winningBid['userId'],
-            "source": "AUCTION"
-        }, timeout=config.timeout.medium, verify=False
-    )
 
-    # Remove Gacha from the seller
-    requests.delete(f"{config.dbmanagers.gacha}/gachacollection/{auction['gachaCollectionId']}", timeout=config.timeout.medium, verify=False)
+    try : 
+        gacha_res = requests.get(f"{config.dbmanagers.gacha}/gachacollection/item/{auction["gachaCollectionId"]}", verify=False, timeout=config.timeout.medium)
+        gachaId = gacha_res.json()["gachaId"]
+        requests.post(
+            f"{config.dbmanagers.gacha}/gachacollection",
+            json={
+                "gachaId": gachaId,
+                "userId": winningBid['userId'],
+                "source": "AUCTION"
+            }, timeout=config.timeout.medium, verify=False
+        )
+
+        # Remove Gacha from the seller
+        requests.delete(f"{config.dbmanagers.gacha}/gachacollection/{auction['gachaCollectionId']}", timeout=config.timeout.medium, verify=False)
+    except Exception as e:
+        print(f"Error assigning Gacha to the winning bidder: {str(e)}", flush=True)
+        return False
 
     return True
 
