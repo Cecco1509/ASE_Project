@@ -1,4 +1,0 @@
-Flask==3.1.0
-requests==2.32.3
-python_json_config==1.2.3
-bleach==6.2.0

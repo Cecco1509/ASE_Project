@@ -1,0 +1,522 @@
+services:
+  apigatewayuser:
+    build:
+      context: ./ApiGatewayUser
+      dockerfile: Dockerfile
+    container_name: apigatewayuser
+    depends_on:
+      - auctionmicroservice
+      - authmicroservice
+      - auctiondbmanager
+      - userdbmanager
+      - gachadbmanager
+      - transactiondbmanager
+      - paymentdbmanager
+      - gachamicroservice
+      - paymentsmicroservice
+      - transactionsmicroservice
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./config.json:/app/config.json
+      - .:/ApiGatewayUser
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./ApiGatewayUser/app.py
+    secrets:
+      - gateway_user_cert
+      - gateway_user_key
+    networks:
+      - user_network
+
+  apigatewayadmin:
+    build:
+      context: ./ApiGatewayAdmin
+      dockerfile: Dockerfile
+    container_name: apigatewayadmin
+    depends_on:
+      - auctionmicroservice
+      - authmicroservice
+      - auctiondbmanager
+      - userdbmanager
+      - gachadbmanager
+      - transactiondbmanager
+      - paymentdbmanager
+      - gachamicroservice
+      - paymentsmicroservice
+      - transactionsmicroservice
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./config.json:/app/config.json
+      - .:/ApiGatewayAdmin
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./ApiGatewayAdmin/app.py
+    secrets:
+      - gateway_admin_cert
+      - gateway_admin_key
+    networks:
+      - admin_network
+
+  auctionmicroservice:
+    build:
+      context: ./AuctionsMicroservice
+      dockerfile: dockerfile
+    container_name: auctionmicroservice
+    depends_on:
+      - auctiondbmanager
+    volumes:
+      - ./config.json:/app/config.json
+      - .:/AuctionsMicroservice
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./AuctionsMicroservice/app.py
+    secrets:
+      - auction_ms_cert
+      - auction_ms_key
+    networks:
+      - user_network
+      - admin_network
+
+  authmicroservice:
+    build:
+      context: ./AuthMicroservice
+      dockerfile: Dockerfile
+    container_name: authmicroservice
+    depends_on:
+      authdatabase:
+        condition: service_healthy
+    volumes:
+      - ./config.json:/app/config.json
+      - ./AuthMicroservice:/AuthMicroservice
+    secrets:
+      - token_secret
+      - auth_cert
+      - auth_cert_key
+      - db_password
+      - auctioneer_credentials
+    networks:
+      - user_network
+      - admin_network
+
+  authdatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+      - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/auth_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/auth_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
+    container_name: authdatabase
+    secrets:
+      - db_password
+      - auth_db_cert
+      - auth_db_key
+    networks:
+      - user_network
+      - admin_network
+
+  gachadatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+      - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/gacha_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/gacha_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
+    container_name: gachadatabase
+    secrets:
+      - db_password
+      - gacha_db_cert
+      - gacha_db_key
+    networks:
+      - user_network
+      - admin_network
+
+  userdatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+      - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/user_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/user_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
+    container_name: userdatabase
+    secrets:
+      - db_password
+      - user_db_cert
+      - user_db_key
+    networks:
+      - user_network
+      - admin_network
+
+  auctiondatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+      - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/auction_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/auction_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
+    container_name: auctiondatabase
+    secrets:
+      - db_password
+      - auction_db_cert
+      - auction_db_key
+    networks:
+      - user_network
+      - admin_network
+
+  gachamicroservice:
+    build:
+      context: ./GachaMicroservice
+      dockerfile: Dockerfile
+    container_name: gachamicroservice
+    volumes:
+      - ./config.json:/app/config.json
+      - .:/GachaMicroservice
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - FLASK_APP=./GachaMicroservice/app.py
+    depends_on:
+      - gachadbmanager
+    secrets:
+      - gacha_ms_cert
+      - gacha_ms_cert_key
+    networks:
+      - user_network
+      - admin_network
+
+  paymentsmicroservice:
+    build:
+      context: ./PaymentsMicroservice
+      dockerfile: Dockerfile
+    container_name: paymentsmicroservice
+    volumes:
+      - ./config.json:/app/config.json
+    depends_on:
+      - paymentdbmanager
+    secrets:
+      - payments_cert
+      - payments_cert_key
+    networks:
+      - user_network
+      - admin_network
+
+  transactionsmicroservice:
+    build:
+      context: ./TransactionsMicroservice
+      dockerfile: Dockerfile
+    container_name: transactionsmicroservice
+    volumes:
+      - ./config.json:/app/config.json # Mounts config.json into the container
+    depends_on:
+      - transactiondbmanager
+    secrets:
+      - transactions_ms_cert
+      - transactions_ms_key
+    networks:
+      - user_network
+      - admin_network
+
+  usersmicroservice:
+    build:
+      context: ./UsersMicroservice
+      dockerfile: Dockerfile
+    container_name: usersmicroservice
+    volumes:
+      - ./config.json:/app/config.json # Mounts config.json into the container
+    depends_on:
+      - userdbmanager
+    secrets:
+      - users_cert
+      - users_cert_key
+    networks:
+      - user_network
+      - admin_network
+
+  paymentdatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+      - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/payment_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/payment_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
+    container_name: paymentdatabase
+    secrets:
+      - db_password
+      - payment_db_cert
+      - payment_db_key
+    networks:
+      - user_network
+      - admin_network
+
+  transactiondatabase:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - MSSQL_SA_PASSWORD_FILE=/run/secrets/db_password
+      - ACCEPT_EULA=Y
+      - MSSQL_TLS_CERT=/run/secrets/transaction_db_cert
+      - MSSQL_TLS_KEY=/run/secrets/transaction_db_key
+      - MSSQL_TLS_PROTOCOLS=1.2
+      - MSSQL_FORCE_ENCRYPTION=1
+    healthcheck:
+      test: >
+        CMD-SHELL echo $(cat /run/secrets/db_password) | /opt/mssql-tools/bin/sqlcmd -Usa -P$(cat /run/secrets/db_password) -Q "SELECT 1"
+      interval: 10s
+      retries: 10
+      start_period: 10s
+    container_name: transactiondatabase
+    secrets:
+      - db_password
+      - transaction_db_cert
+      - transaction_db_key
+    networks:
+      - user_network
+      - admin_network
+
+  auctiondbmanager:
+    build:
+      context: ./AuctionDBManager
+      dockerfile: Dockerfile
+    container_name: auctiondbmanager
+    depends_on:
+      auctiondatabase:
+        condition: service_healthy
+    volumes:
+      - ./config.json:/app/config.json
+    secrets:
+      - db_password
+      - auction_db_manager_cert
+      - auction_db_manager_key
+    networks:
+      - user_network
+      - admin_network
+
+  gachadbmanager:
+    build:
+      context: ./GachaDBManager
+      dockerfile: Dockerfile
+    container_name: gachadbmanager
+    depends_on:
+      gachadatabase:
+        condition: service_healthy
+    volumes:
+      - ./config.json:/app/config.json
+    secrets:
+      - db_password
+      - gacha_db_manager_cert
+      - gacha_db_manager_key
+    networks:
+      - user_network
+      - admin_network
+
+  paymentdbmanager:
+    build:
+      context: ./PaymentDBManager
+      dockerfile: Dockerfile
+    container_name: paymentdbmanager
+    depends_on:
+      paymentdatabase:
+        condition: service_healthy
+    volumes:
+      - ./config.json:/app/config.json
+    secrets:
+      - db_password
+      - payment_db_manager_cert
+      - payment_db_manager_key
+    networks:
+      - user_network
+      - admin_network
+
+  transactiondbmanager:
+    build:
+      context: ./TransactionDBManager
+      dockerfile: Dockerfile
+    container_name: transactiondbmanager
+    depends_on:
+      transactiondatabase:
+        condition: service_healthy
+    volumes:
+      - ./config.json:/app/config.json
+    secrets:
+      - db_password
+      - transaction_db_manager_cert
+      - transaction_db_manager_key
+    networks:
+      - user_network
+      - admin_network
+
+  userdbmanager:
+    build:
+      context: ./UserDBManager
+      dockerfile: Dockerfile
+    container_name: userdbmanager
+    depends_on:
+      userdatabase:
+        condition: service_healthy
+    volumes:
+      - ./config.json:/app/config.json
+    secrets:
+      - db_password
+      - user_db_manager_cert
+      - user_db_manager_key
+    networks:
+      - user_network
+      - admin_network
+
+  auctioneer:
+    build:
+      context: ./Auctioneer
+      dockerfile: dockerfile
+    container_name: auctioneer
+    depends_on:
+      - auctiondbmanager
+      - auctionmicroservice
+      - authmicroservice
+    volumes:
+      - ./config.json:/app/config.json
+      - ./Auctioneer:/Auctioneer
+    secrets:
+      - auctioneer_credentials
+    networks:
+      - admin_network
+
+secrets:
+  token_secret:
+    file: ./secrets/token_secret.env
+  users_cert:
+    file: ./secrets/users_cert.pem
+  users_cert_key:
+    file: ./secrets/users_key.pem
+  auth_cert:
+    file: ./secrets/auth_cert.pem
+  auth_cert_key:
+    file: ./secrets/auth_key.pem
+  db_password:
+    file: ./secrets/db_password.txt
+  auth_db_cert:
+    file: ./secrets/auth_db_cert.pem
+  auth_db_key:
+    file: ./secrets/auth_db_key.pem
+  user_db_cert:
+    file: ./secrets/user_db_cert.pem
+  user_db_key:
+    file: ./secrets/user_db_key.pem
+  gacha_db_cert:
+    file: ./secrets/gacha_db_cert.pem
+  gacha_db_key:
+    file: ./secrets/gacha_db_key.pem
+  payment_db_cert:
+    file: ./secrets/payment_db_cert.pem
+  payment_db_key:
+    file: ./secrets/payment_db_key.pem
+  auction_db_cert:
+    file: ./secrets/auction_db_cert.pem
+  auction_db_key:
+    file: ./secrets/auction_db_key.pem
+  transaction_db_cert:
+    file: ./secrets/transaction_db_cert.pem
+  transaction_db_key:
+    file: ./secrets/transaction_db_key.pem
+  auction_db_manager_cert:
+    file: ./secrets/auction_db_manager_cert.pem
+  auction_db_manager_key:
+    file: ./secrets/auction_db_manager_key.pem
+  gacha_db_manager_cert:
+    file: ./secrets/gacha_db_manager_cert.pem
+  gacha_db_manager_key:
+    file: ./secrets/gacha_db_manager_key.pem
+  payment_db_manager_cert:
+    file: ./secrets/payment_db_manager_cert.pem
+  payment_db_manager_key:
+    file: ./secrets/payment_db_manager_key.pem
+  transaction_db_manager_cert:
+    file: ./secrets/transaction_db_manager_cert.pem
+  transaction_db_manager_key:
+    file: ./secrets/transaction_db_manager_key.pem
+  user_db_manager_cert:
+    file: ./secrets/user_db_manager_cert.pem
+  user_db_manager_key:
+    file: ./secrets/user_db_manager_key.pem
+  gateway_user_cert:
+    file: ./secrets/gateway_user_cert.pem
+  gateway_user_key:
+    file: ./secrets/gateway_user_key.pem
+  payments_cert:
+    file: ./secrets/payments_cert.pem
+  payments_cert_key:
+    file: ./secrets/payments_key.pem
+  gacha_ms_cert:
+    file: ./secrets/gacha_ms_cert.pem
+  gacha_ms_cert_key:
+    file: ./secrets/gacha_ms_key.pem
+  gateway_admin_cert:
+    file: ./secrets/gateway_admin_cert.pem
+  gateway_admin_key:
+    file: ./secrets/gateway_admin_key.pem
+  auction_ms_cert:
+    file: ./secrets/auction_ms_cert.pem
+  auction_ms_key:
+    file: ./secrets/auction_ms_key.pem
+  transactions_ms_cert:
+    file: ./secrets/transactions_ms_cert.pem
+  transactions_ms_key:
+    file: ./secrets/transactions_ms_key.pem
+  auctioneer_credentials:
+    file: ./secrets/auctioneer_credentials.json
+
+networks:
+  user_network:
+  admin_network:
+
+volumes:
+  uservolume:
+    driver: local
+  gachavolume:
+    driver: local
+  auctionsvolume:
+    driver: local
+  transactionsvolume:
+    driver: local

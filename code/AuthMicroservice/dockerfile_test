@@ -1,0 +1,16 @@
+FROM python:3.12-slim
+
+ADD . /AuthMicroservice
+WORKDIR /AuthMicroservice
+
+COPY /code/config.json /app/
+COPY /code/secrets/auth_cert.pem /run/secrets/auth_cert
+COPY /code/secrets/auth_key.pem /run/secrets/auth_cert_key
+
+RUN pip3 install -r ./code/AuthMicroservice/requirements.txt
+
+ENV FLASK_APP=./code/AuthMicroservice/app_test.py
+
+EXPOSE 5000:5000
+
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000", "--cert=/run/secrets/auth_cert", "--key=/run/secrets/auth_cert_key"]
