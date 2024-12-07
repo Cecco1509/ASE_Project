@@ -50,10 +50,21 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:5000/api/admin/users",
+					"raw": "https://localhost:5000/api/admin/users",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -93,10 +104,21 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:5000/api/admin/users/1",
+					"raw": "https://localhost:5000/api/admin/users/1",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -130,10 +152,21 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:5000/api/admin/users/2",
+					"raw": "https://localhost:5000/api/admin/users/2",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -170,6 +203,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -182,7 +225,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/admin/users/1",
+					"raw": "https://localhost:5000/api/admin/users/1",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -216,6 +260,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -228,7 +282,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/admin/users/2",
+					"raw": "https://localhost:5000/api/admin/users/2",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -262,6 +317,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -274,7 +339,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/admin/users/1",
+					"raw": "https://localhost:5000/api/admin/users/1",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -308,6 +374,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -320,7 +396,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/admin/users/ban/1",
+					"raw": "https://localhost:5000/api/admin/users/ban/1",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -346,7 +423,7 @@
 							"pm.test(\"Ban player\", function(){\r",
 							"pm.response.to.have.status(404);\r",
 							"var jsonData = pm.response.json();\r",
-							"pm.expect(jsonData).to.eql({\"error\":\"Unsuccessful data retrieval from the database manager/User ID non existent\"});\r",
+							"pm.expect(jsonData).to.eql({\"error\":\"User not found\"});\r",
 							"});"
 						],
 						"type": "text/javascript",
@@ -355,6 +432,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -367,7 +454,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/admin/users/ban/2",
+					"raw": "https://localhost:5000/api/admin/users/ban/2",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -402,6 +490,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -414,7 +512,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/admin/users/ban/1",
+					"raw": "https://localhost:5000/api/admin/users/ban/1",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -456,47 +555,21 @@
 				}
 			],
 			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "localhost:5000/api/player/profile/1",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"player",
-						"profile",
-						"1"
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
 					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetPlayerInformation404NF",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Get player information\", function(){\r",
-							"pm.response.to.have.status(404);\r",
-							"var jsonData = pm.response.json();\r",
-							"pm.expect(jsonData).to.eql({\"error\": \"Player not found\"});\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:5000/api/player/profile/2",
+					"raw": "https://localhost:5000/api/player/profile",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -504,8 +577,7 @@
 					"path": [
 						"api",
 						"player",
-						"profile",
-						"2"
+						"profile"
 					]
 				}
 			},
@@ -533,52 +605,16 @@
 				}
 			],
 			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"profilePicture\":\"slika.jpg\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
 						}
-					}
-				},
-				"url": {
-					"raw": "localhost:5000/api/player/update/1",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"player",
-						"update",
-						"1"
 					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "UpdatePlayerInformation404NF",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Update player information\", function(){\r",
-							"pm.response.to.have.status(404);\r",
-							"var jsonData = pm.response.json();\r",
-							"pm.expect(jsonData).to.eql({\"error\":\"User not found\"});\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -591,7 +627,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/player/update/2",
+					"raw": "https://localhost:5000/api/player/update",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -599,8 +636,7 @@
 					"path": [
 						"api",
 						"player",
-						"update",
-						"2"
+						"update"
 					]
 				}
 			},
@@ -635,6 +671,16 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "PUT",
 				"header": [],
 				"body": {
@@ -647,7 +693,8 @@
 					}
 				},
 				"url": {
-					"raw": "localhost:5000/api/player/update/1",
+					"raw": "https://localhost:5000/api/player/update",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -655,8 +702,7 @@
 					"path": [
 						"api",
 						"player",
-						"update",
-						"1"
+						"update"
 					]
 				}
 			},
@@ -672,7 +718,7 @@
 							"pm.test(\"Update player information\", function(){\r",
 							"pm.response.to.have.status(200);\r",
 							"var jsonData = pm.response.json();\r",
-							"pm.expect(jsonData).to.eql(\"User successfully deleted\");\r",
+							"pm.expect(jsonData).to.eql(\"Player successfully deleted\");\r",
 							"});"
 						],
 						"type": "text/javascript",
@@ -681,47 +727,21 @@
 				}
 			],
 			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "localhost:5000/api/player/delete/1",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"player",
-						"delete",
-						"1"
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJBU0UgUHJvamVjdCIsImV4cF90aW1lIjoiMjAyNC0xMi0wNSAxODoyNTowNi4zNzcyMDMrMDA6MDAiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZXMiOiJhZG1pbiIsInVzZXJJZCI6Mn0.tbCPXjNwy4uSetZC6Jk9SHZ5QwVDtDw9H-OjP11RDSk",
+							"type": "string"
+						}
 					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "DeletePlayerInformation404NF",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Update player information\", function(){\r",
-							"pm.response.to.have.status(404);\r",
-							"var jsonData = pm.response.json();\r",
-							"pm.expect(jsonData).to.eql(\"Player not found\");\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
+				},
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "localhost:5000/api/player/delete/2",
+					"raw": "https://localhost:5000/api/player/delete",
+					"protocol": "https",
 					"host": [
 						"localhost"
 					],
@@ -729,8 +749,7 @@
 					"path": [
 						"api",
 						"player",
-						"delete",
-						"2"
+						"delete"
 					]
 				}
 			},

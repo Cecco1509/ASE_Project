@@ -23,7 +23,7 @@ def getPlayerInformation():
     user_id=user_info_response['data']
     response=getPlayer(user_id)
     if response['status']==200:
-        return  make_response(jsonify(response.json(),200))
+        return  make_response(jsonify(response['data']),200)
     else:
         return make_response(jsonify({"error": "Player not found"}), response['status'])
 
@@ -68,7 +68,7 @@ def delete_player():
     delete_response = deletePlayer(user_id)
     delete_response_status=delete_response['status']
     if delete_response_status == 200:
-        return make_response(jsonify({"message": "Player successfully deleted"}), 200)
+        return make_response(jsonify("Player successfully deleted"), 200)
     elif delete_response_status == 500:
         return make_response(jsonify({"error": "Failed to delete player"}), 500)
     elif delete_response_status == 404:
@@ -144,7 +144,7 @@ def ban_player(user_id):
                 'profilePicture': profilePicture_data
             }
             update_response = banPlayer(user_id)
-            return make_response(jsonify(update_response),update_response['status'])
+            return make_response(jsonify(update_response['data']),update_response['status'])
         return make_response(jsonify({"error":"User not found"}),response['status'])
     return make_response(jsonify({"error": "No status provided"}), 400)
     
