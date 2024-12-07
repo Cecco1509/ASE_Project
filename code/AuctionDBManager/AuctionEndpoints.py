@@ -50,9 +50,9 @@ def update_auction(auctionId):
         return make_response(jsonify({"message":"Auction sucessfully updated."}), 200)
     return make_response(jsonify({"message":"Invalid auction data"}), 400)
 
-@app.route('/auction/user/<int:userId>/<string:status>', methods=['GET'])
+@app.route('/auction/user/<int:userId>/<int:status>', methods=['GET'])
 def user_auctions(userId, status):
-    auctions = db.session.execute(db.select(Auction).where(Auction.status==status, Auction.userId==userId)).scalars()
+    auctions = db.session.execute(db.select(Auction).where(Auction.status==AuctionStatus(status), Auction.userId==userId)).scalars()
     if auctions:
         return make_response(jsonify([auction.to_dict() for auction in auctions]), 200)
     return make_response(jsonify({"message":"Auctions not found"}), 404)
