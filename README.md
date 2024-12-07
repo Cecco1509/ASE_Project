@@ -61,8 +61,9 @@ The primary users of this backend are:
  -  **Clone the Repository**:
 
 ```
-git clone https://github.com/your-repo/ASE-Project.git
-cd ASE-Project
+git clone https://github.com/Cecco1509/ASE_Project.git
+cd ASE_Project
+cd code
 ```
         
  -  **Build and Run the Docker Containers**:
