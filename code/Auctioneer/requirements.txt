@@ -1,2 +1,2 @@
-requests==2.32.3
+requests==2.32.4
 python-json-config==1.2.3
